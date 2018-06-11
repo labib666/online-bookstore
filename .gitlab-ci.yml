@@ -19,8 +19,12 @@ deploy_staging:
     stage: deploy
     script:
         - echo "Not implemented yet"
+    except:
+        - master
 
 deploy_production:
     stage: deploy
     script:
         - echo "Not implemented yet"
+    only:
+        - master
