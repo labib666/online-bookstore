@@ -1,0 +1,26 @@
+image: coffeemate/nodejs
+
+stages:
+    - build
+    - test
+    - deploy
+
+build_app:
+    stage: build
+    script:
+        - echo "Not implemented yet"
+
+test_app:
+    stage: test
+    script:
+        - echo "Not implemented yet"
+
+deploy_staging:
+    stage: deploy
+    script:
+        - echo "Not implemented yet"
+
+deploy_production:
+    stage: deploy
+    script:
+        - echo "Not implemented yet"
