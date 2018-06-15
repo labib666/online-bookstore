@@ -1,0 +1,12 @@
+{
+  "name": "online-bookstore",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@gitlab.com:swe-ninjas/online-bookstore.git",
+  "author": "Hasib <himuhasib@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
