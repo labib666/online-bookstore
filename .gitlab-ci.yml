@@ -8,12 +8,15 @@ stages:
 build_app:
     stage: build
     script:
-        - echo "Not implemented yet"
+        - yarn install
+    artifacts:
+        expire_in: 1 week
+        untracked: true
 
 test_app:
     stage: test
     script:
-        - echo "Not implemented yet"
+        - npm run lint
 
 deploy_staging:
     stage: deploy

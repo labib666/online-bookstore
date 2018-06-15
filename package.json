@@ -1,0 +1,20 @@
+{
+  "name": "online-bookstore",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@gitlab.com:swe-ninjas/online-bookstore.git",
+  "author": "Hasib <himuhasib@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ./"
+  },
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1"
+  }
+}
