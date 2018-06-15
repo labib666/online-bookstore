@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+    web:
+        image: coffeemate/nodejs
+        ports:
+            - 8000:8000
+        volumes:
+            - .:/var/www/swe-ninjas/online-bookstore
+        working_dir: /var/www/swe-ninjas/online-bookstore
+        command: node index.js
