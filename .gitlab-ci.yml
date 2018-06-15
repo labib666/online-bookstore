@@ -16,7 +16,7 @@ build_app:
 test_app:
     stage: test
     script:
-        - echo "Not implemented yet"
+        - npm run lint
 
 deploy_staging:
     stage: deploy
