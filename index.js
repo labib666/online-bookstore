@@ -9,7 +9,7 @@ if(dotenvParsed.error) {
 console.log('Environment variables:', chalk.bold(JSON.stringify(dotenvParsed.parsed, null, 4)));
 
 const app = express();
-const routes = require('./routes/index');
+const routes = require('./app/routes/index');
 app.use(routes);
 
 app.listen(process.env.PORT, () => {
