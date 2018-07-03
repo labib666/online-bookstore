@@ -19,6 +19,12 @@ dbconnection.dbconnect();
 
 const app = express();
 const routes = require('./app/routes/index');
+
+// Add body parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Use routes
 app.use(routes);
 
 app.listen(process.env.PORT, () => {

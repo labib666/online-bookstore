@@ -1,8 +1,13 @@
 const UserController = {
+    Register: (req, res, next) => {
+        next();
+    },
+
     Login: (req, res, next) => {
         res.status(200);
         res.json({
-            message: '12345678'
+            message: 'Logged In',
+            token: 'Token'
         });
         next();
     },
@@ -10,7 +15,7 @@ const UserController = {
     Logout: (req, res, next) => {
         res.status(200);
         res.json({
-            message: 'OK'
+            message: 'Logged Out'
         });
         next();
     }

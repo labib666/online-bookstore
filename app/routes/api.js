@@ -1,7 +1,6 @@
 const express = require('express');
-const UserController = require('../controllers/UserController');
-
 const router = express.Router();
+const UserController = require('../controllers/UserController');
 
 router.get('/', (req, res, next) => {
     res.status(200);
@@ -11,6 +10,7 @@ router.get('/', (req, res, next) => {
     next();
 });
 
+router.post('/register', UserController.Register);
 router.post('/login', UserController.Login);
 router.post('/logout', UserController.Logout);
 

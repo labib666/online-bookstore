@@ -1,9 +1,11 @@
 const express = require('express');
-const web = require('./web');
-const api = require('./api');
+const router = express.Router();
 const chalk = require('chalk');
 const createError = require('http-errors');
 const dbconnection = require('../../database/dbconnection');
+
+const web = require('./web');
+const api = require('./api');
 
 const databaseConnected = (req,res,next) => {
     const connected = dbconnection.isOnline();
@@ -48,13 +50,11 @@ const ErrorLogger = (err, req, res, next) => {
     next();
 };
 
-const router = express.Router();
-
 // make sure database is connected
 router.use(databaseConnected);
 
-router.use('/api', api);
 router.use('/', web);
+router.use('/api', api);
 router.use(HttpNotFound);
 router.use(Logger);
 router.use(ErrorHandler);

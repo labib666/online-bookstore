@@ -11,6 +11,7 @@
     "start": "nodemon --inspect app.js"
   },
   "dependencies": {
+    "bcrypt": "^2.0.1",
     "chalk": "^2.4.1",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
