@@ -10,28 +10,31 @@ const api = require('./api');
 const databaseConnected = (req,res,next) => {
     const connected = dbconnection.isOnline();
     if (connected) {
-        next();
+        return next();
     }
     else {
         const err = createError('500', '500 Internal Server Error');
-        next(err);
+        
+        return next(err);
     }
 };
 
 const HttpNotFound = (req, res, next) => {
     if (!res.headersSent) {
         const err = createError(404, '404 Not Found');
-        next(err);
+        
+        return next(err);
     }
     else {
-        next();
+        return next();
     }
 };
 
 const Logger = (req, res, next) => {
     const time = new Date();
     console.log(chalk.bold(time.toISOString(), req.method, res.statusCode), req.originalUrl);
-    next();
+    
+    return next();
 };
 
 const ErrorHandler = (err, req, res, next) => {
@@ -40,14 +43,16 @@ const ErrorHandler = (err, req, res, next) => {
     res.json({
         message: err.message
     });
-    next(err);
+    
+    return next(err);
 };
 
 const ErrorLogger = (err, req, res, next) => {
     const time = new Date();
     console.log(chalk.bold(time.toISOString(), req.method, res.statusCode), req.originalUrl);
     console.log(chalk.red(err.status,err.message));
-    next();
+    
+    return next();
 };
 
 // make sure database is connected

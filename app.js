@@ -22,7 +22,7 @@ const routes = require('./app/routes/index');
 
 // Add body parser
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 // Use routes
 app.use(routes);
