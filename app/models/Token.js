@@ -2,11 +2,16 @@ var mongoose = require('mongoose');
 var timestamps = require('mongoose-timestamp');
 
 var TokenSchema = new mongoose.Schema({  
-    token: String
+    token: String,
+    expiryTime: {
+        type: Date,
+        expires: 3600,
+        default: Date.now
+    }
 });
 
 TokenSchema.plugin(timestamps);
-TokenSchema.index({ createdAt: 1 }, { expiresAfterSeconds: 3600 });
+TokenSchema.index({ expiryTime: 1 }, { expiresAfterSeconds: 3600 });
 
 mongoose.model('Token', TokenSchema, 'tokens');
 module.exports = mongoose.model('Token');

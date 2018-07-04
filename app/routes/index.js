@@ -62,7 +62,7 @@ router.use(databaseConnected);
 
 // bind the user detail to req
 router.use(bearerToken());
-router.use(authenticate.getUserData(),authenticate.failedJWT());
+router.use(authenticate.getUserData,authenticate.failedJWT);
 
 router.use('/', web);
 router.use('/api', api);
