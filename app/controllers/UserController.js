@@ -1,7 +1,13 @@
 const createError = require('http-errors');
 const bcrypt = require('bcrypt');
+const JWT = require('jsonwebtoken');
 const User = require('../models/User');
 const Token = require('../models/Token');
+
+const jwtSecret = process.env.JWT_SECRET;
+const jwtOptions = {
+    expiresIn: '10m'
+};
 
 const valid = {
     // validate the username
@@ -20,6 +26,13 @@ const valid = {
 
 const UserController = {
     Register: (req, res, next) => {
+        // user is already logged in? 
+        if (req.user) {
+            const err = createError(400, 'user already logged in');
+            
+            return next(err);
+        }
+
         const username = req.body.username;
         const email = req.body.email;
         const password = req.body.password;
@@ -62,6 +75,12 @@ const UserController = {
     },
 
     Login: (req, res, next) => {
+        // user is already logged in? 
+        if (req.user) {
+            const err = createError(400, 'user already logged in');
+            
+            return next(err);
+        }
         const username = req.body.username;
         const password = req.body.password;
 
@@ -91,28 +110,62 @@ const UserController = {
                 }
                 // password matches
                 // create an API token against this request
-                const token = 'replace with jwt';
+                let token;
+                try {
+                    token = JWT.sign({
+                        _id: user._id,
+                        createdAt: new Date()
+                    }, jwtSecret, jwtOptions);
+                }
+                catch (err) {
+                    return next(err);
+                }
 
-                // save the token and respond to user
-                Token.create({
-                    token: token
-                }, (err, newToken) => {
+                // duplicate request?
+                Token.findOne({ token: token }, (err,exToken) => {
                     if (err) return next(err);
-                    // new token created
-                    console.log(newToken.token, 'created at', newToken.createdAt);
-                    res.status(200).json({
-                        message: 'login successful',
-                        token: token
-                    });
+                    if (exToken) {
+                        const err = createError(400,'Duplicate request');
                     
-                    return next();
+                        return next(err);
+                    }
+                    // save the token and respond to user
+                    Token.create({
+                        token: token
+                    }, (err, newToken) => {
+                        if (err) return next(err);
+                        // new token created
+                        console.log(newToken.token, 'created at', newToken.createdAt);
+                        res.status(200).json({
+                            message: 'login successful',
+                            token: token
+                        });
+                        
+                        return next();
+                    });
                 });
             });
         }
     },
 
     Logout: (req, res, next) => {
-        next();
+        // user is already logged in? 
+        if (!req.user) {
+            const err = createError(400, 'user not logged in');
+            
+            return next(err);
+        }
+
+        // logout the user
+        Token.findByIdAndRemove(req.token, (err, token) => {
+            if (err) return next(err);
+            res.status(200).json({
+                message: 'logout successful',
+                removedToken: token
+            });
+            
+            return next();
+        });
     }
 };
 

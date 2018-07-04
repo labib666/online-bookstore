@@ -6,6 +6,7 @@ var TokenSchema = new mongoose.Schema({
 });
 
 TokenSchema.plugin(timestamps);
+TokenSchema.index({ createdAt: 1 }, { expiresAfterSeconds: 3600 });
 
 mongoose.model('Token', TokenSchema, 'tokens');
 module.exports = mongoose.model('Token');

@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const chalk = require('chalk');
 const createError = require('http-errors');
+const bearerToken = require('express-bearer-token');
 const dbconnection = require('../../database/dbconnection');
+const authenticate = require('../controllers/AuthController');
 
 const web = require('./web');
 const api = require('./api');
@@ -57,6 +59,10 @@ const ErrorLogger = (err, req, res, next) => {
 
 // make sure database is connected
 router.use(databaseConnected);
+
+// bind the user detail to req
+router.use(bearerToken());
+router.use(authenticate.getUserData(),authenticate.failedJWT());
 
 router.use('/', web);
 router.use('/api', api);
