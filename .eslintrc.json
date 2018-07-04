@@ -35,6 +35,7 @@
         "padded-blocks": [
             "error",
             "never"
-        ]
+        ],
+        "brace-style": "error"
     }
 }
