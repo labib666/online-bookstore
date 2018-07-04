@@ -16,6 +16,7 @@
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
     "express-bearer-token": "^2.1.1",
+    "htmlspecialchars": "^1.0.5",
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.1.7",
     "mongoose-timestamp": "^0.6.0"

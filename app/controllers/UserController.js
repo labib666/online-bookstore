@@ -1,10 +1,10 @@
 const createError = require('http-errors');
 const bcrypt = require('bcrypt');
 const JWT = require('jsonwebtoken');
+const htmlspecialchars = require('htmlspecialchars');
 const User = require('../models/User');
 const Token = require('../models/Token');
 
-const jwtSecret = process.env.JWT_SECRET;
 const jwtOptions = {
     expiresIn: '10m'
 };
@@ -12,15 +12,31 @@ const jwtOptions = {
 const valid = {
     // validate the username
     username: (username) => {
-        return (!username) ? false : true;
+        const regex = new RegExp('^[a-zA-Z][a-zA-Z0-9_]*[a-zA-Z0-9]$');
+        //console.log(username, regex.test(username));
+        
+        return (regex.test(username) && username.length >= 4 && username.length <= 20);
     },
     // validate the email
     email: (email) => {
-        return (!email) ? false : true;
+        const regex = new RegExp('^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$');
+        //console.log(email, regex.test(email));
+        
+        return regex.test(email);
+    },
+    // validate the username
+    name: (name) => {
+        const regex = new RegExp('^[a-zA-Z]+([ ][a-zA-Z]+)*([ ][a-zA-Z]+)$');
+        //console.log(name, regex.test(name));
+        
+        return (regex.test(name) && name.length >= 4 && name.length <= 20);
     },
     // validate the password
     password: (password) => {
-        return (!password) ? false : true;
+        const regex = new RegExp('^[^\n\r ]{4,20}$');
+        //console.log(password, regex.test(password));
+        
+        return regex.test(password);
     }
 };
 
@@ -33,12 +49,13 @@ const UserController = {
             return next(err);
         }
 
-        const username = req.body.username;
+        const username = htmlspecialchars(req.body.username);
         const email = req.body.email;
+        const name = htmlspecialchars(req.body.name);
         const password = req.body.password;
 
         // validate credentials
-        if ( !valid.username(username) || !valid.email(email) || !valid.password(password) ) {
+        if ( !valid.username(username) || !valid.email(email) || !valid.name(name) || !valid.password(password) ) {
             const err = createError(400,'Invalid Username, Email or Password');
             
             return next(err);
@@ -46,7 +63,7 @@ const UserController = {
         // credentials are okay
         else {
             const hashedPassword = bcrypt.hashSync(password,12);
-            User.find({ $or:[ {username: username}, {email: email} ] }, (err, user) => {
+            User.findOne({ $or:[ {username: username}, {email: email} ] }, (err, user) => {
                 if (err) return next(err);
                 // same username or email exists
                 if (user) {
@@ -112,10 +129,11 @@ const UserController = {
                 // create an API token against this request
                 let token;
                 try {
-                    token = JWT.sign({
+                    const payload = {
                         _id: user._id,
                         createdAt: new Date()
-                    }, jwtSecret, jwtOptions);
+                    };
+                    token = JWT.sign(payload, process.env.JWT_SECRET, jwtOptions);
                 }
                 catch (err) {
                     return next(err);

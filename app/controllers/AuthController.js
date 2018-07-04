@@ -1,7 +1,6 @@
 const JWT = require('jsonwebtoken');
 const Token = require('../models/Token');
 
-const jwtSecret = process.env.JWT_SECRET;
 const jwtOptions = {
     ignoreExpiration: true
 };
@@ -18,7 +17,7 @@ const AuthController = {
         else {
             // works asynchronously when there is a callback
             // payload contains decoded token
-            JWT.verify(req.token,jwtSecret,jwtOptions, (err, payload) => {
+            JWT.verify(req.token,process.env.JWT_SECRET,jwtOptions, (err, payload) => {
                 if (err) return next(err);
                 // see if the token exists in database
                 Token.findOne({ token: req.token }, (err, token) => {
@@ -26,6 +25,12 @@ const AuthController = {
                         err.status = 500;
                         
                         return next(err);
+                    }
+                    // no such token exists
+                    if (!token) {
+                        req.user = null;
+                        
+                        return next();
                     }
                     // if all is ok, attach the user id to req
                     req.user = payload._id;

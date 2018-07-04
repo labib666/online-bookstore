@@ -32,3 +32,12 @@ dbconnection.dbconnect();
 app.listen(process.env.PORT, () => {
     console.log(`App running on port ${process.env.PORT}.`);
 });
+
+// Close DB connection when process ends
+
+process.on('SIGINT', () => {
+    dbconnection.dbclose( () => {
+        console.log(chalk.bold('Database connection closed'));
+        process.exit(0);
+    });
+});
