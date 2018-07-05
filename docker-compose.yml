@@ -8,4 +8,10 @@ services:
         volumes:
             - .:/var/www/swe-ninjas/online-bookstore
         working_dir: /var/www/swe-ninjas/online-bookstore
-        command: node index.js
+        command: node app.js
+
+    mongodb:
+        image: mongo
+        restart: unless-stopped
+        environment:
+            MONGO_INITDB_DATABASE: online-bookstore
