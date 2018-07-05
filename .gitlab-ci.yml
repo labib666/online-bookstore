@@ -9,6 +9,8 @@ build_app:
     stage: build
     script:
         - yarn install
+        - cd resources && yarn install
+        - yarn run build
     artifacts:
         expire_in: 1 week
         untracked: true

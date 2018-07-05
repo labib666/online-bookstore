@@ -4,6 +4,9 @@ node_modules/
 # Environment secrets
 .env
 
+# Generated frontend code
+public/
+
 # Log files
 *.log
 npm-debug.log*
