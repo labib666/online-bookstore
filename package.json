@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "lint": "eslint ./",
-    "start": "nodemon --inspect app.js"
+    "start": "nodemon --inspect app.js",
+    "build": "rm -rf public && mkdir -p public && cd resources && yarn run build && cp -r ./dist/. ../public"
   },
   "dependencies": {
     "bootstrap": "^4.1.1",
