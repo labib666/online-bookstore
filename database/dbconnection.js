@@ -13,7 +13,7 @@ function connect () {
             dbErrorHandler(err);
         }
     );
-    
+
     return mongoose.connection;
 }
 

@@ -18,7 +18,8 @@ build_app:
 test_app:
     stage: test
     script:
-        - npm run lint
+        - yarn run lint
+        - cd resources && yarn run lint
 
 deploy_staging:
     stage: deploy

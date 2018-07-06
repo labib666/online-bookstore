@@ -6,11 +6,9 @@ const AuthController = {
         // user did not send a token
         if (!req.token) {
             req.user = null;
-            
+
             return next();
-        }
-        // verify the payload
-        else {
+        } else { // verify the payload
             const jwtSecret = process.env.JWT_SECRET;
             const jwtOptions = {
                 ignoreExpiration: true
@@ -23,13 +21,13 @@ const AuthController = {
                 Token.findOne({ token: req.token }, (err, token) => {
                     if (err) {
                         err.status = 500;
-                        
+
                         return next(err);
                     }
                     // no such token exists
                     if (!token) {
                         req.user = null;
-                        
+
                         return next();
                     }
                     // if all is ok, attach the user id to req
@@ -37,7 +35,7 @@ const AuthController = {
 
                     // change the token to its id in token table
                     req.token = token._id;
-                    
+
                     return next();
                 });
             });
@@ -47,7 +45,7 @@ const AuthController = {
         if (err.status === 500) return next(err);
         err.status = 400;
         err.message = 'invalid JWT';
-        
+
         return next(err);
     }
 };

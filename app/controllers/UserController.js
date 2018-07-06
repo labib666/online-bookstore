@@ -41,10 +41,10 @@ const validate = {
 
 const UserController = {
     Register: (req, res, next) => {
-        // user is already logged in? 
+        // user is already logged in?
         if (req.user) {
             const err = createError(400, 'user already logged in');
-            
+
             return next(err);
         }
 
@@ -55,16 +55,14 @@ const UserController = {
         validate.password(req);
 
         const error = req.validationErrors();
-        
+
         // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(400);
             err.message = error;
-            
+
             return next(err);
-        }
-        // credentials are okay
-        else {
+        } else { // Credentials are okay
             const name = req.body.name;
             const username = req.body.username;
             const email = req.body.email;
@@ -76,7 +74,7 @@ const UserController = {
                 // same username or email exists
                 if (user) {
                     const err = createError(400,'Username or Email already in use');
-                    
+
                     return next(err);
                 }
                 // duplicate does not exist. create new user
@@ -93,18 +91,18 @@ const UserController = {
                         message: 'registration successful',
                         username: username
                     });
-                    
+
                     return next();
                 });
             });
         }
     },
-    
+
     Login: (req, res, next) => {
-        // user is already logged in? 
+        // user is already logged in?
         if (req.user) {
             const err = createError(400, 'user already logged in');
-            
+
             return next(err);
         }
 
@@ -113,16 +111,14 @@ const UserController = {
         validate.password(req);
 
         const error = req.validationErrors();
-        
+
         // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(400);
             err.message = error;
-            
+
             return next(err);
-        }
-        // credentials are okay
-        else {
+        } else { // credentials are okay
             const username = req.body.username;
             const password = req.body.password;
             // look for a user with this credential
@@ -131,14 +127,14 @@ const UserController = {
                 // user does not exist
                 if (!user) {
                     const err = createError(400,'Invalid Username');
-                    
+
                     return next(err);
                 }
                 // user exists, check password
                 // password does not match
                 if (!bcrypt.compareSync(password,user.password)) {
                     const err = createError(400,'Password Mismatch');
-                    
+
                     return next(err);
                 }
                 // password matches
@@ -154,8 +150,7 @@ const UserController = {
                         ticket: randomstring.generate(50)
                     };
                     token = JWT.sign(payload, jwtSecret, jwtOptions);
-                }
-                catch (err) {
+                } catch (err) {
                     return next(err);
                 }
 
@@ -170,7 +165,7 @@ const UserController = {
                         message: 'login successful',
                         token: token
                     });
-                        
+
                     return next();
                 });
             });
@@ -178,10 +173,10 @@ const UserController = {
     },
 
     Logout: (req, res, next) => {
-        // user is not logged in? 
+        // user is not logged in?
         if (!req.user) {
             const err = createError(400, 'user not logged in');
-            
+
             return next(err);
         }
 
@@ -192,7 +187,7 @@ const UserController = {
                 message: 'logout successful',
                 removedToken: token
             });
-            
+
             return next();
         });
     }

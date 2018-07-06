@@ -12,10 +12,9 @@ const databaseConnected = (req,res,next) => {
     const connected = dbconnection.isOnline();
     if (connected) {
         return next();
-    }
-    else {
+    } else {
         const err = createError('500', '500 Internal Server Error');
-        
+
         return next(err);
     }
 };
@@ -23,10 +22,9 @@ const databaseConnected = (req,res,next) => {
 const HttpNotFound = (req, res, next) => {
     if (!res.headersSent) {
         const err = createError(404, '404 Not Found');
-        
+
         return next(err);
-    }
-    else {
+    } else {
         return next();
     }
 };
@@ -34,7 +32,7 @@ const HttpNotFound = (req, res, next) => {
 const Logger = (req, res, next) => {
     const time = new Date();
     console.log(chalk.bold(time.toISOString(), req.method, res.statusCode), req.originalUrl);
-    
+
     return next();
 };
 
@@ -44,7 +42,7 @@ const ErrorHandler = (err, req, res, next) => {
     res.json({
         message: err.message
     });
-    
+
     return next(err);
 };
 
@@ -52,7 +50,7 @@ const ErrorLogger = (err, req, res, next) => {
     const time = new Date();
     console.log(chalk.bold(time.toISOString(), req.method, res.statusCode), req.originalUrl);
     console.log(chalk.red(err.status,err.message));
-    
+
     return next();
 };
 
