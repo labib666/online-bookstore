@@ -9,22 +9,33 @@ const validate = {
     // validate the name
     name: (req) => {
         req.checkBody('name')
-            .exists();
+            .exists().notEmpty()
+            .trim().escape()
+            .matches('^[A-Z a-z]+$')
+            .isLength({ min: 4, max: 30 });
     },
     // validate the username
     username: (req) => {
         req.checkBody('username')
-            .exists();
+            .exists().notEmpty()
+            .trim().escape()
+            .isAlphanumeric()
+            .isLength({ min: 4, max: 20 });
     },
     // validate the email
     email: (req) => {
         req.checkBody('email')
-            .exists();
+            .exists().notEmpty()
+            .trim().escape()
+            .isEmail();
     },
     // validate the password
     password: (req) => {
         req.checkBody('password')
-            .exists();
+            .exists().notEmpty()
+            .trim().escape()
+            .matches('^[^ \t\n\r]+$')
+            .isLength({ min: 4, max: 20 });
     },
 };
 
@@ -42,6 +53,7 @@ const UserController = {
         validate.username(req);
         validate.email(req);
         validate.password(req);
+
         const error = req.validationErrors();
         
         // errors faced while validating / sanitizing
@@ -57,8 +69,8 @@ const UserController = {
             const username = req.body.username;
             const email = req.body.email;
             const password = req.body.password;
-
             const hashedPassword = bcrypt.hashSync(password,12);
+
             User.findOne({ $or:[ {username: username}, {email: email} ] }, (err, user) => {
                 if (err) return next(err);
                 // same username or email exists
@@ -99,6 +111,7 @@ const UserController = {
         // validate and sanitize the incoming data
         validate.username(req);
         validate.password(req);
+
         const error = req.validationErrors();
         
         // errors faced while validating / sanitizing
@@ -146,28 +159,19 @@ const UserController = {
                     return next(err);
                 }
 
-                // duplicate request?
-                Token.findOne({ token: token }, (err,exToken) => {
+                // save the token and respond to user
+                Token.create({
+                    token: token
+                }, (err, newToken) => {
                     if (err) return next(err);
-                    if (exToken) {
-                        const err = createError(400,'Duplicate request');
-                    
-                        return next(err);
-                    }
-                    // save the token and respond to user
-                    Token.create({
+                    // new token created
+                    console.log('new token created at', newToken.createdAt);
+                    res.status(200).json({
+                        message: 'login successful',
                         token: token
-                    }, (err, newToken) => {
-                        if (err) return next(err);
-                        // new token created
-                        console.log(newToken.token, 'created at', newToken.createdAt);
-                        res.status(200).json({
-                            message: 'login successful',
-                            token: token
-                        });
-                        
-                        return next();
                     });
+                        
+                    return next();
                 });
             });
         }

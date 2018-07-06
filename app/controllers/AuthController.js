@@ -17,7 +17,7 @@ const AuthController = {
             };
             // works asynchronously when there is a callback
             // payload contains decoded token
-            JWT.verify(req.token,jwtSecret,jwtOptions, (err, payload) => {
+            JWT.verify(req.token, jwtSecret, jwtOptions, (err, payload) => {
                 if (err) return next(err);
                 // see if the token exists in database
                 Token.findOne({ token: req.token }, (err, token) => {
