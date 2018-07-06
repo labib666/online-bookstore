@@ -1,5 +1,4 @@
 const express = require('express');
-const router = express.Router();
 const chalk = require('chalk');
 const createError = require('http-errors');
 const bearerToken = require('express-bearer-token');
@@ -56,6 +55,8 @@ const ErrorLogger = (err, req, res, next) => {
     
     return next();
 };
+
+const router = express.Router();
 
 // make sure database is connected
 router.use(databaseConnected);

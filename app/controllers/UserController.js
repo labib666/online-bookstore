@@ -1,43 +1,31 @@
 const createError = require('http-errors');
 const bcrypt = require('bcrypt');
 const JWT = require('jsonwebtoken');
-const htmlspecialchars = require('htmlspecialchars');
+const randomstring = require('randomstring');
 const User = require('../models/User');
 const Token = require('../models/Token');
 
-const jwtOptions = {
-    expiresIn: '10m'
-};
-
-const valid = {
+const validate = {
+    // validate the name
+    name: (req) => {
+        req.checkBody('name')
+            .exists();
+    },
     // validate the username
-    username: (username) => {
-        const regex = new RegExp('^[a-zA-Z][a-zA-Z0-9_]*[a-zA-Z0-9]$');
-        //console.log(username, regex.test(username));
-        
-        return (regex.test(username) && username.length >= 4 && username.length <= 20);
+    username: (req) => {
+        req.checkBody('username')
+            .exists();
     },
     // validate the email
-    email: (email) => {
-        const regex = new RegExp('^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$');
-        //console.log(email, regex.test(email));
-        
-        return regex.test(email);
-    },
-    // validate the username
-    name: (name) => {
-        const regex = new RegExp('^[a-zA-Z]+([ ][a-zA-Z]+)*([ ][a-zA-Z]+)$');
-        //console.log(name, regex.test(name));
-        
-        return (regex.test(name) && name.length >= 4 && name.length <= 20);
+    email: (req) => {
+        req.checkBody('email')
+            .exists();
     },
     // validate the password
-    password: (password) => {
-        const regex = new RegExp('^[^\n\r ]{4,20}$');
-        //console.log(password, regex.test(password));
-        
-        return regex.test(password);
-    }
+    password: (req) => {
+        req.checkBody('password')
+            .exists();
+    },
 };
 
 const UserController = {
@@ -49,19 +37,27 @@ const UserController = {
             return next(err);
         }
 
-        const username = htmlspecialchars(req.body.username);
-        const email = req.body.email;
-        const name = htmlspecialchars(req.body.name);
-        const password = req.body.password;
-
-        // validate credentials
-        if ( !valid.username(username) || !valid.email(email) || !valid.name(name) || !valid.password(password) ) {
-            const err = createError(400,'Invalid Username, Email or Password');
+        // validate and sanitize the incoming data
+        validate.name(req);
+        validate.username(req);
+        validate.email(req);
+        validate.password(req);
+        const error = req.validationErrors();
+        
+        // errors faced while validating / sanitizing
+        if ( error ) {
+            const err = createError(400);
+            err.message = error;
             
             return next(err);
         }
         // credentials are okay
         else {
+            const name = req.body.name;
+            const username = req.body.username;
+            const email = req.body.email;
+            const password = req.body.password;
+
             const hashedPassword = bcrypt.hashSync(password,12);
             User.findOne({ $or:[ {username: username}, {email: email} ] }, (err, user) => {
                 if (err) return next(err);
@@ -73,6 +69,7 @@ const UserController = {
                 }
                 // duplicate does not exist. create new user
                 User.create({
+                    name: name,
                     username: username,
                     email: email,
                     password: hashedPassword
@@ -90,7 +87,7 @@ const UserController = {
             });
         }
     },
-
+    
     Login: (req, res, next) => {
         // user is already logged in? 
         if (req.user) {
@@ -98,17 +95,23 @@ const UserController = {
             
             return next(err);
         }
-        const username = req.body.username;
-        const password = req.body.password;
 
-        // validate credentials
-        if ( !valid.username(username) || !valid.password(password) ) {
-            const err = createError(400,'Invalid Username or Password');
+        // validate and sanitize the incoming data
+        validate.username(req);
+        validate.password(req);
+        const error = req.validationErrors();
+        
+        // errors faced while validating / sanitizing
+        if ( error ) {
+            const err = createError(400);
+            err.message = error;
             
             return next(err);
         }
         // credentials are okay
         else {
+            const username = req.body.username;
+            const password = req.body.password;
             // look for a user with this credential
             User.findOne({ username: username }, (err,user) => {
                 if (err) return next(err);
@@ -127,13 +130,17 @@ const UserController = {
                 }
                 // password matches
                 // create an API token against this request
+                const jwtSecret = process.env.JWT_SECRET;
+                const jwtOptions = {
+                    expiresIn: '30d'
+                };
                 let token;
                 try {
                     const payload = {
                         _id: user._id,
-                        createdAt: new Date()
+                        ticket: randomstring.generate(50)
                     };
-                    token = JWT.sign(payload, process.env.JWT_SECRET, jwtOptions);
+                    token = JWT.sign(payload, jwtSecret, jwtOptions);
                 }
                 catch (err) {
                     return next(err);
@@ -167,7 +174,7 @@ const UserController = {
     },
 
     Logout: (req, res, next) => {
-        // user is already logged in? 
+        // user is not logged in? 
         if (!req.user) {
             const err = createError(400, 'user not logged in');
             

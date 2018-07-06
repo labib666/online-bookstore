@@ -1,5 +1,4 @@
 const express = require('express');
-const app = express();
 const dotenv = require('dotenv');
 const chalk = require('chalk');
 const path = require('path');
@@ -13,6 +12,8 @@ if(dotenvParsed.error) {
     throw dotenvParsed.error;
 }
 console.log('Environment variables:', chalk.bold(JSON.stringify(dotenvParsed.parsed, null, 4)));
+
+const app = express();
 
 // Add body parser and public assets
 app.use(express.json());

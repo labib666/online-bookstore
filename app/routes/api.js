@@ -1,6 +1,8 @@
 const express = require('express');
-const router = express.Router();
+const expressValidator = require('express-validator');
 const UserController = require('../controllers/UserController');
+
+const router = express.Router();
 
 router.get('/', (req, res, next) => {
     res.status(200).json({
@@ -10,8 +12,8 @@ router.get('/', (req, res, next) => {
     return next();
 });
 
-router.post('/register', UserController.Register);
-router.post('/login', UserController.Login);
+router.post('/register', expressValidator(), UserController.Register);
+router.post('/login', expressValidator(), UserController.Login);
 router.post('/logout', UserController.Logout);
 
 module.exports = router;
