@@ -1,35 +1,41 @@
 const express = require('express');
-const web = require('./web');
-const api = require('./api');
 const chalk = require('chalk');
 const createError = require('http-errors');
+const bearerToken = require('express-bearer-token');
 const dbconnection = require('../../database/dbconnection');
+const authenticate = require('../controllers/AuthController');
+
+const web = require('./web');
+const api = require('./api');
 
 const databaseConnected = (req,res,next) => {
     const connected = dbconnection.isOnline();
     if (connected) {
-        next();
+        return next();
     }
     else {
         const err = createError('500', '500 Internal Server Error');
-        next(err);
+        
+        return next(err);
     }
 };
 
 const HttpNotFound = (req, res, next) => {
     if (!res.headersSent) {
         const err = createError(404, '404 Not Found');
-        next(err);
+        
+        return next(err);
     }
     else {
-        next();
+        return next();
     }
 };
 
 const Logger = (req, res, next) => {
     const time = new Date();
     console.log(chalk.bold(time.toISOString(), req.method, res.statusCode), req.originalUrl);
-    next();
+    
+    return next();
 };
 
 const ErrorHandler = (err, req, res, next) => {
@@ -38,14 +44,16 @@ const ErrorHandler = (err, req, res, next) => {
     res.json({
         message: err.message
     });
-    next(err);
+    
+    return next(err);
 };
 
 const ErrorLogger = (err, req, res, next) => {
     const time = new Date();
     console.log(chalk.bold(time.toISOString(), req.method, res.statusCode), req.originalUrl);
     console.log(chalk.red(err.status,err.message));
-    next();
+    
+    return next();
 };
 
 const router = express.Router();
@@ -53,8 +61,12 @@ const router = express.Router();
 // make sure database is connected
 router.use(databaseConnected);
 
-router.use('/api', api);
+// bind the user detail to req
+router.use(bearerToken());
+router.use(authenticate.getUserData,authenticate.failedJWT);
+
 router.use('/', web);
+router.use('/api', api);
 router.use(HttpNotFound);
 router.use(Logger);
 router.use(ErrorHandler);

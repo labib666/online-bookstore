@@ -1,6 +1,8 @@
-const dotenv = require('dotenv');
 const express = require('express');
+const dotenv = require('dotenv');
 const chalk = require('chalk');
+const path = require('path');
+const routes = require('./app/routes/index');
 const dbconnection = require('./database/dbconnection');
 
 // Importing Environment variables from .env file
@@ -11,15 +13,22 @@ if(dotenvParsed.error) {
 }
 console.log('Environment variables:', chalk.bold(JSON.stringify(dotenvParsed.parsed, null, 4)));
 
+const app = express();
+
+// Add body parser and public assets
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Use routes
+
+app.use(routes);
+
 // Start database connection
 
 dbconnection.dbconnect();
 
 // Start the node server
-
-const app = express();
-const routes = require('./app/routes/index');
-app.use(routes);
 
 app.listen(process.env.PORT, () => {
     console.log(`App running on port ${process.env.PORT}.`);
