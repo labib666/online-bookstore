@@ -6,14 +6,14 @@
                 <div class="form-group row">
                     <label for="username" class="col-md-4 col-form-label col-form-label-lg">Username</label>
                     <div class="col-md-8">
-                        <input id="username" class="form-control form-control-lg" />
+                        <input id="username" v-model="username" class="form-control form-control-lg" />
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label for="password" class="col-md-4 col-form-label col-form-label-lg">Password</label>
                     <div class="col-md-8">
-                        <input type="password" id="password" class="form-control form-control-lg" />
+                        <input type="password" v-model="password" id="password" class="form-control form-control-lg" />
                     </div>
                 </div>
 
@@ -22,7 +22,7 @@
                     <a href="#" v-on:click="toggleLoginRegister">Create an account</a>
                 </div>
                 <div class="float-right">
-                    <button type="submit" class="btn btn-primary mb-2">Login</button>
+                    <button @click="login()" type="submit" class="btn btn-primary mb-2">Login</button>
                 </div>
             </div>
         </div>
@@ -33,10 +33,28 @@
 // @ is an alias to /src
 import { mapMutations } from 'vuex';
 export default {
+    data () {
+        return {
+            username: '',
+            password: ''
+        };
+    },
+
     methods: {
         ...mapMutations([
-            'toggleLoginRegister'
-        ])
+            'toggleLoginRegister',
+            'authSuccess'
+        ]),
+        login () {
+            this.$http.post('/login', {
+                username: this.username,
+                password: this.password
+            }).then((res) => {
+                console.log(res);
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
     }
 };
 </script>

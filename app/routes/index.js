@@ -19,6 +19,13 @@ const databaseConnected = (req,res,next) => {
     }
 };
 
+const CORS = (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+    return next();
+};
+
 const HttpNotFound = (req, res, next) => {
     if (!res.headersSent) {
         const err = createError(404, '404 Not Found');
@@ -55,13 +62,14 @@ const ErrorLogger = (err, req, res, next) => {
 };
 
 const router = express.Router();
+router.use(CORS);
 
 // make sure database is connected
 router.use(databaseConnected);
 
 // bind the user detail to req
 router.use(bearerToken());
-router.use(authenticate.getUserData,authenticate.failedJWT);
+router.use(authenticate.getUserData, authenticate.failedJWT);
 
 router.use('/', web);
 router.use('/api', api);

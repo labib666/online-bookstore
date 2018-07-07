@@ -6,28 +6,28 @@
                 <div class="form-group row">
                     <label for="name" class="col-md-4 col-form-label col-form-label-lg">Full name</label>
                     <div class="col-md-8">
-                        <input id="name" class="form-control form-control-lg" />
+                        <input id="name" v-model="name" class="form-control form-control-lg" />
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label for="username" class="col-md-4 col-form-label col-form-label-lg">Username</label>
                     <div class="col-md-8">
-                        <input id="username" class="form-control form-control-lg" />
+                        <input id="username" v-model="username" class="form-control form-control-lg" />
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label for="email" class="col-md-4 col-form-label col-form-label-lg">E-mail</label>
                     <div class="col-md-8">
-                        <input id="email" class="form-control form-control-lg" />
+                        <input id="email" v-model="email" class="form-control form-control-lg" />
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label for="password" class="col-md-4 col-form-label col-form-label-lg">Password</label>
                     <div class="col-md-8">
-                        <input type="password" id="password" class="form-control form-control-lg" />
+                        <input type="password" v-model="password" id="password" class="form-control form-control-lg" />
                     </div>
                 </div>
 
@@ -36,7 +36,7 @@
                     <a href="#" v-on:click="toggleLoginRegister">Already have an account?</a>
                 </div>
                 <div class="float-right">
-                    <button type="submit" class="btn btn-primary mb-2">Register</button>
+                    <button type="submit" @click="register()" class="btn btn-primary mb-2">Register</button>
                 </div>
             </div>
         </div>
@@ -47,10 +47,39 @@
 // @ is an alias to /src
 import { mapMutations } from 'vuex';
 export default {
+    data () {
+        return {
+            name: '',
+            username: '',
+            email: '',
+            password: ''
+        };
+    },
+
     methods: {
         ...mapMutations([
             'toggleLoginRegister'
-        ])
+        ]),
+
+        register () {
+            this.$http.post('/register', {
+                name: this.name,
+                username: this.username,
+                email: this.email,
+                password: this.password
+            }).then((res) => {
+                this.$notify({
+                    text: 'Account created successfully!'
+                });
+                this.toggleLoginRegister();
+            }).catch((err) => {
+                if (err.response) {
+                    this.$notify({
+                        text: JSON.stringify(err.response.data)
+                    });
+                }
+            });
+        }
     }
 };
 </script>
