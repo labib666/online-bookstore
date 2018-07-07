@@ -50,7 +50,12 @@ export default {
                 username: this.username,
                 password: this.password
             }).then((res) => {
-                console.log(res);
+                window.localStorage.apitoken = res.token;
+                this.authSuccess();
+                this.$notify({
+                    text: 'Login Successful'
+                });
+                this.$router.push('/dashboard');
             }).catch((err) => {
                 console.log(err);
             });

@@ -5,9 +5,15 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 
 export default {
+    computed: {
+        ...mapState([
+            'isAuthSuccess',
+            'isAuthAttempted'
+        ])
+    },
     mounted () {
         setTimeout(() => {
             this.authAttempted();
