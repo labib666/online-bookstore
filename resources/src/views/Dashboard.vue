@@ -21,6 +21,5 @@ export default {
             'isAuthSuccess'
         ])
     }
-
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <AttemptAuth v-if="!isAuthAttempted"></AttemptAuth>
+        <div v-if="!isAuthAttempted">Loading...</div>
         <div v-if="isAuthAttempted" class="flex-center full-height home">
             <div class="flex-container">
                 <h1 class="m-b-md center-content">Online Bookstore</h1>
@@ -18,7 +18,7 @@
 
 <script>
 // @ is an alias to /src
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import AttemptAuth from '@/components/AttemptAuth';
 import Login from '@/components/Login.vue';
 import Register from '@/components/Register.vue';
@@ -26,13 +26,13 @@ import Register from '@/components/Register.vue';
 export default {
     name: 'home',
     components: {
-        AttemptAuth,
         Login,
         Register
     },
-    mounted () {
-        if (this.isAuthSuccess) {
-            this.$router.push('/dashboard');
+
+    data() {
+        return {
+            isAuthAttempted: false,
         }
     },
 
@@ -40,9 +40,39 @@ export default {
         ...mapState([
             'loginOrRegisterChoice',
             'isAuthSuccess',
-            'isAuthAttempted'
         ])
-    }
+    },
+
+    methods: {
+        ...mapMutations([
+            'authSuccess'
+        ])
+    },
+
+    mounted () {
+        if (this.isAuthSuccess) {
+            const path = this.$route.query.redirect || '/dashboard';
+            this.$router.push(path);
+            return;
+        }
+
+        if( ! ('apitoken' in window.localStorage)) {
+            this.isAuthAttempted = true;
+            return;
+        }
+
+        const apitoken = window.localStorage.apitoken;
+        this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + apitoken;
+        this.$http.get('/user')
+            .then((res) => {
+                this.authSuccess(res.data.user);
+                const path = this.$route.query.redirect || '/dashboard';
+                this.$router.push(path);
+            })
+            .catch((err) => {
+                this.isAuthAttempted = true;
+            });
+    },
 };
 </script>
 

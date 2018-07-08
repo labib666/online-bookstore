@@ -6,7 +6,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         loginOrRegisterChoice: true,
-        isAuthAttempted: false,
         isAuthSuccess: false,
         user: null
     },
@@ -17,9 +16,6 @@ export default new Vuex.Store({
         authSuccess (store, user) {
             store.isAuthSuccess = true;
             store.user = user;
-        },
-        authAttempted (store) {
-            store.isAuthAttempted = true;
         }
     },
     actions: {

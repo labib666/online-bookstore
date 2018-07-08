@@ -22,7 +22,7 @@
                     <a href="#" v-on:click="toggleLoginRegister">Create an account</a>
                 </div>
                 <div class="float-right">
-                    <button @click="login()" type="submit" class="btn btn-primary mb-2">Login</button>
+                    <button @click="login" type="submit" class="btn btn-primary mb-2">Login</button>
                 </div>
             </div>
         </div>
@@ -43,21 +43,23 @@ export default {
     methods: {
         ...mapMutations([
             'toggleLoginRegister',
-            'authSuccess'
         ]),
         login () {
             this.$http.post('/login', {
                 username: this.username,
                 password: this.password
             }).then((res) => {
-                window.localStorage.apitoken = res.token;
-                this.authSuccess();
+                window.localStorage.apitoken = res.data.token;
                 this.$notify({
                     text: 'Login Successful'
                 });
-                this.$router.push('/dashboard');
+                const path = this.$route.query.redirect || '/dashboard';
+                this.$router.push(path);
             }).catch((err) => {
-                console.log(err);
+                this.$notify({
+                    text: 'Login failed',
+                    type: 'error'
+                });
             });
         }
     }
