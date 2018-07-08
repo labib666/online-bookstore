@@ -190,6 +190,30 @@ const UserController = {
 
             return next();
         });
+    },
+
+    getProfile: (req, res, next) => {
+        // user is not logged in?
+        if (!req.user) {
+            const err = createError(400, 'user not logged in');
+
+            return next(err);
+        }
+
+        // reply with the user profile
+        User.findById(req.user, {
+            password: false,
+            createdAt: false,
+            updatedAt: false
+        }, (err,user) => {
+            if (err) return next(err);
+            res.json({
+                message: 'successfully retrieved user data',
+                user: user
+            });
+
+            return next();
+        });
     }
 };
 
