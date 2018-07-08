@@ -19,7 +19,6 @@
 <script>
 // @ is an alias to /src
 import { mapState, mapMutations } from 'vuex';
-import AttemptAuth from '@/components/AttemptAuth';
 import Login from '@/components/Login.vue';
 import Register from '@/components/Register.vue';
 
@@ -30,16 +29,16 @@ export default {
         Register
     },
 
-    data() {
+    data () {
         return {
-            isAuthAttempted: false,
-        }
+            isAuthAttempted: false
+        };
     },
 
     computed: {
         ...mapState([
             'loginOrRegisterChoice',
-            'isAuthSuccess',
+            'isAuthSuccess'
         ])
     },
 
@@ -56,23 +55,21 @@ export default {
             return;
         }
 
-        if( ! ('apitoken' in window.localStorage)) {
+        if (!('apitoken' in window.localStorage)) {
             this.isAuthAttempted = true;
             return;
         }
 
         const apitoken = window.localStorage.apitoken;
         this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + apitoken;
-        this.$http.get('/user')
-            .then((res) => {
-                this.authSuccess(res.data.user);
-                const path = this.$route.query.redirect || '/dashboard';
-                this.$router.push(path);
-            })
-            .catch((err) => {
-                this.isAuthAttempted = true;
-            });
-    },
+        this.$http.get('/user').then((res) => {
+            this.authSuccess(res.data.user);
+            const path = this.$route.query.redirect || '/dashboard';
+            this.$router.push(path);
+        }).catch((err) => {
+            this.isAuthAttempted = true;
+        });
+    }
 };
 </script>
 

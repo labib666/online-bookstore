@@ -42,7 +42,7 @@ export default {
 
     methods: {
         ...mapMutations([
-            'toggleLoginRegister',
+            'toggleLoginRegister'
         ]),
         login () {
             this.$http.post('/login', {

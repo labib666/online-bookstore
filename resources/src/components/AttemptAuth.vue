@@ -10,29 +10,27 @@ import { mapMutations, mapState } from 'vuex';
 export default {
     computed: {
         ...mapState([
-            'isAuthSuccess',
+            'isAuthSuccess'
         ])
     },
     mounted () {
-        if( ! ('apitoken' in window.localStorage) ) {
+        if (!('apitoken' in window.localStorage)) {
             this.redirectToLogin();
             return;
         }
 
         const apitoken = window.localStorage.apitoken;
         this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + apitoken;
-        this.$http.get('/user')
-            .then((res) => {
-                this.authSuccess(res.data.user);
-            })
-            .catch((err) => {
-                this.redirectToLogin();
-            });
+        this.$http.get('/user').then((res) => {
+            this.authSuccess(res.data.user);
+        }).catch((err) => {
+            this.redirectToLogin();
+        });
     },
 
     methods: {
         ...mapMutations([
-            'authSuccess',
+            'authSuccess'
         ]),
         redirectToLogin () {
             if (this.$route.path === '/') return;
