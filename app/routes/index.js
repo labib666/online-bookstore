@@ -2,6 +2,7 @@ const express = require('express');
 const chalk = require('chalk');
 const createError = require('http-errors');
 const bearerToken = require('express-bearer-token');
+const expressValidator = require('express-validator');
 const dbconnection = require('../../database/dbconnection');
 const authenticate = require('../controllers/AuthController');
 
@@ -28,12 +29,10 @@ const CORS = (req, res, next) => {
 
 const HttpNotFound = (req, res, next) => {
     if (!res.headersSent) {
-        const err = createError(404, '404 Not Found');
-
-        return next(err);
-    } else {
-        return next();
+        res.redirect('/');
     }
+    
+    return next();
 };
 
 const Logger = (req, res, next) => {
@@ -70,6 +69,9 @@ router.use(databaseConnected);
 // bind the user detail to req
 router.use(bearerToken());
 router.use(authenticate.getUserData, authenticate.failedJWT);
+
+// bind validator to request
+router.use(expressValidator());
 
 router.use('/', web);
 router.use('/api', api);
