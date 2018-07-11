@@ -5,7 +5,6 @@ var TokenSchema = new mongoose.Schema({
     token: String,
     expiryTime: {
         type: Date,
-        expires: '30d',
         default: Date.now
     }
 });

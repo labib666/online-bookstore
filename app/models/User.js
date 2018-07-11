@@ -5,7 +5,8 @@ var UserSchema = new mongoose.Schema({
     username: String,
     email: String,
     name: String,
-    password: String
+    password: String,
+    isModerator: Boolean
 });
 
 UserSchema.plugin(timestamps);
