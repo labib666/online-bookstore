@@ -4,7 +4,7 @@ const createError = require('http-errors');
 const bearerToken = require('express-bearer-token');
 const expressValidator = require('express-validator');
 const dbconnection = require('../../database/dbconnection');
-const authenticate = require('../controllers/AuthController');
+const authenticator = require('../controllers/AuthController');
 
 const web = require('./web');
 const api = require('./api');
@@ -68,7 +68,7 @@ router.use(databaseConnected);
 
 // bind the user detail to req
 router.use(bearerToken());
-router.use(authenticate.getUserData);
+router.use(authenticator.getUserData);
 
 // bind validator to request
 router.use(expressValidator());
