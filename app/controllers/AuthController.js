@@ -21,17 +21,16 @@ const AuthController = {
         try {
             payload = JWT.verify(req.token, jwtSecret, jwtOptions);
         } catch (err) {
-            return next(err);
+            // invalid JWT. Ignore it.
+            req.user = null;
+            
+            return next();
         }
 
         // see if the token exists in database
         Token.findOne({ token: req.token })
             .catch( (err) => {
-                if (err) {
-                    err.status = 500;
-    
-                    return next(err);
-                }
+                if (err) return next(err);
             })
             .then( (token) => {
                 // no such token exists. user is logged out
@@ -49,14 +48,6 @@ const AuthController = {
 
                 return next();
             });
-    },
-    
-    failedJWT: (err, req, res, next) => {
-        if (err.status === 500) return next(err);
-        err.status = 400;
-        err.message = 'invalid JWT';
-
-        return next(err);
     }
 };
 
