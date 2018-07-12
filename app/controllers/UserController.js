@@ -142,19 +142,18 @@ const UserController = {
                 }
 
                 // save the token and respond to user
-                Token.create({
-                    token: token
-                }, (err, newToken) => {
-                    if (err) return next(err);
-                    // new token created
-                    console.log('new token created at', newToken.createdAt);
-                    res.status(200).json({
-                        message: 'login successful',
-                        token: token
+                Token.create({ token: token })
+                    .catch( (err) => {
+                        if (err) return next(err);
+                    })
+                    .then( (newToken) => {
+                        // new token created
+                        console.log('new token created at', newToken.createdAt);
+                        res.status(200).json({
+                            message: 'login successful',
+                            token: token
+                        });
                     });
-
-                    return next();
-                });
             });
     },
 
