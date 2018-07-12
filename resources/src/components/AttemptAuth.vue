@@ -24,6 +24,7 @@ export default {
         this.$http.get('/user').then((res) => {
             this.authSuccess(res.data.user);
         }).catch((err) => {
+            console.log(err);
             this.redirectToLogin();
         });
     },

@@ -56,6 +56,7 @@ export default {
                 const path = this.$route.query.redirect || '/dashboard';
                 this.$router.push(path);
             }).catch((err) => {
+                console.log(err);
                 this.$notify({
                     text: 'Login failed',
                     type: 'error'
