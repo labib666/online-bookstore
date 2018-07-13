@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "eslint ./",
     "start": "nodemon --inspect app.js",
-    "build": "rm -rf public && mkdir -p public && cd resources && yarn run build && cp -r ./dist/. ../public"
+    "build": "cd resources && yarn run build"
   },
   "dependencies": {
     "bcrypt": "^2.0.1",

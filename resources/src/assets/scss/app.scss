@@ -2,7 +2,7 @@
 
 html, body {
     background-color: #fff;
-    color: #636b6f;
+    //color: #636b6f;
     font-family: 'Raleway', sans-serif;
     font-weight: 100;
     height: 100vh;
@@ -53,4 +53,24 @@ a {
 
 .m-b-md {
     margin-bottom: 30px;
+}
+
+// App specific design
+$sidebar-width: 300px;
+
+#sidebar {
+    background-color: whitesmoke;
+    min-width: $sidebar-width;
+    max-width: $sidebar-width;
+    margin: 0px;
+    padding-top: 20px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    height: 100vh;
+    z-index: 998;
+}
+
+#main {
+    margin-left: $sidebar-width;
 }

@@ -20,18 +20,11 @@ const databaseConnected = (req,res,next) => {
     }
 };
 
-const CORS = (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-
-    return next();
-};
-
 const HttpNotFound = (req, res, next) => {
     if (!res.headersSent) {
         res.redirect('/');
     }
-    
+
     return next();
 };
 
@@ -61,7 +54,6 @@ const ErrorLogger = (err, req, res, next) => {
 };
 
 const router = express.Router();
-router.use(CORS);
 
 // make sure database is connected
 router.use(databaseConnected);
