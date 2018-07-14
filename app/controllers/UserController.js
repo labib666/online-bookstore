@@ -27,7 +27,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(400);
+            const err = createError(409);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
@@ -47,7 +47,7 @@ const UserController = {
             .then( (user) => {
                 // same username or email exists
                 if (user) {
-                    const err = createError(400,'Username or Email already in use');
+                    const err = createError(409,'username or email already in use');
 
                     return next(err);
                 }
@@ -93,7 +93,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(400);
+            const err = createError(409);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
@@ -110,14 +110,14 @@ const UserController = {
             .then( (user) => {
                 // user does not exist
                 if (!user) {
-                    const err = createError(400,'Invalid Username');
+                    const err = createError(409,'user not found');
 
                     return next(err);
                 }
                 // user exists, check password
                 // password does not match
                 if (!bcrypt.compareSync(password,user.password)) {
-                    const err = createError(400,'Password Mismatch');
+                    const err = createError(409,'password mismatch');
 
                     return next(err);
                 }
@@ -267,7 +267,7 @@ const UserController = {
 
         // username cannot be changed
         if ('username' in req.body) {
-            const err = createError(400,'username cannot be changed');
+            const err = createError(409,'username cannot be changed');
 
             return next(err);
         }
@@ -291,7 +291,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(400);
+            const err = createError(409);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
