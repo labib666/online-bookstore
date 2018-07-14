@@ -12,7 +12,7 @@ const UserController = {
     register: (req, res, next) => {
         // user is already logged in?
         if (req.user) {
-            const err = createError(400, 'user already logged in');
+            const err = createError(403, 'user already logged in');
 
             return next(err);
         }
@@ -27,7 +27,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(409);
+            const err = createError(422);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
@@ -80,7 +80,7 @@ const UserController = {
     login: (req, res, next) => {
         // user is already logged in?
         if (req.user) {
-            const err = createError(400, 'user already logged in');
+            const err = createError(403, 'user already logged in');
 
             return next(err);
         }
@@ -93,7 +93,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(409);
+            const err = createError(422);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
@@ -110,14 +110,14 @@ const UserController = {
             .then( (user) => {
                 // user does not exist
                 if (!user) {
-                    const err = createError(409,'user not found');
+                    const err = createError(404,'user not found');
 
                     return next(err);
                 }
                 // user exists, check password
                 // password does not match
                 if (!bcrypt.compareSync(password,user.password)) {
-                    const err = createError(409,'password mismatch');
+                    const err = createError(401,'password mismatch');
 
                     return next(err);
                 }
@@ -160,7 +160,7 @@ const UserController = {
     logout: (req, res, next) => {
         // user is not logged in?
         if (!req.user) {
-            const err = createError(400, 'user not logged in');
+            const err = createError(401, 'user not logged in');
 
             return next(err);
         }
@@ -183,7 +183,7 @@ const UserController = {
     getOwnProfile: (req, res, next) => {
         // user is not logged in?
         if (!req.user) {
-            const err = createError(400, 'user not logged in');
+            const err = createError(401, 'user not logged in');
 
             return next(err);
         }
@@ -196,7 +196,7 @@ const UserController = {
     getProfile: (req, res, next) => {
         // user is not logged in?
         if (!req.user) {
-            const err = createError(400, 'user not logged in');
+            const err = createError(401, 'user not logged in');
 
             return next(err);
         }
@@ -240,7 +240,7 @@ const UserController = {
     updateProfile: (req,res,next) => {
         // user is not logged in?
         if (!req.user) {
-            const err = createError(400, 'user not logged in');
+            const err = createError(401, 'user not logged in');
 
             return next(err);
         }
@@ -260,14 +260,14 @@ const UserController = {
 
         // check if the user has previlige for this
         if (!req.user.isAdmin && req.user._id !== targetUserId) {
-            const err = createError(401, 'user not authorized for this action');
+            const err = createError(403, 'user not authorized for this action');
 
             return next(err);
         }
 
         // username cannot be changed
         if ('username' in req.body) {
-            const err = createError(409,'username cannot be changed');
+            const err = createError(403,'username cannot be changed');
 
             return next(err);
         }
@@ -275,7 +275,7 @@ const UserController = {
         // only admin can give moderator previlige
         if ('isModerator' in req.body) {
             if (!req.user.isAdmin) {
-                const err = createError(401, 'user not authorized for this action');
+                const err = createError(403, 'user not authorized for this action');
 
                 return next(err);
             }
@@ -291,7 +291,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(409);
+            const err = createError(422);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
@@ -345,7 +345,7 @@ const UserController = {
     getAllProfiles: (req, res, next) => {
         // user is not logged in?
         if (!req.user) {
-            const err = createError(400, 'user not logged in');
+            const err = createError(401, 'user not logged in');
 
             return next(err);
         }
@@ -377,7 +377,7 @@ const UserController = {
     getModeratorProfiles: (req, res, next) => {
         // user is not logged in?
         if (!req.user) {
-            const err = createError(400, 'user not logged in');
+            const err = createError(401, 'user not logged in');
 
             return next(err);
         }
