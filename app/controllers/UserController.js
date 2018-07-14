@@ -309,14 +309,14 @@ const UserController = {
         }
 
         // username cannot be changed
-        if (req.body.username) {
+        if ('username' in req.body) {
             const err = createError(400,'username cannot be changed');
 
             return next(err);
         }
         
         // only admin can give moderator previlige
-        if (req.body.isModerator) {
+        if ('isModerator' in req.body) {
             if (!req.user.isAdmin) {
                 const err = createError(401, 'user not authorized for this action');
 
@@ -326,9 +326,9 @@ const UserController = {
         }
 
         // validate and sanitize the incoming data
-        if (req.body.name) validate.name(req);
-        if (req.body.email) validate.email(req);
-        if (req.body.password)validate.password(req);
+        if ('name' in req.body) validate.name(req);
+        if ('email' in req.body) validate.email(req);
+        if ('password' in req.body)validate.password(req);
 
         error = req.validationErrors();
 
@@ -354,20 +354,20 @@ const UserController = {
                 }
 
                 // user exists, make necessary changes
-                if (req.body.name) {
+                if ('name' in req.body) {
                     targetUser.name = req.body.name;
                 }
-                if (req.body.email) {
+                if ('email' in req.body) {
                     targetUser.email = req.body.email;
                 }
-                if (req.body.password) {
+                if ('password' in req.body) {
                     targetUser.password = bcrypt.hashSync(req.body.password,12);
                 }
                 
                 // don't change access for the admin
-                if (req.body.isModerator) { 
-                    targetUser.isModerator = (req.user.isAdmin && 
-                        req.user._id == targetUserId) ? true : req.body.isModerator;
+                if ('isModerator' in req.body) {
+                    const changingAdminPrev = (req.user.isAdmin && req.user._id === targetUserId);
+                    targetUser.isModerator = (changingAdminPrev) ? true : req.body.isModerator;
                 }
 
                 targetUser.save()
@@ -379,6 +379,8 @@ const UserController = {
                             message: 'user successfully updated',
                             username: updatedUser.username
                         });
+
+                        return next();
                     });
             });
     },
