@@ -28,7 +28,7 @@ const UserController = {
         // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;     // return the first error
 
             return next(err);
         } 
@@ -65,10 +65,11 @@ const UserController = {
                     })
                     .then( (newUser) => {
                         // new user created
-                        console.log(newUser.username, 'created at', newUser.createdAt);
+                        // erase the password before sending the response
+                        delete newUser._doc.password;
                         res.status(200).json({
                             message: 'registration successful',
-                            username: username
+                            user: newUser
                         });
 
                         return next();
@@ -93,7 +94,7 @@ const UserController = {
         // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;     // return the first error
 
             return next(err);
         }
@@ -148,10 +149,9 @@ const UserController = {
                     })
                     .then( (newToken) => {
                         // new token created
-                        console.log('new token created at', newToken.createdAt);
                         res.status(200).json({
                             message: 'login successful',
-                            token: token
+                            token: newToken.token
                         });
                     });
             });
@@ -206,7 +206,7 @@ const UserController = {
         const error = req.validationErrors();
         if (error) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;
 
             return next(err);
         }
@@ -221,11 +221,19 @@ const UserController = {
                 if (err) return next(err);
             })
             .then( (user) => {
+                // user does not exist
+                if (!user) {
+                    const err = createError(404,'user not found');
+
+                    return next(err);
+                }
                 user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
                 res.status(200).json({
                     message: 'successfully retrieved user data',
                     user: user
                 });
+
+                return next();
             });
     },
 
@@ -242,7 +250,7 @@ const UserController = {
         let error = req.validationErrors();
         if ( error ) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;
 
             return next(err);
         }
@@ -284,7 +292,7 @@ const UserController = {
         // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;     // return the first error
 
             return next(err);
         }
@@ -297,7 +305,7 @@ const UserController = {
             .then( (targetUser) => {
                 // the target user does not exist
                 if (!targetUser) {
-                    const err = createError(400,'Invalid User ID');
+                    const err = createError(404,'user not found');
 
                     return next(err);
                 }
@@ -352,6 +360,11 @@ const UserController = {
                 if (err) return next(err);
             })
             .then( (users) => {
+                // add isAdmin field to the results
+                users.forEach( (user) => {
+                    user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                });
+
                 res.status(200).json({
                     message: 'successfully retrieved users',
                     users: users
@@ -379,6 +392,11 @@ const UserController = {
                 if (err) return next(err);
             })
             .then( (users) => {
+                // add isAdmin field to the results
+                users.forEach( (user) => {
+                    user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                });
+
                 res.status(200).json({
                     message: 'successfully retrieved moderators',
                     users: users
