@@ -4,59 +4,9 @@ const JWT = require('jsonwebtoken');
 const randomstring = require('randomstring');
 const User = require('../models/User');
 const Token = require('../models/Token');
+const authenticator = require('../controllers/AuthController');
 
-const validate = {
-    // validate the name
-    name: (req) => {
-        req.checkBody('name')
-            .exists().withMessage('body must have a \'name\' field')
-            .notEmpty().withMessage('\'name\' field must be non empty')
-            .trim().escape()
-            .matches('^[A-Z a-z]+$').withMessage('\'name\' can contain only letters and spaces')
-            .isLength({ min: 4, max: 30 }).withMessage('\'name\' has a length in range[4,30]');
-    },
-    // validate the username
-    username: (req) => {
-        req.checkBody('username')
-            .exists().withMessage('body must have a \'username\' field')
-            .notEmpty().withMessage('\'username\' field must be non empty')
-            .trim().escape()
-            .isAlphanumeric().withMessage('\'username\' can contain only alphanumerics')
-            .isLength({ min: 4, max: 20 }).withMessage('\'username\' has a length in range[4,20]');
-    },
-    // validate the email
-    email: (req) => {
-        req.checkBody('email')
-            .exists().withMessage('body must have a \'email\' field')
-            .notEmpty().withMessage('\'email\' field must be non empty')
-            .trim().escape()
-            .isEmail().withMessage('\'email\' must be a valid email address');
-    },
-    // validate the password
-    password: (req) => {
-        req.checkBody('password')
-            .exists().withMessage('body must have a \'password\' field')
-            .notEmpty().withMessage('\'password\' field must be non empty')
-            .trim().escape()
-            .matches('^[^ \t\n\r]+$').withMessage('\'password\' field cannot contain space or newlines')
-            .isLength({ min: 4, max: 20 }).withMessage('\'password\' has a length in range[4,20]');
-    },
-    // validate isAdmin attribute
-    isModerator: (req) => {
-        req.checkBody('isModerator')
-            .exists().withMessage('body must have a \'isModerator\' field')
-            .notEmpty().withMessage('\'isModerator\' field must be non empty')
-            .isBoolean().withMessage('\'isModerator\' field must be a boolean');
-    },
-    // validate mongo objectID
-    isMongoObejectID: (req) => {
-        req.checkParams('id')
-            .exists().withMessage('params must have a \'id\' field')
-            .notEmpty().withMessage('\'id\' field must be non empty')
-            .trim().escape()
-            .isMongoId().withMessage('\'id\' field must be a valid Mongo ObjectID');
-    }
-};
+const validate = authenticator.validate;
 
 const UserController = {
     register: (req, res, next) => {
@@ -78,7 +28,7 @@ const UserController = {
         // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;     // return the first error
 
             return next(err);
         } 
@@ -115,10 +65,11 @@ const UserController = {
                     })
                     .then( (newUser) => {
                         // new user created
-                        console.log(newUser.username, 'created at', newUser.createdAt);
+                        // erase the password before sending the response
+                        delete newUser._doc.password;
                         res.status(200).json({
                             message: 'registration successful',
-                            username: username
+                            user: newUser
                         });
 
                         return next();
@@ -143,7 +94,7 @@ const UserController = {
         // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;     // return the first error
 
             return next(err);
         }
@@ -192,19 +143,17 @@ const UserController = {
                 }
 
                 // save the token and respond to user
-                Token.create({
-                    token: token
-                }, (err, newToken) => {
-                    if (err) return next(err);
-                    // new token created
-                    console.log('new token created at', newToken.createdAt);
-                    res.status(200).json({
-                        message: 'login successful',
-                        token: token
+                Token.create({ token: token })
+                    .catch( (err) => {
+                        if (err) return next(err);
+                    })
+                    .then( (newToken) => {
+                        // new token created
+                        res.status(200).json({
+                            message: 'login successful',
+                            token: newToken.token
+                        });
                     });
-
-                    return next();
-                });
             });
     },
 
@@ -257,7 +206,7 @@ const UserController = {
         const error = req.validationErrors();
         if (error) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;
 
             return next(err);
         }
@@ -272,11 +221,19 @@ const UserController = {
                 if (err) return next(err);
             })
             .then( (user) => {
+                // user does not exist
+                if (!user) {
+                    const err = createError(404,'user not found');
+
+                    return next(err);
+                }
                 user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
                 res.status(200).json({
                     message: 'successfully retrieved user data',
                     user: user
                 });
+
+                return next();
             });
     },
 
@@ -293,7 +250,7 @@ const UserController = {
         let error = req.validationErrors();
         if ( error ) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;
 
             return next(err);
         }
@@ -309,14 +266,14 @@ const UserController = {
         }
 
         // username cannot be changed
-        if (req.body.username) {
+        if ('username' in req.body) {
             const err = createError(400,'username cannot be changed');
 
             return next(err);
         }
         
         // only admin can give moderator previlige
-        if (req.body.isModerator) {
+        if ('isModerator' in req.body) {
             if (!req.user.isAdmin) {
                 const err = createError(401, 'user not authorized for this action');
 
@@ -326,16 +283,16 @@ const UserController = {
         }
 
         // validate and sanitize the incoming data
-        if (req.body.name) validate.name(req);
-        if (req.body.email) validate.email(req);
-        if (req.body.password)validate.password(req);
+        if ('name' in req.body) validate.name(req);
+        if ('email' in req.body) validate.email(req);
+        if ('password' in req.body)validate.password(req);
 
         error = req.validationErrors();
 
         // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(400);
-            err.message = error;
+            err.message = error[0].msg;     // return the first error
 
             return next(err);
         }
@@ -348,26 +305,26 @@ const UserController = {
             .then( (targetUser) => {
                 // the target user does not exist
                 if (!targetUser) {
-                    const err = createError(400,'Invalid User ID');
+                    const err = createError(404,'user not found');
 
                     return next(err);
                 }
 
                 // user exists, make necessary changes
-                if (req.body.name) {
+                if ('name' in req.body) {
                     targetUser.name = req.body.name;
                 }
-                if (req.body.email) {
+                if ('email' in req.body) {
                     targetUser.email = req.body.email;
                 }
-                if (req.body.password) {
+                if ('password' in req.body) {
                     targetUser.password = bcrypt.hashSync(req.body.password,12);
                 }
                 
                 // don't change access for the admin
-                if (req.body.isModerator) { 
-                    targetUser.isModerator = (req.user.isAdmin && 
-                        req.user._id == targetUserId) ? true : req.body.isModerator;
+                if ('isModerator' in req.body) {
+                    const changingAdminPrev = (req.user.isAdmin && req.user._id === targetUserId);
+                    targetUser.isModerator = (changingAdminPrev) ? true : req.body.isModerator;
                 }
 
                 targetUser.save()
@@ -379,6 +336,8 @@ const UserController = {
                             message: 'user successfully updated',
                             username: updatedUser.username
                         });
+
+                        return next();
                     });
             });
     },
@@ -401,6 +360,11 @@ const UserController = {
                 if (err) return next(err);
             })
             .then( (users) => {
+                // add isAdmin field to the results
+                users.forEach( (user) => {
+                    user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                });
+
                 res.status(200).json({
                     message: 'successfully retrieved users',
                     users: users
@@ -428,6 +392,11 @@ const UserController = {
                 if (err) return next(err);
             })
             .then( (users) => {
+                // add isAdmin field to the results
+                users.forEach( (user) => {
+                    user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                });
+
                 res.status(200).json({
                     message: 'successfully retrieved moderators',
                     users: users
