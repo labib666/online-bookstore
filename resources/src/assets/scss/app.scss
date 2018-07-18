@@ -57,20 +57,41 @@ a {
 
 // App specific design
 $sidebar-width: 300px;
+$topbar-height: 60px;
+$sidebar-color: whitesmoke;
+$topbar-color: #481e86;
+$default-padding: 20px;
 
 #sidebar {
-    background-color: whitesmoke;
+    background-color: $sidebar-color;
     min-width: $sidebar-width;
     max-width: $sidebar-width;
     margin: 0px;
-    padding-top: 20px;
+    padding-top: $default-padding;
     position: fixed;
-    top: 0px;
+    top: $topbar-height;
     left: 0px;
     height: 100vh;
     z-index: 998;
 }
 
+#topbar {
+    background-color: $topbar-color;
+    min-height: $topbar-height;
+    max-height: $topbar-height;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: $default-padding;
+}
+
 #main {
-    margin-left: $sidebar-width;
+    margin-top: $default-padding;
+    margin-left: $sidebar-width + $default-padding;
+}
+
+.brand {
+    color: #ffffff;
+    font-weight: 900;
+    padding-left: $default-padding;
 }

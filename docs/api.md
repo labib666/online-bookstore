@@ -21,6 +21,7 @@
 + Request (application/json)
 
     + Headers
+
     ```
         Authorization: Bearer 2erefkhjwrqr1i23rssndfiqwherakjhdfsfqer
     ```

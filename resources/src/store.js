@@ -3,12 +3,16 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
+const baseState = {
+    loginOrRegisterChoice: true,
+    isAuthSuccess: false,
+    user: null,
+    users: {}
+};
+
 export default new Vuex.Store({
     state: {
-        loginOrRegisterChoice: true,
-        isAuthSuccess: false,
-        user: null,
-        users: {}
+        ...baseState
     },
     mutations: {
         toggleLoginRegister (state) {
@@ -27,6 +31,12 @@ export default new Vuex.Store({
 
         updateUser (store, user) {
             store.users[user._id] = user;
+        },
+
+        clearState (store) {
+            Object.keys(baseState).forEach(key => {
+                store[key] = baseState[key];
+            });
         }
     },
     actions: {
