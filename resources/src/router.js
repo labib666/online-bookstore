@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
-import Dashboard from './views/Dashboard.vue';
-import Admin from './views/Admin.vue';
+import Home from './pages/Home.vue';
+import Dashboard from './pages/Dashboard.vue';
+import Admin from './pages/Admin.vue';
 
 Vue.use(Router);
 
