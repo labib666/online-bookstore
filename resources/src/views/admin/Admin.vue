@@ -1,5 +1,5 @@
 <template>
-    <div id="admin-panel">
+    <div id="admin">
         <Topbar></Topbar>
         <div id="sidebar">
             <center><h3>Admin panel</h3></center>
@@ -25,7 +25,7 @@
 
 <script>
 import User from './User';
-import Topbar from '../Topbar';
+import Topbar from '@/components/Topbar';
 import { mapState, mapMutations } from 'vuex';
 export default {
     components: {

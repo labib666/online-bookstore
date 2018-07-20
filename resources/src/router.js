@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
-import Dashboard from './views/Dashboard.vue';
-import Admin from './views/Admin.vue';
+import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import Admin from './pages/Admin';
+import NotFound from './pages/NotFound';
 
 Vue.use(Router);
 
@@ -22,6 +23,11 @@ export default new Router({
             path: '/admin',
             name: 'admin',
             component: Admin
+        },
+        {
+            path: '/*',
+            name: 'NotFound',
+            component: NotFound
         }
     ]
 });

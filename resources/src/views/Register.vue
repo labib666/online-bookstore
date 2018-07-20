@@ -1,12 +1,26 @@
 <template>
-    <div class="login">
+    <div id="register">
         <div class="card">
-            <div class="card-header">Login</div>
+            <div class="card-header">Register</div>
             <div class="card-body">
+                <div class="form-group row">
+                    <label for="name" class="col-md-4 col-form-label col-form-label-lg">Full name</label>
+                    <div class="col-md-8">
+                        <input id="name" v-model="name" class="form-control form-control-lg" />
+                    </div>
+                </div>
+
                 <div class="form-group row">
                     <label for="username" class="col-md-4 col-form-label col-form-label-lg">Username</label>
                     <div class="col-md-8">
                         <input id="username" v-model="username" class="form-control form-control-lg" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="email" class="col-md-4 col-form-label col-form-label-lg">E-mail</label>
+                    <div class="col-md-8">
+                        <input id="email" v-model="email" class="form-control form-control-lg" />
                     </div>
                 </div>
 
@@ -19,10 +33,10 @@
 
                 <hr />
                 <div class="float-left">
-                    <a href="#" v-on:click="toggleLoginRegister">Create an account</a>
+                    <a href="#" v-on:click="toggleLoginRegister">Already have an account?</a>
                 </div>
                 <div class="float-right">
-                    <button @click="login" type="submit" class="btn btn-primary mb-2">Login</button>
+                    <button type="submit" @click="register()" class="btn btn-primary mb-2">Register</button>
                 </div>
             </div>
         </div>
@@ -35,7 +49,9 @@ import { mapMutations } from 'vuex';
 export default {
     data () {
         return {
+            name: '',
             username: '',
+            email: '',
             password: ''
         };
     },
@@ -44,23 +60,24 @@ export default {
         ...mapMutations([
             'toggleLoginRegister'
         ]),
-        login () {
-            this.$http.post('/login', {
+
+        register () {
+            this.$http.post('/register', {
+                name: this.name,
                 username: this.username,
+                email: this.email,
                 password: this.password
             }).then((res) => {
-                window.localStorage.apitoken = res.data.token;
                 this.$notify({
-                    text: 'Login Successful'
+                    text: 'Account created successfully!'
                 });
-                const path = this.$route.query.redirect || '/dashboard';
-                this.$router.push(path);
+                this.toggleLoginRegister();
             }).catch((err) => {
-                console.log(err);
-                this.$notify({
-                    text: 'Login failed',
-                    type: 'error'
-                });
+                if (err.response) {
+                    this.$notify({
+                        text: JSON.stringify(err.response.data)
+                    });
+                }
             });
         }
     }

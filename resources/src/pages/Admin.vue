@@ -1,21 +1,21 @@
 <template>
-    <div id="admin">
+    <div>
         <AttemptAuth v-if="!isAuthSuccess"></AttemptAuth>
         <div v-if="isAuthSuccess">
-            <Adminpanel></Adminpanel>
+            <Admin></Admin>
         </div>
     </div>
 </template>
 
 <script>
 import AttemptAuth from '@/components/AttemptAuth';
-import Adminpanel from '@/components/admin/Adminpanel';
+import Admin from '@/views/admin/Admin';
 import { mapState } from 'vuex';
 
 export default {
     components: {
         AttemptAuth,
-        Adminpanel
+        Admin
     },
 
     computed: {
