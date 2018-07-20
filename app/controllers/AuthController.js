@@ -1,4 +1,5 @@
 const JWT = require('jsonwebtoken');
+const createError = require('http-errors');
 const Token = require('../models/Token');
 
 const AuthController = {
@@ -30,7 +31,7 @@ const AuthController = {
         // see if the token exists in database
         Token.findOne({ token: req.token })
             .catch( (err) => {
-                if (err) return next(err);
+                return next(err);
             })
             .then( (token) => {
                 // no such token exists. user is logged out
@@ -49,6 +50,29 @@ const AuthController = {
                 return next();
             });
     },
+
+    loggedIn: (req, res, next) => {
+        // user is not logged in?
+        if (!req.user) {
+            const err = createError(401, 'user not logged in');
+
+            return next(err);
+        } else {
+            return next();
+        }
+    },
+
+    loggedOut: (req, res, next) => {
+        // user is logged in?
+        if (req.user) {
+            const err = createError(403, 'user already logged in');
+
+            return next(err);
+        } else {
+            return next();
+        }
+    },
+
     validate: {
         // validate the name
         name: (req) => {
@@ -85,12 +109,34 @@ const AuthController = {
                 .matches('^[^ \t\n\r]+$').withMessage('\'password\' field cannot contain space or newlines')
                 .isLength({ min: 4, max: 20 }).withMessage('\'password\' has a length in range[4,20]');
         },
-        // validate isAdmin attribute
+        // validate isModerator attribute
         isModerator: (req) => {
             req.checkBody('isModerator')
                 .exists().withMessage('body must have a \'isModerator\' field')
                 .notEmpty().withMessage('\'isModerator\' field must be non empty')
                 .isBoolean().withMessage('\'isModerator\' field must be a boolean');
+        },
+        // validate the book title
+        title: (req) => {
+            req.checkBody('title')
+                .exists().withMessage('body must have a \'title\' field')
+                .notEmpty().withMessage('\'title\' field must be non empty')
+                .trim().escape();
+        },
+        // validate the book author
+        author: (req) => {
+            req.checkBody('author')
+                .exists().withMessage('body must have a \'author\' field')
+                .notEmpty().withMessage('\'author\' field must be non empty')
+                .trim().escape();
+        },
+        // validate the ISBN
+        ISBN: (req) => {
+            req.checkBody('ISBN')
+                .exists().withMessage('body must have a \'ISBN\' field')
+                .notEmpty().withMessage('\'ISBN\' field must be non empty')
+                .trim().escape()
+                .isISBN(10).withMessage('\'ISBN\' must have a ISBN 10 value');
         },
         // validate mongo objectID
         isMongoObejectID: (req) => {
