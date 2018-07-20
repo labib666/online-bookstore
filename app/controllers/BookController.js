@@ -191,8 +191,8 @@ const BookController = {
             })
             .then( (books) => {
                 res.status(200).json({
-                    message: 'book retrieved successfully',
-                    book: books
+                    message: 'books retrieved successfully',
+                    books: books
                 });
                 
                 return next();
