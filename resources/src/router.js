@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
+import Moderator from './pages/Moderator';
 import NotFound from './pages/NotFound';
 
 Vue.use(Router);
@@ -23,6 +24,11 @@ export default new Router({
             path: '/admin',
             name: 'admin',
             component: Admin
+        },
+        {
+            path: '/moderator',
+            name: 'moderator',
+            component: Moderator
         },
         {
             path: '/*',
