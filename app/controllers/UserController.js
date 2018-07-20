@@ -10,13 +10,6 @@ const validate = authenticator.validate;
 
 const UserController = {
     register: (req, res, next) => {
-        // user is already logged in?
-        if (req.user) {
-            const err = createError(400, 'user already logged in');
-
-            return next(err);
-        }
-
         // validate and sanitize the incoming data
         validate.name(req);
         validate.username(req);
@@ -27,7 +20,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(400);
+            const err = createError(422);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
@@ -42,12 +35,12 @@ const UserController = {
 
         User.findOne({ $or:[ {username: username}, {email: email} ] })
             .catch( (err) => {
-                if (err) return next(err);
+                return next(err);
             })
             .then( (user) => {
                 // same username or email exists
                 if (user) {
-                    const err = createError(400,'Username or Email already in use');
+                    const err = createError(409,'username or email already in use');
 
                     return next(err);
                 }
@@ -61,7 +54,7 @@ const UserController = {
                     isModerator: (email === process.env.SUPER_ADMIN)
                 })
                     .catch( (err) => {
-                        if (err) return next(err);
+                        return next(err);
                     })
                     .then( (newUser) => {
                         // new user created
@@ -69,7 +62,7 @@ const UserController = {
                         delete newUser._doc.password;
                         res.status(200).json({
                             message: 'registration successful',
-                            user: newUser
+                            user: newUser._id
                         });
 
                         return next();
@@ -78,13 +71,6 @@ const UserController = {
     },
 
     login: (req, res, next) => {
-        // user is already logged in?
-        if (req.user) {
-            const err = createError(400, 'user already logged in');
-
-            return next(err);
-        }
-
         // validate and sanitize the incoming data
         validate.username(req);
         validate.password(req);
@@ -93,7 +79,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(400);
+            const err = createError(422);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
@@ -105,19 +91,19 @@ const UserController = {
         // look for a user with this credential
         User.findOne({ username: username })
             .catch( (err) => {
-                if (err) return next(err);
+                return next(err);
             })
             .then( (user) => {
                 // user does not exist
                 if (!user) {
-                    const err = createError(400,'Invalid Username');
+                    const err = createError(404,'user not found');
 
                     return next(err);
                 }
                 // user exists, check password
                 // password does not match
                 if (!bcrypt.compareSync(password,user.password)) {
-                    const err = createError(400,'Password Mismatch');
+                    const err = createError(401,'password mismatch');
 
                     return next(err);
                 }
@@ -145,7 +131,7 @@ const UserController = {
                 // save the token and respond to user
                 Token.create({ token: token })
                     .catch( (err) => {
-                        if (err) return next(err);
+                        return next(err);
                     })
                     .then( (newToken) => {
                         // new token created
@@ -158,79 +144,15 @@ const UserController = {
     },
 
     logout: (req, res, next) => {
-        // user is not logged in?
-        if (!req.user) {
-            const err = createError(400, 'user not logged in');
-
-            return next(err);
-        }
-
         // logout the user
         Token.findByIdAndRemove(req.token)
             .catch( (err) => {
-                if (err) return next(err);
+                return next(err);
             })
             .then( (token) => {
                 res.status(200).json({
                     message: 'logout successful',
-                    removedToken: token
-                });
-
-                return next();
-            });
-    },
-
-    getOwnProfile: (req, res, next) => {
-        // user is not logged in?
-        if (!req.user) {
-            const err = createError(400, 'user not logged in');
-
-            return next(err);
-        }
-
-        res.redirect('/api/user/'+req.user._id);
-        
-        return next();
-    },
-
-    getProfile: (req, res, next) => {
-        // user is not logged in?
-        if (!req.user) {
-            const err = createError(400, 'user not logged in');
-
-            return next(err);
-        }
-
-        // validate requested id
-        validate.isMongoObejectID(req);
-        const error = req.validationErrors();
-        if (error) {
-            const err = createError(400);
-            err.message = error[0].msg;
-
-            return next(err);
-        }
-
-        // reply with the user profile
-        User.findById(req.params.id, {
-            password: false,
-            createdAt: false,
-            updatedAt: false
-        })
-            .catch( (err) => {
-                if (err) return next(err);
-            })
-            .then( (user) => {
-                // user does not exist
-                if (!user) {
-                    const err = createError(404,'user not found');
-
-                    return next(err);
-                }
-                user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
-                res.status(200).json({
-                    message: 'successfully retrieved user data',
-                    user: user
+                    removedToken: token.token
                 });
 
                 return next();
@@ -238,14 +160,7 @@ const UserController = {
     },
 
     updateProfile: (req,res,next) => {
-        // user is not logged in?
-        if (!req.user) {
-            const err = createError(400, 'user not logged in');
-
-            return next(err);
-        }
-
-        // is the given ID valid?
+        // validate requested id
         validate.isMongoObejectID(req);
         let error = req.validationErrors();
         if ( error ) {
@@ -260,14 +175,14 @@ const UserController = {
 
         // check if the user has previlige for this
         if (!req.user.isAdmin && req.user._id !== targetUserId) {
-            const err = createError(401, 'user not authorized for this action');
+            const err = createError(403, 'user not authorized for this action');
 
             return next(err);
         }
 
         // username cannot be changed
         if ('username' in req.body) {
-            const err = createError(400,'username cannot be changed');
+            const err = createError(403,'username cannot be changed');
 
             return next(err);
         }
@@ -275,7 +190,7 @@ const UserController = {
         // only admin can give moderator previlige
         if ('isModerator' in req.body) {
             if (!req.user.isAdmin) {
-                const err = createError(401, 'user not authorized for this action');
+                const err = createError(403, 'user not authorized for this action');
 
                 return next(err);
             }
@@ -291,7 +206,7 @@ const UserController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(400);
+            const err = createError(422);
             err.message = error[0].msg;     // return the first error
 
             return next(err);
@@ -300,7 +215,7 @@ const UserController = {
         // everything is fine. look the user up and update
         User.findById(targetUserId)
             .catch( (err) => {
-                if (err) return next(err);
+                return next(err);
             })
             .then( (targetUser) => {
                 // the target user does not exist
@@ -327,14 +242,15 @@ const UserController = {
                     targetUser.isModerator = (changingAdminPrev) ? true : req.body.isModerator;
                 }
 
+                // save changed data in database
                 targetUser.save()
                     .catch( (err) => {
-                        if (err) return next(err);
+                        return next(err);
                     })
                     .then( (updatedUser) => {
                         res.status(200).json({
                             message: 'user successfully updated',
-                            username: updatedUser.username
+                            user: updatedUser._id
                         });
 
                         return next();
@@ -342,14 +258,50 @@ const UserController = {
             });
     },
 
-    getAllProfiles: (req, res, next) => {
-        // user is not logged in?
-        if (!req.user) {
-            const err = createError(400, 'user not logged in');
+    getOwnProfile: (req, res, next) => {
+        res.redirect('/api/user/'+req.user._id);
+        
+        return next();
+    },
+
+    getProfile: (req, res, next) => {
+        // validate requested id
+        validate.isMongoObejectID(req);
+        const error = req.validationErrors();
+        if (error) {
+            const err = createError(400);
+            err.message = error[0].msg;
 
             return next(err);
         }
 
+        // reply with the user profile
+        User.findById(req.params.id, {
+            password: false,
+            createdAt: false,
+            updatedAt: false
+        })
+            .catch( (err) => {
+                return next(err);
+            })
+            .then( (user) => {
+                // user does not exist
+                if (!user) {
+                    const err = createError(404,'user not found');
+
+                    return next(err);
+                }
+                user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                res.status(200).json({
+                    message: 'successfully retrieved user data',
+                    user: user
+                });
+
+                return next();
+            });
+    },
+
+    getAllProfiles: (req, res, next) => {
         // reply with the user profile
         User.find({}, {
             password: false,
@@ -357,7 +309,7 @@ const UserController = {
             updatedAt: false
         })
             .catch( (err) => {
-                if (err) return next(err);
+                return next(err);
             })
             .then( (users) => {
                 // add isAdmin field to the results
@@ -375,13 +327,6 @@ const UserController = {
     },
 
     getModeratorProfiles: (req, res, next) => {
-        // user is not logged in?
-        if (!req.user) {
-            const err = createError(400, 'user not logged in');
-
-            return next(err);
-        }
-
         // reply with the user profile
         User.find({isModerator: true}, {
             password: false,
@@ -389,7 +334,7 @@ const UserController = {
             updatedAt: false
         })
             .catch( (err) => {
-                if (err) return next(err);
+                return next(err);
             })
             .then( (users) => {
                 // add isAdmin field to the results

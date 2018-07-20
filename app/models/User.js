@@ -2,9 +2,9 @@ var mongoose = require('mongoose');
 var timestamps = require('mongoose-timestamp');
 
 var UserSchema = new mongoose.Schema({  
+    name: String,
     username: String,
     email: String,
-    name: String,
     password: String,
     isModerator: Boolean
 });

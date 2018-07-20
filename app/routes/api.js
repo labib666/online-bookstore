@@ -1,7 +1,10 @@
 const express = require('express');
 const createError = require('http-errors');
 const UserController = require('../controllers/UserController');
+const authenticator = require('../controllers/AuthController');
+
 const userRouter = require('./userRouter');
+const bookRouter = require('./bookRouter');
 
 const router = express.Router();
 
@@ -25,12 +28,13 @@ router.get('/', (req, res, next) => {
 });
 
 // authentication
-router.post('/register', UserController.register);
-router.post('/login', UserController.login);
-router.post('/logout', UserController.logout);
+router.post('/register', authenticator.loggedOut, UserController.register);
+router.post('/login', authenticator.loggedOut, UserController.login);
+router.post('/logout', authenticator.loggedIn, UserController.logout);
 
 // request regarding user
-router.use('/user', userRouter);
+router.use('/user', authenticator.loggedIn, userRouter);
+router.use('/book', authenticator.loggedIn, bookRouter);
 
 // could not find a good route. httpnotfound
 router.use(HttpNotFound);
