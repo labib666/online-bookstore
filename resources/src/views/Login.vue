@@ -32,6 +32,7 @@
 <script>
 // @ is an alias to /src
 import { mapMutations } from 'vuex';
+
 export default {
     data () {
         return {
@@ -55,8 +56,7 @@ export default {
                 });
                 const path = this.$route.query.redirect || '/dashboard';
                 this.$router.push(path);
-            }).catch((err) => {
-                console.log(err);
+            }).catch(() => {
                 this.$notify({
                     text: 'Login failed',
                     type: 'error'
