@@ -7,5 +7,6 @@ const router = express.Router();
 router.post('/', BookController.addBook);
 router.get('/:id', BookController.getBook);
 router.patch('/:id', BookController.updateBook);
+router.get('/group/all', BookController.getAllBooks);
 
 module.exports = router;

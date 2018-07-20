@@ -179,6 +179,24 @@ const BookController = {
                 
                 return next();
             });
+    },
+    
+    getAllBooks: (req, res, next) => {        
+        Book.find(req.params.id, {
+            createdAt: false,
+            updatedAt: false
+        })
+            .catch( (err) => {
+                return next(err);
+            })
+            .then( (books) => {
+                res.status(200).json({
+                    message: 'book retrieved successfully',
+                    book: books
+                });
+                
+                return next();
+            });
     }
 };
 
