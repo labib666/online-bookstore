@@ -164,7 +164,7 @@ const UserController = {
         validate.isMongoObejectID(req);
         let error = req.validationErrors();
         if ( error ) {
-            const err = createError(400);
+            const err = createError(404);
             err.message = error[0].msg;
 
             return next(err);
@@ -267,7 +267,7 @@ const UserController = {
         validate.isMongoObejectID(req);
         const error = req.validationErrors();
         if (error) {
-            const err = createError(400);
+            const err = createError(404);
             err.message = error[0].msg;
 
             return next(err);
