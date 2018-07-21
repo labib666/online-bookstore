@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import Moderator from './pages/Moderator';
+import Book from './pages/Book';
 import NotFound from './pages/NotFound';
 
 Vue.use(Router);
@@ -29,6 +30,11 @@ export default new Router({
             path: '/moderator',
             name: 'moderator',
             component: Moderator
+        },
+        {
+            path: '/book/*',
+            name: 'book',
+            component: Book
         },
         {
             path: '/*',
