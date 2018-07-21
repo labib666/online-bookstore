@@ -159,6 +159,7 @@ const BookController = {
             return next(err);
         }
         
+        // request is okay. respond with book data
         Book.findById(req.params.id, {
             createdAt: false,
             updatedAt: false
