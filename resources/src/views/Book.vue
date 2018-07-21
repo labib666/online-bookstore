@@ -1,7 +1,7 @@
 <template>
     <div>
         <Topbar></Topbar>
-        <div class="main">
+        <div id="main">
             <Book :title="title" :author="author" :isbn="isbn"></Book>
         </div>
     </div>
@@ -19,7 +19,7 @@ export default {
 
     data () {
         return {
-            title: 'test',
+            title: '',
             author: '',
             isbn: ''
         };

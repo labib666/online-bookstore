@@ -4,23 +4,24 @@
         <div id="sidebar">
             <center><h3>Moderator panel</h3></center>
             <hr />
+            <router-link to="/moderator">Add new book</router-link>
         </div>
 
         <div id="main">
-            <BookForm></BookForm>
+            <router-view />
         </div>
     </div>
 </template>
 
 <script>
 import Topbar from '@/components/Topbar';
-import BookForm from './BookForm';
+import NewBookForm from './NewBookForm';
 import { mapState } from 'vuex';
 
 export default {
     components: {
         Topbar,
-        BookForm
+        NewBookForm
     },
 
     computed: {

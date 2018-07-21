@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import Moderator from './pages/Moderator';
+import NewBookForm from './views/moderator/NewBookForm';
+import EditBookForm from './views/moderator/EditBookForm';
 import Book from './pages/Book';
 import NotFound from './pages/NotFound';
 
@@ -28,8 +30,22 @@ export default new Router({
         },
         {
             path: '/moderator',
-            name: 'moderator',
-            component: Moderator
+            component: Moderator,
+            children: [
+                {
+                    path: '',
+                    component: NewBookForm
+                },
+                {
+                    path: 'edit',
+                    component: EditBookForm
+                }
+            ]
+        },
+        {
+            path: '/moderator/book/:id',
+            name: 'moderator-book-edit',
+            component: EditBookForm
         },
         {
             path: '/book/*',
