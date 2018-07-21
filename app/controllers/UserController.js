@@ -188,8 +188,9 @@ const UserController = {
         }
         
         // only admin can give moderator previlige
+        // admin cannot revoke his own moderator/admin access
         if ('isModerator' in req.body) {
-            if (!req.user.isAdmin) {
+            if (!req.user.isAdmin || req.user._id === targetUserId) {
                 const err = createError(403, 'user not authorized for this action');
 
                 return next(err);
@@ -235,11 +236,8 @@ const UserController = {
                 if ('password' in req.body) {
                     targetUser.password = bcrypt.hashSync(req.body.password,12);
                 }
-                
-                // don't change access for the admin
                 if ('isModerator' in req.body) {
-                    const changingAdminPrev = (req.user.isAdmin && req.user._id === targetUserId);
-                    targetUser.isModerator = (changingAdminPrev) ? true : req.body.isModerator;
+                    targetUser.isModerator = req.body.isModerator;
                 }
 
                 // save changed data in database
