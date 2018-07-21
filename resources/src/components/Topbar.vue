@@ -2,7 +2,7 @@
     <div id="topbar">
         <div class="clearfix">
             <div class="float-left">
-                <h4 class="brand">Online Bookstore</h4>
+                <router-link to="/" tag="h4" class="brand">Online Bookstore</router-link>
             </div>
             <div class="float-right">
                 <Logout></Logout>
