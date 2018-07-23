@@ -3,6 +3,11 @@ const createError = require('http-errors');
 const Token = require('../models/Token');
 
 const AuthController = {
+    /**
+     * Get user's information from the bearer token
+     * Binds 'user' attribute to 'req'
+     * req.user = null when missing/invalid bearer token
+     */
     getUserData: (req, res, next) => {
         // user did not send a token
         if (!req.token) {
@@ -51,6 +56,11 @@ const AuthController = {
             });
     },
 
+    /**
+     * Middleware that only allows logged in users to pass
+     * Responds:
+     *      401: {}     // unauthorized for not logged in users
+     */
     loggedIn: (req, res, next) => {
         // user is not logged in?
         if (!req.user) {
@@ -62,6 +72,11 @@ const AuthController = {
         }
     },
 
+    /**
+     * Middleware that only allows not logged in users to pass
+     * Responds:
+     *      403: {}     // forbidden for logged in users
+     */
     loggedOut: (req, res, next) => {
         // user is logged in?
         if (req.user) {
@@ -73,6 +88,10 @@ const AuthController = {
         }
     },
 
+    /**
+     * Different purpose validators
+     * Bind errors with the 'req' object
+     */
     validate: {
         // validate the name
         name: (req) => {
