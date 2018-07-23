@@ -9,6 +9,21 @@ const authenticator = require('../controllers/AuthController');
 const validate = authenticator.validate;
 
 const UserController = {
+    /**
+     * POST /api/register
+     * Creates new user
+     * Returns new user id
+     * Expects: {
+     *      body:   name, username, email, password
+     * }
+     * Responds: {
+     *      200: { body: user } // success
+     *      403: {}             // forbidden for logged in user
+     *      422: {}             // invalid data provided
+     *      409: {}             // conflict with existing data
+     *      500: {}             // internal error
+     * }
+     */
     register: (req, res, next) => {
         // validate and sanitize the incoming data
         validate.name(req);
@@ -33,7 +48,7 @@ const UserController = {
         const password = req.body.password;
         const hashedPassword = bcrypt.hashSync(password,12);
 
-        User.findOne({ $or:[ {username: username}, {email: email} ] })
+        User.findOne({ username: username })
             .catch( (err) => {
                 return next(err);
             })
@@ -58,8 +73,6 @@ const UserController = {
                     })
                     .then( (newUser) => {
                         // new user created
-                        // erase the password before sending the response
-                        delete newUser._doc.password;
                         res.status(200).json({
                             message: 'registration successful',
                             user: newUser._id
@@ -70,6 +83,23 @@ const UserController = {
             });
     },
 
+    /**
+     * POST /api/login
+     * Logs in an existing user
+     * Returns created token
+     * Expects: {
+     *      body:   username, password
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: token }    // success
+     *      403: {}                 // forbidden for logged in user
+     *      422: {}                 // invalid data provided
+     *      404: {}                 // user not found
+     *      401: {}                 // password mismatch
+     *      500: {}                 // internal error
+     * }
+     */
     login: (req, res, next) => {
         // validate and sanitize the incoming data
         validate.username(req);
@@ -143,6 +173,19 @@ const UserController = {
             });
     },
 
+    /**
+     * POST /api/logout
+     * Logs out an existing user
+     * Returns removed token
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: token }    // success
+     *      401: {}                 // unauthorized for not logged in user
+     *      500: {}                 // internal error
+     * }
+     */
     logout: (req, res, next) => {
         // logout the user
         Token.findByIdAndRemove(req.token)
@@ -159,6 +202,24 @@ const UserController = {
             });
     },
 
+    /**
+     * PATCH /api/user/:id
+     * Updates user data
+     * Returns user id
+     * Expects: {
+     *      params: user._id
+     *      body:   name (optional), email (optional), password (optional), isModerator (optional)
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: user } // success
+     *      401: {}             // unauthorized for not logged in user
+     *      403: {}             // forbidden (changing username or admin previlizes)
+     *      404: {}             // user not found
+     *      422: {}             // invalid data provided
+     *      500: {}             // internal error
+     * }
+     */
     updateProfile: (req,res,next) => {
         // validate requested id
         validate.isMongoObejectID(req);
@@ -256,12 +317,39 @@ const UserController = {
             });
     },
 
+    /**
+     * GET /api/user/
+     * Returns user's own profile
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: user } // success
+     *      401: {}             // unauthorized for not logged in user
+     *      404: {}             // user not found
+     *      500: {}             // internal error
+     * }
+     */
     getOwnProfile: (req, res, next) => {
         res.redirect('/api/user/'+req.user._id);
         
         return next();
     },
 
+    /**
+     * GET /api/user/:id
+     * Returns user profile for the given id
+     * Expects: {
+     *      params: user._id
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: user } // success
+     *      401: {}             // unauthorized for not logged in user
+     *      404: {}             // user not found
+     *      500: {}             // internal error
+     * }
+     */
     getProfile: (req, res, next) => {
         // validate requested id
         validate.isMongoObejectID(req);
@@ -273,7 +361,7 @@ const UserController = {
             return next(err);
         }
 
-        // reply with the user profile
+        // look up user in db
         User.findById(req.params.id, {
             password: false,
             createdAt: false,
@@ -289,6 +377,7 @@ const UserController = {
 
                     return next(err);
                 }
+                // reply with the user profile
                 user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
                 res.status(200).json({
                     message: 'successfully retrieved user data',
@@ -299,8 +388,20 @@ const UserController = {
             });
     },
 
+    /**
+     * GET /api/user/group/all
+     * Returns all user profiles
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: users }    // success
+     *      401: {}                 // unauthorized for not logged in user
+     *      500: {}                 // internal error
+     * }
+     */
     getAllProfiles: (req, res, next) => {
-        // reply with the user profile
+        // look up users in db
         User.find({}, {
             password: false,
             createdAt: false,
@@ -315,6 +416,7 @@ const UserController = {
                     user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
                 });
 
+                // reply with the user profiles
                 res.status(200).json({
                     message: 'successfully retrieved users',
                     users: users
@@ -324,8 +426,20 @@ const UserController = {
             });
     },
 
+    /**
+     * GET /api/user/group/moderators
+     * Returns moderator user profiles
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: users }    // success
+     *      401: {}                 // unauthorized for not logged in user
+     *      500: {}                 // internal error
+     * }
+     */
     getModeratorProfiles: (req, res, next) => {
-        // reply with the user profile
+        // look up moderators in db
         User.find({isModerator: true}, {
             password: false,
             createdAt: false,
@@ -339,7 +453,8 @@ const UserController = {
                 users.forEach( (user) => {
                     user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
                 });
-
+                
+                // reply with the moderator profiles
                 res.status(200).json({
                     message: 'successfully retrieved moderators',
                     users: users

@@ -5,6 +5,23 @@ const authenticator = require('../controllers/AuthController');
 const validate = authenticator.validate;
 
 const BookController = {
+    /**
+     * POST /api/book
+     * Creates new book
+     * Returns new book id
+     * Expects: {
+     *      body:   title, author, isbn
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: book } // success
+     *      401: {}             // unauthorized for not logged in users
+     *      403: {}             // forbidden for users with no moderator access
+     *      422: {}             // invalid data provided
+     *      409: {}             // conflict with existing data
+     *      500: {}             // internal error
+     * }
+     */
     addBook: (req, res, next) => {
         // check if the user has previlige for this
         if (!req.user.isModerator) {
@@ -67,6 +84,24 @@ const BookController = {
             });
     },
 
+    /**
+     * PATCH /api/book/:id
+     * Updates book data
+     * Returns book id
+     * Expects: {
+     *      params: book._id
+     *      body:   title (optional), author (optional)
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: user } // success
+     *      401: {}             // unauthorized for not logged in user
+     *      403: {}             // forbidden (no moderator access, changing isbn )
+     *      404: {}             // book not found
+     *      422: {}             // invalid data provided
+     *      500: {}             // internal error
+     * }
+     */
     updateBook: (req, res, next) => {
         // validate requested id
         validate.isMongoObejectID(req);
@@ -148,6 +183,20 @@ const BookController = {
             });
     },
 
+    /**
+     * GET /api/book/:id
+     * Returns book profile for the given id
+     * Expects: {
+     *      params: book._id
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: book } // success
+     *      401: {}             // unauthorized for not logged in user
+     *      404: {}             // book not found
+     *      500: {}             // internal error
+     * }
+     */
     getBook: (req, res, next) => {
         // validate requested id
         validate.isMongoObejectID(req);
@@ -159,6 +208,7 @@ const BookController = {
             return next(err);
         }
         
+        // request is okay. look up the book
         Book.findById(req.params.id, {
             createdAt: false,
             updatedAt: false
@@ -167,11 +217,13 @@ const BookController = {
                 return next(err);
             })
             .then( (book) => {
+                // book not in db
                 if (!book) {
                     const err = createError(404,'book not found');
 
                     return next(err);
                 }
+                // respond with book profile
                 res.status(200).json({
                     message: 'book retrieved successfully',
                     book: book
@@ -181,7 +233,20 @@ const BookController = {
             });
     },
     
-    getAllBooks: (req, res, next) => {        
+    /**
+     * GET /api/book/group/all
+     * Returns all book profiles
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: books }    // success
+     *      401: {}                 // unauthorized for not logged in user
+     *      500: {}                 // internal error
+     * }
+     */
+    getAllBooks: (req, res, next) => {
+        // look up books in db
         Book.find(req.params.id, {
             createdAt: false,
             updatedAt: false
@@ -190,6 +255,7 @@ const BookController = {
                 return next(err);
             })
             .then( (books) => {
+                // respond with book profiles
                 res.status(200).json({
                     message: 'books retrieved successfully',
                     books: books
