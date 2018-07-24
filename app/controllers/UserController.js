@@ -249,9 +249,8 @@ const UserController = {
         }
         
         // only admin can give moderator previlige
-        // admin cannot revoke his own moderator/admin access
         if ('isModerator' in req.body) {
-            if (!req.user.isAdmin || req.user._id === targetUserId) {
+            if (!req.user.isAdmin) {
                 const err = createError(403, 'user not authorized for this action');
 
                 return next(err);
@@ -272,6 +271,16 @@ const UserController = {
             err.message = error[0].msg;     // return the first error
 
             return next(err);
+        }
+
+        // admin changing his own credential
+        if('isModerator' in req.body && req.user._id === targetUserId) {
+            // admin cannot revoke his own moderator/admin access
+            if (req.body.isModerator !== true) {
+                const err = createError(403, 'user not authorized for this action');
+
+                return next(err);
+            }
         }
 
         // everything is fine. look the user up and update
