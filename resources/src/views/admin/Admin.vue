@@ -48,6 +48,8 @@ export default {
     },
 
     mounted () {
+        document.title = 'Admin panel';
+
         if (!this.user.isAdmin) {
             this.$router.push('/');
             return;

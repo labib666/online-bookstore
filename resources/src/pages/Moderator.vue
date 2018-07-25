@@ -22,6 +22,10 @@ export default {
         ...mapState([
             'isAuthSuccess'
         ])
+    },
+
+    mounted () {
+        document.title = 'Moderator panel';
     }
 };
 </script>
