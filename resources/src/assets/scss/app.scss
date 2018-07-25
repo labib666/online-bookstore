@@ -52,10 +52,12 @@ html, body {
 a {
     color: #42b983;
     padding: 0 25px;
-    font-size: 12px;
     font-weight: 1000;
     letter-spacing: .1rem;
     text-decoration: none;
+}
+
+.uppercase {
     text-transform: uppercase;
 }
 

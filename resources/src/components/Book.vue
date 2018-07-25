@@ -3,7 +3,14 @@
         <div class="card">
             <div class="card-body">
                 <div class="card-title">
-                    <h4>{{ title }}</h4>
+                    <div class="clearfix">
+                        <div class="float-left">
+                            <h4>{{ title }}</h4>
+                        </div>
+                        <div v-if="user.isModerator" class="float-right">
+                            <router-link :to="'/moderator/edit/book/' + id">Edit</router-link>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-text">
                     Author: {{ author }}
@@ -16,7 +23,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
-    props: ['title', 'author', 'isbn']
+    props: ['id', 'title', 'author', 'isbn'],
+
+    computed: {
+        ...mapState([
+            'user'
+        ])
+    }
 };
 </script>
