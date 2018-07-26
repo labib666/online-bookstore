@@ -21,7 +21,7 @@ const AuthController = {
         let payload;
         const jwtSecret = process.env.JWT_SECRET;
         const jwtOptions = {
-            ignoreExpiration: true
+            ignoreExpiration: false
         };
         
         try {

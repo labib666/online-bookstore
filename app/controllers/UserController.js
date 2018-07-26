@@ -48,7 +48,7 @@ const UserController = {
         const password = req.body.password;
         const hashedPassword = bcrypt.hashSync(password,12);
 
-        User.findOne({ username: username })
+        User.findOne({ $or:[ { username: username }, { email: email } ] })
             .catch( (err) => {
                 return next(err);
             })
@@ -141,7 +141,7 @@ const UserController = {
                 // create an API token against this request
                 const jwtSecret = process.env.JWT_SECRET;
                 const jwtOptions = {
-                    expiresIn: '30d'
+                    expiresIn: '30m'
                 };
                 let token, isAdmin, isModerator;
                 isAdmin = (user.email === process.env.SUPER_ADMIN) ? true : false;
@@ -273,57 +273,39 @@ const UserController = {
             return next(err);
         }
 
-        // admin changing his own credential
-        if('isModerator' in req.body && req.user._id === targetUserId) {
-            // admin cannot revoke his own moderator/admin access
-            if (req.body.isModerator !== true) {
-                const err = createError(403, 'user not authorized for this action');
-
-                return next(err);
-            }
-        }
-
-        // everything is fine. look the user up and update
-        User.findById(targetUserId)
-            .catch( (err) => {
-                return next(err);
-            })
-            .then( (targetUser) => {
-                // the target user does not exist
-                if (!targetUser) {
-                    const err = createError(404,'user not found');
-
+        if ('email' in req.body) {
+            User.findOne({ email: req.body.email })
+                .catch( (err) => {
                     return next(err);
-                }
+                })
+                .then( (oldUser) => {
+                    if (oldUser) {
+                        const err = createError(409,'username or email already in use');
 
-                // user exists, make necessary changes
-                if ('name' in req.body) {
-                    targetUser.name = req.body.name;
-                }
-                if ('email' in req.body) {
-                    targetUser.email = req.body.email;
-                }
-                if ('password' in req.body) {
-                    targetUser.password = bcrypt.hashSync(req.body.password,12);
-                }
-                if ('isModerator' in req.body) {
-                    targetUser.isModerator = req.body.isModerator;
-                }
-
-                // save changed data in database
-                targetUser.save()
-                    .catch( (err) => {
                         return next(err);
-                    })
-                    .then( (updatedUser) => {
-                        res.status(200).json({
-                            message: 'user successfully updated',
-                            user: updatedUser._id
-                        });
-
-                        return next();
-                    });
-            });
+                    } else {
+                        updateDatabaseWithProfile(targetUserId,req)
+                            .then( (response) => {
+                                res.json(response);
+                                
+                                return next();
+                            })
+                            .catch( (err) => {
+                                return next(err);
+                            });
+                    }
+                });
+        } else {
+            updateDatabaseWithProfile(targetUserId,req)
+                .then( (response) => {
+                    res.json(response);
+                                
+                    return next();
+                })
+                .catch( (err) => {
+                    return next(err);
+                });
+        }
     },
 
     /**
@@ -472,6 +454,59 @@ const UserController = {
                 return next();
             });
     }
+};
+
+/**
+ * Method to aid updateProfile method in Usercontroller.
+ * Once verification and validation is done, this method
+ * is called to save the requested changes in database.
+ * Returns a promise which resolves if changes are successfully
+ * saved, and rejects if some error is encountered.
+ */
+const updateDatabaseWithProfile = (targetUserId, req) => {
+    return new Promise( (resolve,reject) => {
+        // everything is fine. look the user up and update
+        User.findById(targetUserId)
+            .catch( (err) => {
+                return reject(err);
+            })
+            .then( (targetUser) => {
+                // the target user does not exist
+                if (!targetUser) {
+                    const err = createError(404,'user not found');
+
+                    return reject(err);
+                }
+
+                // user exists, make necessary changes
+                if ('name' in req.body) {
+                    targetUser.name = req.body.name;
+                }
+                if ('email' in req.body) {
+                    targetUser.email = req.body.email;
+                }
+                if ('password' in req.body) {
+                    targetUser.password = bcrypt.hashSync(req.body.password,12);
+                }
+                if ('isModerator' in req.body) {
+                    targetUser.isModerator = req.body.isModerator;
+                }
+
+                // save changed data in database
+                targetUser.save()
+                    .catch( (err) => {
+                        return reject(err);
+                    })
+                    .then( (updatedUser) => {
+                        const response = {
+                            message: 'user successfully updated',
+                            user: updatedUser._id
+                        };
+
+                        return resolve(response);
+                    });
+            });
+    });
 };
 
 module.exports = UserController;
