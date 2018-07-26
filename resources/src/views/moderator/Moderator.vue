@@ -7,19 +7,21 @@
             <router-link to="/moderator">Add new book</router-link>
         </div>
 
-        <div id="main">
+        <Main>
             <router-view />
-        </div>
+        </Main>
     </div>
 </template>
 
 <script>
+import Main from '@/components/Main';
 import Topbar from '@/components/Topbar';
 import NewBookForm from './NewBookForm';
 import { mapState } from 'vuex';
 
 export default {
     components: {
+        Main,
         Topbar,
         NewBookForm
     },

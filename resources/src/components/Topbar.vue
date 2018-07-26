@@ -1,21 +1,27 @@
 <template>
     <div id="topbar">
-        <div class="clearfix">
-            <div class="float-left">
-                <router-link to="/" tag="h4" class="brand">Online Bookstore</router-link>
+            <div class="left">
+                <i class="material-icons" @click="toggleSidebar">menu</i>
+                <router-link to="/" tag="a" class="brand">Online Bookstore</router-link>
             </div>
-            <div class="float-right">
+            <div class="right">
                 <Logout></Logout>
             </div>
-        </div>
     </div>
 </template>
 
 <script>
 import Logout from './Logout';
+import { mapMutations } from 'vuex';
 export default {
     components: {
         Logout
+    },
+
+    methods: {
+        ...mapMutations([
+            'toggleSidebar'
+        ])
     }
 };
 </script>

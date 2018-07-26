@@ -2,7 +2,7 @@
     <div>
         <Topbar></Topbar>
         <div id="sidebar"></div>
-        <div id="main">
+        <Main>
             <div class="row-container flex-center">
                 <div class="col-md-6">
                     <div v-if="loading">
@@ -16,16 +16,18 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </Main>
     </div>
 </template>
 
 <script>
+import Main from '@/components/Main';
 import Topbar from '@/components/Topbar';
 import Book from '@/components/Book';
 
 export default {
     components: {
+        Main,
         Topbar,
         Book
     },
