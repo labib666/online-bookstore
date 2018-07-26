@@ -1,10 +1,7 @@
 <template>
     <div id="admin">
         <Topbar></Topbar>
-        <div id="sidebar" :class="{'toggle-active': isSidebarActive}">
-            <center><h3>Admin panel</h3></center>
-            <hr />
-        </div>
+        <Sidebar title="Admin panel"></Sidebar>
         <Main>
             <h1>Moderators</h1>
             <div class="row mr-0">
@@ -27,17 +24,18 @@
 import User from './User';
 import Main from '@/components/Main';
 import Topbar from '@/components/Topbar';
+import Sidebar from '@/components/Sidebar';
 import { mapState, mapMutations } from 'vuex';
 export default {
     components: {
         Main,
         User,
-        Topbar
+        Topbar,
+        Sidebar
     },
 
     computed: {
         ...mapState([
-            'isSidebarActive',
             'isAuthSuccess',
             'user',
             'users'
