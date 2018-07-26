@@ -7,15 +7,15 @@
         </div>
         <div id="main">
             <h1>Moderators</h1>
-            <div class="card-columns">
-                <div v-for="user in users" v-if="user.isModerator" v-bind:key="user._id">
+            <div class="row mr-0">
+                <div v-for="user in users" v-if="user.isModerator" v-bind:key="user._id" class="col-lg-4">
                     <User v-bind:user="user"></User>
                 </div>
             </div>
             <hr />
             <h1>Registered users</h1>
-            <div class="card-columns">
-                <div v-for="user in users" v-if="!user.isModerator" v-bind:key="user._id">
+            <div class="row mr-0">
+                <div v-for="user in users" v-if="!user.isModerator" v-bind:key="user._id" class="col-lg-4">
                     <User v-bind:user="user"></User>
                 </div>
             </div>

@@ -81,6 +81,6 @@ export default {
 
 <style lang="scss" scoped>
     .home {
-        margin-top: -10vh;
+        margin-top: -50px;
     }
 </style>

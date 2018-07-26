@@ -3,7 +3,7 @@
         <Topbar></Topbar>
         <div id="sidebar"></div>
         <div id="main">
-            <div class="row flex-center">
+            <div class="row-container flex-center">
                 <div class="col-md-6">
                     <div v-if="loading">
                         Loading...
