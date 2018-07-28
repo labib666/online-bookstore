@@ -27,7 +27,6 @@ router.post('/register', authenticator.loggedOut, UserController.register);
 router.post('/login', authenticator.loggedOut, UserController.login);
 
 // request from logged-in user
-router.get('/me', authenticator.loggedIn, UserController.getOwnProfile);
 router.post('/logout', authenticator.loggedIn, UserController.logout);
 router.use('/users', authenticator.loggedIn, userRouter);
 router.use('/books', authenticator.loggedIn, bookRouter);

@@ -50,8 +50,8 @@ const BookController = {
      *      200: { body: book } // success
      *      401: {}             // unauthorized for not logged in users
      *      403: {}             // forbidden for users with no moderator access
-     *      422: {}             // invalid data provided
      *      409: {}             // conflict with existing data
+     *      422: {}             // invalid data provided
      *      500: {}             // internal error
      * }
      */
@@ -266,7 +266,7 @@ const BookController = {
     },
 
     /**
-     * POST /api/book/:id/category
+     * POST /api/books/:id/category
      * Adds a book to a category
      * Returns the book id
      * Expects: {
@@ -278,8 +278,9 @@ const BookController = {
      *      200: { body: book } // success
      *      401: {}             // unauthorized for not logged in users
      *      403: {}             // forbidden for users with no moderator access
-     *      422: {}             // invalid data provided
+     *      404: {}             // book not found
      *      409: {}             // conflict with existing data
+     *      422: {}             // invalid data provided
      *      500: {}             // internal error
      * }
      */
@@ -307,7 +308,7 @@ const BookController = {
         
         // Credentials are okay
         const category_name = req.body.category_name;
-        const book_id = req.params.book_id;
+        const book_id = req.params.id;
 
         // look whether this book exists in db
         Book.findById(book_id)
@@ -344,6 +345,87 @@ const BookController = {
                                 res.status(200).json({
                                     message: 'successfully added book to category',
                                     book: data.book_id
+                                });
+                            });
+                    });
+            });
+    },
+
+    /**
+     * DELETE /api/books/:id/category
+     * Removes a book from a category
+     * Returns the book id
+     * Expects: {
+     *      params: book._id
+     *      body:   category_name
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: book } // success
+     *      401: {}             // unauthorized for not logged in users
+     *      403: {}             // forbidden for users with no moderator access
+     *      404: {}             // book not found
+     *      422: {}             // invalid data provided
+     *      500: {}             // internal error
+     * }
+     */
+    removeFromCategory: (req, res, next) => {
+        // check if the user has previlige for this
+        if (!req.user.isModerator) {
+            const err = createError(403, 'user not authorized for this action');
+
+            return next(err);
+        }
+
+        // validate and sanitize the incoming data
+        validate.category_name(req);
+        validate.isMongoObejectID(req);
+
+        const error = req.validationErrors();
+
+        // errors faced while validating / sanitizing
+        if ( error ) {
+            const err = createError(422);
+            err.message = error[0].msg;     // return the first error
+
+            return next(err);
+        } 
+        
+        // Credentials are okay
+        const category_name = req.body.category_name;
+        const book_id = req.params.id;
+
+        // look whether this book exists in db
+        Book.findById(book_id)
+            .catch( (err) => {
+                return next(err);
+            })
+            .then( (book) => {
+                if (!book) {
+                    const err = createError(404,'book not found');
+
+                    return next(err);
+                }
+                // look for the book in this category
+                findBookInCategory(category_name,book_id)
+                    .catch( (err) => {
+                        return next(err);
+                    })
+                    .then( (data) => {
+                        if (!data) {
+                            const err = createError(404,'book does not belong to this category');
+
+                            return next(err);
+                        }
+                        // book belongs to category. now remove it
+                        Category.findByIdAndRemove(data._id)
+                            .catch( (err) => {
+                                return next(err);
+                            })
+                            .then( (deletedData) => {
+                                res.status(200).json({
+                                    message: 'successfully removed book from category',
+                                    book: deletedData.book_id
                                 });
                             });
                     });
@@ -387,7 +469,7 @@ const getBookCategory = (targetBookID) => {
             .then( (entries) => {
                 let categories = [];
                 entries.forEach( (entry) => {
-                    categories.append(entry.category_name);
+                    categories.push(entry.category_name);
                 });
                 resolve(categories);
             });

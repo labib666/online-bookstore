@@ -20,8 +20,8 @@ const UserController = {
      * Responds: {
      *      200: { body: user } // success
      *      403: {}             // forbidden for logged in user
-     *      422: {}             // invalid data provided
      *      409: {}             // conflict with existing data
+     *      422: {}             // invalid data provided
      *      500: {}             // internal error
      * }
      */
@@ -92,10 +92,10 @@ const UserController = {
      * }
      * Responds: {
      *      200: { body: token }    // success
-     *      403: {}                 // forbidden for logged in user
-     *      422: {}                 // invalid data provided
-     *      404: {}                 // user not found
      *      401: {}                 // password mismatch
+     *      403: {}                 // forbidden for logged in user
+     *      404: {}                 // user not found
+     *      422: {}                 // invalid data provided
      *      500: {}                 // internal error
      * }
      */
@@ -140,7 +140,7 @@ const UserController = {
                 // create an API token against this request
                 const jwtSecret = process.env.JWT_SECRET;
                 const jwtOptions = {
-                    expiresIn: '30m'
+                    expiresIn: '12h'
                 };
                 let token, isAdmin, isModerator;
                 isAdmin = (user.email === process.env.SUPER_ADMIN) ? true : false;
@@ -200,7 +200,7 @@ const UserController = {
     },
 
     /**
-     * GET /api/me
+     * GET /api/users/me
      * Returns user's own profile
      * Expects: {
      *      header: bearer-token
@@ -314,7 +314,7 @@ const UserController = {
      * Responds: {
      *      200: { body: user } // success
      *      401: {}             // unauthorized for not logged in user
-     *      403: {}             // forbidden (changing username or admin previlizes)
+     *      403: {}             // forbidden (changing username)
      *      404: {}             // user not found
      *      422: {}             // invalid data provided
      *      500: {}             // internal error
