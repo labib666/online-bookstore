@@ -16,7 +16,7 @@ export default {
         gapi.load('auth2', () => {
             const auth2 = gapi.auth2.init(params);
             auth2.attachClickHandler(this.$refs.glogin, {}, (googleUser) => {
-                this.$http.post('/api/auth/social/fb', googleUser).then((response) => {
+                this.$http.post('/api/social/google', googleUser).then((response) => {
                     this.$notify({
                         text: 'Yay'
                     });
