@@ -1,5 +1,6 @@
 const JWT = require('jsonwebtoken');
 const createError = require('http-errors');
+
 const Token = require('../models/Token');
 
 const AuthController = {
@@ -21,7 +22,7 @@ const AuthController = {
         let payload;
         const jwtSecret = process.env.JWT_SECRET;
         const jwtOptions = {
-            ignoreExpiration: true
+            ignoreExpiration: false
         };
         
         try {
@@ -156,6 +157,13 @@ const AuthController = {
                 .notEmpty().withMessage('\'ISBN\' field must be non empty')
                 .trim().escape()
                 .isISBN(10).withMessage('\'ISBN\' must have a ISBN 10 value');
+        },
+        // validate the category-name
+        category_name: (req) => {
+            req.check('category_name')
+                .exists().withMessage('req must have a \'category_name\' field')
+                .notEmpty().withMessage('\'category_name\' field must be non empty')
+                .trim().escape();
         },
         // validate mongo objectID
         isMongoObejectID: (req) => {
