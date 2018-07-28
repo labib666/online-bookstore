@@ -5,8 +5,8 @@
                 <h5 class="card-title">{{user.name}}</h5>
                 <p class="card-text">E-mail: {{user.email}}</p>
                 <div class="text-center">
-                    <a v-if="!user.isModerator" @click="makeModerator" class="btn btn-primary">Make moderator</a>
-                    <a v-if="user.isModerator" @click="removeModerator" class="btn btn-danger">Remove moderator</a>
+                    <button v-if="!user.isModerator" @click="makeModerator" class="btn btn-primary">Make moderator</button>
+                    <button v-if="user.isModerator" @click="removeModerator" class="btn btn-danger">Remove moderator</button>
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@ export default {
         },
 
         removeModerator () {
-            this.$http.patch(`/user/${this.user._id}`, {
+            this.$http.patch(`/users/${this.user._id}`, {
                 isModerator: false
             }).then((response) => {
                 const updatedUser = {

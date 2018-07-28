@@ -56,6 +56,10 @@ export default {
         };
     },
 
+    mounted () {
+        document.title = 'Register';
+    },
+
     methods: {
         ...mapMutations([
             'toggleLoginRegister'

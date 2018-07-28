@@ -4,13 +4,16 @@
         <div v-if="isAuthAttempted" class="flex-center full-height home">
             <div class="flex-container">
                 <h1 class="m-b-md center-content">Online Bookstore</h1>
-                    <div class="col-md-12" v-if="!loginOrRegisterChoice">
-                        <Register />
-                    </div>
+                <div class="col-md-12" v-if="!loginOrRegisterChoice">
+                    <Register />
+                </div>
 
-                    <div class="col-md-12" v-if="loginOrRegisterChoice">
-                        <Login />
-                    </div>
+                <div class="col-md-12" v-if="loginOrRegisterChoice">
+                    <Login />
+                </div>
+                <div class="col-md-12 social-auth center-content">
+                    <social-auth />
+                </div>
             </div>
         </div>
     </div>
@@ -21,12 +24,14 @@
 import { mapState, mapMutations } from 'vuex';
 import Login from '@/views/Login';
 import Register from '@/views/Register';
+import SocialAuth from '@/components/SocialAuth';
 
 export default {
     name: 'home',
     components: {
         Login,
-        Register
+        Register,
+        SocialAuth
     },
 
     data () {
@@ -62,7 +67,7 @@ export default {
 
         const apitoken = window.localStorage.apitoken;
         this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + apitoken;
-        this.$http.get('/user').then((res) => {
+        this.$http.get('/users/me').then((res) => {
             this.authSuccess(res.data.user);
             const path = this.$route.query.redirect || '/dashboard';
             this.$router.push(path);
@@ -76,6 +81,6 @@ export default {
 
 <style lang="scss" scoped>
     .home {
-        margin-top: -10vh;
+        margin-top: -50px;
     }
 </style>

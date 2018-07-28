@@ -1,37 +1,63 @@
 <template>
     <div>
         <Topbar></Topbar>
-        <div id="main">
-            <Book :title="title" :author="author" :isbn="isbn"></Book>
-        </div>
+        <div id="sidebar"></div>
+        <Main>
+            <div class="row-container flex-center">
+                <div class="col-md-6">
+                    <div v-if="loading">
+                        Loading...
+                    </div>
+                    <div v-if="book.loaded">
+                        <Book :id="book.id" :title="book.title" :author="book.author" :isbn="book.isbn"></Book>
+                    </div>
+                    <div v-if="!loading && !book.loaded">
+                        <h1>Book not found</h1>
+                    </div>
+                </div>
+            </div>
+        </Main>
     </div>
 </template>
 
 <script>
+import Main from '@/components/Main';
 import Topbar from '@/components/Topbar';
 import Book from '@/components/Book';
 
 export default {
     components: {
+        Main,
         Topbar,
         Book
     },
 
     data () {
         return {
-            title: '',
-            author: '',
-            isbn: ''
+            loading: true,
+            book: {
+                loaded: false,
+                id: '',
+                title: '',
+                author: '',
+                isbn: ''
+            }
         };
     },
 
     mounted () {
-        const bookPath = this.$route.path;
-        this.$http.get(bookPath).then((response) => {
+        this.book.id = this.$route.params.id;
+        this.$http.get(`/books/${this.book.id}`).then((response) => {
             const book = response.data.book;
-            this.title = book.title;
-            this.author = book.author;
-            this.isbn = book.ISBN;
+            this.book.title = book.title;
+            this.book.author = book.author;
+            this.book.isbn = book.ISBN;
+
+            this.loading = false;
+            this.book.loaded = true;
+        }).catch(() => {
+            this.loading = false;
+            this.book.loaded = false;
         });
     }
 };

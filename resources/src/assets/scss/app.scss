@@ -1,66 +1,40 @@
 @import "~bootstrap/scss/bootstrap";
 
+
 $text-color: #000;
-$sidebar-width: 300px;
+$sidebar-width: 280px;
 $topbar-height: 60px;
 $sidebar-color: whitesmoke;
 $topbar-color: var(--secondary);
+$default-margin: 20px;
 $default-padding: 20px;
+$default-transition: all 0.3s;
 
-html, body {
-    background-color: #fff;
-    color: $text-color;
-    font-family: 'Raleway', sans-serif;
-    font-weight: 100;
-    height: 100vh;
-    margin: 0px;
-    padding: 0px;
-}
 
 .full-height {
     height: 100vh;
 }
 
 .flex-center {
-    align-items: center;
     display: flex;
+    align-items: center;
     justify-content: center;
-}
-
-.flex-container {
-    flex: none;
-}
-
-.position-ref {
-    position: relative;
-}
-
-.top-right {
-    position: absolute;
-    right: 10px;
-    top: 18px;
 }
 
 .center-content {
     text-align: center;
 }
 
-.title {
-    font-size: 84px;
-}
-
 a {
     color: #42b983;
     padding: 0 25px;
-    font-size: 12px;
     font-weight: 1000;
-    letter-spacing: .1rem;
     text-decoration: none;
-    text-transform: uppercase;
 }
 
-.m-b-md {
-    margin-bottom: 30px;
+.uppercase {
+    letter-spacing: .1rem;
+    text-transform: uppercase;
 }
 
 // App specific design
@@ -76,7 +50,9 @@ a {
     top: 0px;
     left: 0px;
     height: 100vh;
+    overflow-y: auto;
     z-index: 998;
+    transition: $default-transition;
 
     a {
         color: var(--teal);
@@ -90,6 +66,10 @@ a {
             background-color: #fff;
         }
     }
+
+    &.toggle-active {
+        margin-left: -$sidebar-width;
+    }
 }
 
 #topbar {
@@ -99,26 +79,69 @@ a {
     min-height: $topbar-height;
     max-height: $topbar-height;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     padding-right: $default-padding;
     position: fixed;
     top: 0px;
     left: 0px;
     z-index: 999;
     box-shadow: 0px 1px 6px lighten($text-color, 20%);
+    transition: $default-transition;
+
+    a, a:hover {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 900;
+        padding-left: 5px;
+    }
+
+    .left {
+        cursor: pointer;
+        margin-left: $default-margin;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
 }
+
 
 #main {
     margin-top: $topbar-height;
     padding-top: $default-padding;
     margin-left: $sidebar-width;
     padding-left: $default-padding;
+    transition: $default-transition;
+
+    &.toggle-full-width {
+        margin-left: 0px;
+    }
 }
 
-.brand {
-    color: #ffffff;
-    cursor: pointer;
-    font-weight: 900;
-    padding-left: $default-padding;
+@media(max-width: 768px) {
+    // For mobile device
+    #sidebar {
+        margin-left: -$sidebar-width;
+        &.toggle-active {
+            margin-left: 0px;
+        }
+    }
+
+    #main {
+        margin-left: 0px;
+        &.toggle-full-width {
+            margin-left: $sidebar-width;
+        }
+    }
+}
+.social-auth {
+    padding-top: $default-padding;
+}
+
+.card {
+    margin: 10px;
+    border: 0px;
+    border-radius: 0px;
+    box-shadow: 0px 0px 10px 1px grey;
 }

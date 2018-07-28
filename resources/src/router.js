@@ -37,18 +37,13 @@ export default new Router({
                     component: NewBookForm
                 },
                 {
-                    path: 'edit',
+                    path: 'edit/book/:id',
                     component: EditBookForm
                 }
             ]
         },
         {
-            path: '/moderator/book/:id',
-            name: 'moderator-book-edit',
-            component: EditBookForm
-        },
-        {
-            path: '/book/*',
+            path: '/book/:id',
             name: 'book',
             component: Book
         },

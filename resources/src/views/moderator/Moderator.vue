@@ -1,27 +1,27 @@
 <template>
     <div id="moderator">
         <Topbar></Topbar>
-        <div id="sidebar">
-            <center><h3>Moderator panel</h3></center>
-            <hr />
+        <Sidebar title="Moderator panel">
             <router-link to="/moderator">Add new book</router-link>
-        </div>
+        </Sidebar>
 
-        <div id="main">
+        <Main>
             <router-view />
-        </div>
+        </Main>
     </div>
 </template>
 
 <script>
+import Main from '@/components/Main';
 import Topbar from '@/components/Topbar';
-import NewBookForm from './NewBookForm';
+import Sidebar from '@/components/Sidebar';
 import { mapState } from 'vuex';
 
 export default {
     components: {
+        Main,
         Topbar,
-        NewBookForm
+        Sidebar
     },
 
     computed: {

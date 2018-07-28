@@ -1,6 +1,6 @@
 <template>
     <div id="logout">
-        <a class="btn btn-light" @click="logout">Logout</a>
+        <button class="btn btn-light" @click="logout">Logout</button>
     </div>
 </template>
 

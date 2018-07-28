@@ -4,6 +4,7 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 const baseState = {
+    isSidebarActive: false,
     loginOrRegisterChoice: true,
     isAuthSuccess: false,
     user: null,
@@ -15,6 +16,10 @@ export default new Vuex.Store({
         ...baseState
     },
     mutations: {
+        toggleSidebar (state) {
+            state.isSidebarActive = !state.isSidebarActive;
+        },
+
         toggleLoginRegister (state) {
             state.loginOrRegisterChoice = !state.loginOrRegisterChoice;
         },
