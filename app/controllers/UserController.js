@@ -1,7 +1,8 @@
-const createError = require('http-errors');
 const bcrypt = require('bcrypt');
 const JWT = require('jsonwebtoken');
+const createError = require('http-errors');
 const randomstring = require('randomstring');
+
 const User = require('../models/User');
 const Token = require('../models/Token');
 const authenticator = require('../controllers/AuthController');
@@ -77,8 +78,6 @@ const UserController = {
                             message: 'registration successful',
                             user: newUser._id
                         });
-
-                        return next();
                     });
             });
     },
@@ -197,8 +196,6 @@ const UserController = {
                     message: 'logout successful',
                     removedToken: token.token
                 });
-
-                return next();
             });
     },
 
@@ -215,10 +212,8 @@ const UserController = {
      *      500: {}             // internal error
      * }
      */
-    getOwnProfile: (req, res, next) => {
-        res.redirect('/api/user/'+req.user._id);
-        
-        return next();
+    getOwnProfile: (req, res) => {
+        res.redirect('/api/users/'+req.user._id);
     },
 
     /**
@@ -254,8 +249,6 @@ const UserController = {
                     message: 'successfully retrieved users',
                     users: users
                 });
-                
-                return next();
             });
     },
 
@@ -306,8 +299,6 @@ const UserController = {
                     message: 'successfully retrieved user data',
                     user: user
                 });
-
-                return next();
             });
     },
 
@@ -394,25 +385,21 @@ const UserController = {
                         return next(err);
                     } else {
                         updateDatabaseWithProfile(targetUserId,req)
-                            .then( (response) => {
-                                res.json(response);
-                                
-                                return next();
-                            })
                             .catch( (err) => {
                                 return next(err);
+                            })
+                            .then( (response) => {
+                                res.status(200).json(response);
                             });
                     }
                 });
         } else {
             updateDatabaseWithProfile(targetUserId,req)
-                .then( (response) => {
-                    res.json(response);
-                                
-                    return next();
-                })
                 .catch( (err) => {
                     return next(err);
+                })
+                .then( (response) => {
+                    res.status(200).json(response);
                 });
         }
     },

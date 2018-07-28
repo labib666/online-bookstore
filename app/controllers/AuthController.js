@@ -1,5 +1,6 @@
 const JWT = require('jsonwebtoken');
 const createError = require('http-errors');
+
 const Token = require('../models/Token');
 
 const AuthController = {

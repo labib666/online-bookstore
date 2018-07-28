@@ -1,8 +1,10 @@
 const express = require('express');
-const dotenv = require('dotenv');
-const morgan = require('morgan');
-const chalk = require('chalk');
+
 const path = require('path');
+const chalk = require('chalk');
+const morgan = require('morgan');
+const dotenv = require('dotenv');
+
 const routes = require('./app/routes/index');
 const dbconnection = require('./database/dbconnection');
 
@@ -42,5 +44,5 @@ process.on('SIGINT', () => {
 // Start the node server
 
 module.exports = app.listen(process.env.PORT, () => {
-    console.log(`App running on port ${process.env.PORT}.`);
+    console.log(chalk.bold(`App running on port ${process.env.PORT}.`));
 });

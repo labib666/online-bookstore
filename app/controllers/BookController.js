@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+
 const Book = require('../models/Book');
 const Category = require('../models/Category');
 const authenticator = require('../controllers/AuthController');
@@ -34,8 +35,6 @@ const BookController = {
                     message: 'books retrieved successfully',
                     books: books
                 });
-                
-                return next();
             });
     },
 
@@ -112,8 +111,6 @@ const BookController = {
                             message: 'book successfully added',
                             book: newBook._id
                         });
-
-                        return next();
                     });
             });
     },
@@ -167,8 +164,6 @@ const BookController = {
                             book: book,
                             categories: categories
                         });
-                        
-                        return next();
                     });
             });
     },
@@ -266,8 +261,6 @@ const BookController = {
                             message: 'book updated successfully',
                             book: updatedBook._id
                         });
-
-                        return next();
                     });
             });
     },
@@ -348,12 +341,10 @@ const BookController = {
                             })
                             .then( (data) => {
                                 // send book id back
-                                res.json({
+                                res.status(200).json({
                                     message: 'successfully added book to category',
                                     book: data.book_id
                                 });
-                                
-                                return next();
                             });
                     });
             });
@@ -395,7 +386,7 @@ const getBookCategory = (targetBookID) => {
             })
             .then( (entries) => {
                 let categories = [];
-                entries.foreach( (entry) => {
+                entries.forEach( (entry) => {
                     categories.append(entry.category_name);
                 });
                 resolve(categories);
