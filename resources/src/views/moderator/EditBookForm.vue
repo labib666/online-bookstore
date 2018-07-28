@@ -37,7 +37,7 @@ export default {
 
     mounted () {
         const bookID = this.$route.params.id;
-        this.$http.get(`/book/${bookID}`).then((response) => {
+        this.$http.get(`/books/${bookID}`).then((response) => {
             const book = response.data.book;
             this.title = book.title;
             this.author = book.author;
@@ -48,7 +48,7 @@ export default {
     methods: {
         save () {
             const bookID = this.$route.params.id;
-            this.$http.patch(`/book/${bookID}`, {
+            this.$http.patch(`/books/${bookID}`, {
                 title: this.title,
                 author: this.author
             }).then(res => {

@@ -56,7 +56,7 @@ export default {
             return;
         }
 
-        this.$http.get('/user/group/all').then((response) => {
+        this.$http.get('/users').then((response) => {
             let users = {};
             response.data.users.forEach((user) => {
                 users[user._id] = user;

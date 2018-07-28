@@ -47,7 +47,7 @@ export default {
 
     mounted () {
         this.book.id = this.$route.params.id;
-        this.$http.get(`/book/${this.book.id}`).then((response) => {
+        this.$http.get(`/books/${this.book.id}`).then((response) => {
             const book = response.data.book;
             this.book.title = book.title;
             this.book.author = book.author;

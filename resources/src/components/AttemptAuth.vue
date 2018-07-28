@@ -21,7 +21,7 @@ export default {
 
         const apitoken = window.localStorage.apitoken;
         this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + apitoken;
-        this.$http.get('/user').then((res) => {
+        this.$http.get('/users/me').then((res) => {
             this.authSuccess(res.data.user);
         }).catch((err) => {
             console.log(err);

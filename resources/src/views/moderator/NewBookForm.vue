@@ -40,7 +40,7 @@ export default {
 
     methods: {
         save () {
-            this.$http.post('/book', {
+            this.$http.post('/books', {
                 title: this.title,
                 author: this.author,
                 ISBN: this.isbn

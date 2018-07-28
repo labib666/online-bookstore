@@ -43,7 +43,7 @@ export default {
         },
 
         removeModerator () {
-            this.$http.patch(`/user/${this.user._id}`, {
+            this.$http.patch(`/users/${this.user._id}`, {
                 isModerator: false
             }).then((response) => {
                 const updatedUser = {
