@@ -55,7 +55,7 @@ export default {
                 this.$notify({
                     text: 'Update sucessful'
                 });
-                this.$router.push(`/book/${bookID}`);
+                this.$router.push(`/books/${bookID}`);
             }).catch(err => {
                 this.$notify({
                     text: err.response.data.message,
