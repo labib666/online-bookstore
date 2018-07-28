@@ -11,5 +11,6 @@ router.get('/:id', BookController.getBook);
 router.patch('/:id', BookController.updateBook);
 router.post('/:id/category', BookController.addToCategory);
 router.delete('/:id/category', BookController.removeFromCategory);
+router.get('/category/:category_name', BookController.getBooksInCategory);
 
 module.exports = router;

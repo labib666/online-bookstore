@@ -160,8 +160,8 @@ const AuthController = {
         },
         // validate the category-name
         category_name: (req) => {
-            req.checkBody('category_name')
-                .exists().withMessage('body must have a \'category_name\' field')
+            req.check('category_name')
+                .exists().withMessage('req must have a \'category_name\' field')
                 .notEmpty().withMessage('\'category_name\' field must be non empty')
                 .trim().escape();
         },

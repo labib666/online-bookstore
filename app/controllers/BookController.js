@@ -430,6 +430,55 @@ const BookController = {
                             });
                     });
             });
+    },
+
+    /**
+     * GET /api/books/category/:category_name
+     * Fetches all the books from the given category
+     * Expects: {
+     *      params: category_name
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: books }    // success
+     *      401: {}                 // unauthorized for not logged in users
+     *      404: {}                 // category not found
+     *      500: {}                 // internal error
+     * }
+     */
+    getBooksInCategory: (req, res, next) => {
+        // validate the category name
+        validate.category_name(req);
+        let error = req.validationErrors();
+        if ( error ) {
+            const err = createError(404);
+            err.message = error[0].msg;
+
+            return next(err);
+        }
+
+        // request is okay. look up the books
+        Category.distinct('book_id', {category_name: req.params.category_name})
+            .catch( (err) => {
+                return next(err);
+            })
+            .then( (entries) => {
+                let promises = [];
+                entries.forEach((entry) => {
+                    promises.push(Book.findById(entry));
+                });
+                // once we have all the book data, respond to query
+                Promise.all(promises)
+                    .catch( (err) => {
+                        return next(err);
+                    })
+                    .then( (books) => {
+                        res.status(200).json({
+                            message: 'successfully retrieved books of given category',
+                            books: books
+                        });
+                    });
+            });
     }
     
 };
