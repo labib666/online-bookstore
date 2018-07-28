@@ -30,11 +30,12 @@ router.get('/', (req, res, next) => {
 // authentication
 router.post('/register', authenticator.loggedOut, UserController.register);
 router.post('/login', authenticator.loggedOut, UserController.login);
-router.post('/logout', authenticator.loggedIn, UserController.logout);
 
-// request regarding user
-router.use('/user', authenticator.loggedIn, userRouter);
-router.use('/book', authenticator.loggedIn, bookRouter);
+// request from logged-in user
+router.get('/me', authenticator.loggedIn, UserController.getOwnProfile);
+router.post('/logout', authenticator.loggedIn, UserController.logout);
+router.use('/users', authenticator.loggedIn, userRouter);
+router.use('/books', authenticator.loggedIn, bookRouter);
 
 // could not find a good route. httpnotfound
 router.use(HttpNotFound);

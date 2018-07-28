@@ -203,7 +203,116 @@ const UserController = {
     },
 
     /**
-     * PATCH /api/user/:id
+     * GET /api/me
+     * Returns user's own profile
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: user } // success
+     *      401: {}             // unauthorized for not logged in user
+     *      404: {}             // user not found
+     *      500: {}             // internal error
+     * }
+     */
+    getOwnProfile: (req, res, next) => {
+        res.redirect('/api/user/'+req.user._id);
+        
+        return next();
+    },
+
+    /**
+     * GET /api/users
+     * Returns all user profiles
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: users }    // success
+     *      401: {}                 // unauthorized for not logged in user
+     *      500: {}                 // internal error
+     * }
+     */
+    getAllProfiles: (req, res, next) => {
+        // look up users in db
+        User.find({}, {
+            password: false,
+            createdAt: false,
+            updatedAt: false
+        })
+            .catch( (err) => {
+                return next(err);
+            })
+            .then( (users) => {
+                // add isAdmin field to the results
+                users.forEach( (user) => {
+                    user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                });
+
+                // reply with the user profiles
+                res.status(200).json({
+                    message: 'successfully retrieved users',
+                    users: users
+                });
+                
+                return next();
+            });
+    },
+
+    /**
+     * GET /api/users/:id
+     * Returns user profile for the given id
+     * Expects: {
+     *      params: user._id
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: user } // success
+     *      401: {}             // unauthorized for not logged in user
+     *      404: {}             // user not found
+     *      500: {}             // internal error
+     * }
+     */
+    getProfile: (req, res, next) => {
+        // validate requested id
+        validate.isMongoObejectID(req);
+        const error = req.validationErrors();
+        if (error) {
+            const err = createError(404);
+            err.message = error[0].msg;
+
+            return next(err);
+        }
+
+        // look up user in db
+        User.findById(req.params.id, {
+            password: false,
+            createdAt: false,
+            updatedAt: false
+        })
+            .catch( (err) => {
+                return next(err);
+            })
+            .then( (user) => {
+                // user does not exist
+                if (!user) {
+                    const err = createError(404,'user not found');
+
+                    return next(err);
+                }
+                // reply with the user profile
+                user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                res.status(200).json({
+                    message: 'successfully retrieved user data',
+                    user: user
+                });
+
+                return next();
+            });
+    },
+
+    /**
+     * PATCH /api/users/:id
      * Updates user data
      * Returns user id
      * Expects: {
@@ -307,153 +416,7 @@ const UserController = {
                 });
         }
     },
-
-    /**
-     * GET /api/user/
-     * Returns user's own profile
-     * Expects: {
-     *      header: bearer-token
-     * }
-     * Responds: {
-     *      200: { body: user } // success
-     *      401: {}             // unauthorized for not logged in user
-     *      404: {}             // user not found
-     *      500: {}             // internal error
-     * }
-     */
-    getOwnProfile: (req, res, next) => {
-        res.redirect('/api/user/'+req.user._id);
-        
-        return next();
-    },
-
-    /**
-     * GET /api/user/:id
-     * Returns user profile for the given id
-     * Expects: {
-     *      params: user._id
-     *      header: bearer-token
-     * }
-     * Responds: {
-     *      200: { body: user } // success
-     *      401: {}             // unauthorized for not logged in user
-     *      404: {}             // user not found
-     *      500: {}             // internal error
-     * }
-     */
-    getProfile: (req, res, next) => {
-        // validate requested id
-        validate.isMongoObejectID(req);
-        const error = req.validationErrors();
-        if (error) {
-            const err = createError(404);
-            err.message = error[0].msg;
-
-            return next(err);
-        }
-
-        // look up user in db
-        User.findById(req.params.id, {
-            password: false,
-            createdAt: false,
-            updatedAt: false
-        })
-            .catch( (err) => {
-                return next(err);
-            })
-            .then( (user) => {
-                // user does not exist
-                if (!user) {
-                    const err = createError(404,'user not found');
-
-                    return next(err);
-                }
-                // reply with the user profile
-                user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
-                res.status(200).json({
-                    message: 'successfully retrieved user data',
-                    user: user
-                });
-
-                return next();
-            });
-    },
-
-    /**
-     * GET /api/user/group/all
-     * Returns all user profiles
-     * Expects: {
-     *      header: bearer-token
-     * }
-     * Responds: {
-     *      200: { body: users }    // success
-     *      401: {}                 // unauthorized for not logged in user
-     *      500: {}                 // internal error
-     * }
-     */
-    getAllProfiles: (req, res, next) => {
-        // look up users in db
-        User.find({}, {
-            password: false,
-            createdAt: false,
-            updatedAt: false
-        })
-            .catch( (err) => {
-                return next(err);
-            })
-            .then( (users) => {
-                // add isAdmin field to the results
-                users.forEach( (user) => {
-                    user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
-                });
-
-                // reply with the user profiles
-                res.status(200).json({
-                    message: 'successfully retrieved users',
-                    users: users
-                });
-                
-                return next();
-            });
-    },
-
-    /**
-     * GET /api/user/group/moderators
-     * Returns moderator user profiles
-     * Expects: {
-     *      header: bearer-token
-     * }
-     * Responds: {
-     *      200: { body: users }    // success
-     *      401: {}                 // unauthorized for not logged in user
-     *      500: {}                 // internal error
-     * }
-     */
-    getModeratorProfiles: (req, res, next) => {
-        // look up moderators in db
-        User.find({isModerator: true}, {
-            password: false,
-            createdAt: false,
-            updatedAt: false
-        })
-            .catch( (err) => {
-                return next(err);
-            })
-            .then( (users) => {
-                // add isAdmin field to the results
-                users.forEach( (user) => {
-                    user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
-                });
-                
-                // reply with the moderator profiles
-                res.status(200).json({
-                    message: 'successfully retrieved moderators',
-                    users: users
-                });
-                
-                return next();
-            });
-    }
+    
 };
 
 /**
@@ -462,6 +425,8 @@ const UserController = {
  * is called to save the requested changes in database.
  * Returns a promise which resolves if changes are successfully
  * saved, and rejects if some error is encountered.
+ * @param {string} targetUserId // the user to look up
+ * @param {req}    req          // express request object
  */
 const updateDatabaseWithProfile = (targetUserId, req) => {
     return new Promise( (resolve,reject) => {

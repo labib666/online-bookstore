@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
 const chalk = require('chalk');
 const path = require('path');
 const routes = require('./app/routes/index');
@@ -15,7 +16,8 @@ console.log('Environment variables:', chalk.bold(JSON.stringify(dotenvParsed.par
 
 const app = express();
 
-// Add body parser and public assets
+// Add logger, body parser and public assets
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));

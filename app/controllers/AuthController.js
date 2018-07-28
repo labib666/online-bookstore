@@ -157,6 +157,13 @@ const AuthController = {
                 .trim().escape()
                 .isISBN(10).withMessage('\'ISBN\' must have a ISBN 10 value');
         },
+        // validate the category-name
+        category_name: (req) => {
+            req.checkBody('category_name')
+                .exists().withMessage('body must have a \'category_name\' field')
+                .notEmpty().withMessage('\'category_name\' field must be non empty')
+                .trim().escape();
+        },
         // validate mongo objectID
         isMongoObejectID: (req) => {
             req.checkParams('id')
