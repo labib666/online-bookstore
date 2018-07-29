@@ -16,10 +16,15 @@ export default {
         gapi.load('auth2', () => {
             const auth2 = gapi.auth2.init(params);
             auth2.attachClickHandler(this.$refs.glogin, {}, (googleUser) => {
-                this.$http.post('/api/social/google', googleUser).then((response) => {
+                this.$http.post('/social/google', {
+                    id_token: googleUser.getAuthResponse().id_token
+                }).then((res) => {
+                    window.localStorage.apitoken = res.data.token;
                     this.$notify({
-                        text: 'Yay'
+                        text: 'Login Successful'
                     });
+                    const path = this.$route.query.redirect || '/dashboard';
+                    this.$router.push(path);
                 }).catch(() => {
                     this.$notify({
                         text: 'Something went wrong :(',

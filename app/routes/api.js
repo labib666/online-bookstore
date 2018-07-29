@@ -25,6 +25,7 @@ router.get('/', (req, res) => {
 // authentication
 router.post('/register', authenticator.loggedOut, UserController.register);
 router.post('/login', authenticator.loggedOut, UserController.login);
+router.post('/social/google', authenticator.loggedOut, UserController.googleLogin);
 
 // request from logged-in user
 router.post('/logout', authenticator.loggedIn, UserController.logout);

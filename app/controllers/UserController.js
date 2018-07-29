@@ -2,12 +2,16 @@ const bcrypt = require('bcrypt');
 const JWT = require('jsonwebtoken');
 const createError = require('http-errors');
 const randomstring = require('randomstring');
+const gAuth = require('google-auth-library');
 
 const User = require('../models/User');
 const Token = require('../models/Token');
 const authenticator = require('../controllers/AuthController');
 
 const validate = authenticator.validate;
+const client = new gAuth.OAuth2Client(
+    process.env.GOOGLE_DEV_CLIENT_ID
+);
 
 const UserController = {
     /**
@@ -137,37 +141,78 @@ const UserController = {
                     return next(err);
                 }
                 // password matches
-                // create an API token against this request
-                const jwtSecret = process.env.JWT_SECRET;
-                const jwtOptions = {
-                    expiresIn: '12h'
-                };
-                let token, isAdmin, isModerator;
-                isAdmin = (user.email === process.env.SUPER_ADMIN) ? true : false;
-                isModerator = (isAdmin || user.isModerator) ? true : false;
-                try {
-                    const payload = {
-                        _id: user._id,
-                        isAdmin: isAdmin,
-                        isModerator: isModerator,
-                        ticket: randomstring.generate(50)
-                    };
-                    token = JWT.sign(payload, jwtSecret, jwtOptions);
-                } catch (err) {
-                    return next(err);
-                }
-
-                // save the token and respond to user
-                Token.create({ token: token })
+                // create an api token
+                createLoginToken(user)
                     .catch( (err) => {
                         return next(err);
                     })
-                    .then( (newToken) => {
-                        // new token created
-                        res.status(200).json({
-                            message: 'login successful',
-                            token: newToken.token
-                        });
+                    .then( (token) => {
+                        res.status(200).json(token);
+                    });
+            });
+    },
+
+    /**
+     * POST /api/social/google
+     * Logs in an existing user
+     * Returns created token
+     * Expects: {
+     *      body:   username, password
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: token }    // success
+     *      403: {}                 // forbidden for logged in user
+     *      404: {}                 // user not found
+     *      422: {}                 // invalid data provided
+     *      500: {}                 // internal error
+     */
+    googleLogin: (req,res,next) => {
+        // validate the id_token
+        validate.id_token(req);
+
+        const error = req.validationErrors();
+
+        // errors faced while validating / sanitizing
+        if ( error ) {
+            const err = createError(422);
+            err.message = error[0].msg;     // return the first error
+
+            return next(err);
+        }
+
+        // id_token is usable
+        client.verifyIdToken({
+            idToken: req.body.id_token,
+            audience: process.env.GOOGLE_DEV_CLIENT_ID
+        })
+            .catch( (err) => {
+                return next(err);
+            })
+            .then( (ticket) => {
+                const payload = ticket.getPayload();
+
+                // found user email. check if this email exists in db
+                User.findOne({ email: payload.email })
+                    .catch( (err) => {
+                        return next(err);
+                    })
+                    .then( (user) => {
+                        // user does not exist
+                        if (!user) {
+                            const err = createError(404,'user not found');
+
+                            return next(err);
+                        }
+                        // user exists
+                        // create an api token
+                        createLoginToken(user)
+                            .catch( (err) => {
+                                return next(err);
+                            })
+                            .then( (token) => {
+                                res.status(200).json(token);
+                            });
                     });
             });
     },
@@ -269,7 +314,10 @@ const UserController = {
     getProfile: (req, res, next) => {
         // validate requested id
         validate.isMongoObejectID(req);
+
         const error = req.validationErrors();
+
+        // errors faced while validating / sanitizing
         if (error) {
             const err = createError(404);
             err.message = error[0].msg;
@@ -323,7 +371,10 @@ const UserController = {
     updateProfile: (req,res,next) => {
         // validate requested id
         validate.isMongoObejectID(req);
+
         let error = req.validationErrors();
+
+        // errors faced while validating / sanitizing
         if ( error ) {
             const err = createError(404);
             err.message = error[0].msg;
@@ -457,6 +508,46 @@ const updateDatabaseWithProfile = (targetUserId, req) => {
 
                         return resolve(response);
                     });
+            });
+    });
+};
+
+/**
+ * Create an API token for the given user
+ * @param {User} user   // the user who is logging in
+ */
+const createLoginToken = (user) => {
+    return new Promise( (resolve, reject) => {
+        const jwtSecret = process.env.JWT_SECRET;
+        const jwtOptions = {
+            expiresIn: '12h'
+        };
+        let token, isAdmin, isModerator;
+        isAdmin = (user.email === process.env.SUPER_ADMIN) ? true : false;
+        isModerator = (isAdmin || user.isModerator) ? true : false;
+        try {
+            const payload = {
+                _id: user._id,
+                isAdmin: isAdmin,
+                isModerator: isModerator,
+                ticket: randomstring.generate(50)
+            };
+            token = JWT.sign(payload, jwtSecret, jwtOptions);
+        } catch (err) {
+            return reject(err);
+        }
+
+        // save the token and respond to user
+        Token.create({ token: token })
+            .catch( (err) => {
+                return reject(err);
+            })
+            .then( (newToken) => {
+                // new token created
+                resolve({
+                    message: 'login successful',
+                    token: newToken.token
+                });
             });
     });
 };

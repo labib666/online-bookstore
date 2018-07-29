@@ -26,7 +26,7 @@ export default {
         ]),
 
         makeModerator () {
-            this.$http.patch(`/user/${this.user._id}`, {
+            this.$http.patch(`/users/${this.user._id}`, {
                 isModerator: true
             }).then((response) => {
                 const updatedUser = {
