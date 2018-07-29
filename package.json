@@ -11,7 +11,7 @@
     "start": "nodemon --inspect app.js",
     "build": "cd resources && yarn run build",
     "test": "mocha ./tests/**/*.spec.js --timeout 10000 --exit",
-    "heroku-postbuild": "cd resources && yarn install && yarn run build"
+    "heroku-postbuild": "cd resources && yarn install --production=false && yarn run build"
   },
   "dependencies": {
     "bcrypt": "^2.0.1",
