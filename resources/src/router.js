@@ -6,6 +6,7 @@ import Admin from './pages/Admin';
 import Moderator from './pages/Moderator';
 import NewBookForm from './views/moderator/NewBookForm';
 import EditBookForm from './views/moderator/EditBookForm';
+import Books from './pages/Books';
 import Book from './pages/Book';
 import NotFound from './pages/NotFound';
 
@@ -43,7 +44,11 @@ export default new Router({
             ]
         },
         {
-            path: '/book/:id',
+            path: '/books',
+            component: Books
+        },
+        {
+            path: '/books/:id',
             name: 'book',
             component: Book
         },
