@@ -12,9 +12,9 @@ const dbconnection = require('./database/dbconnection');
 
 const dotenvParsed = dotenv.config();
 if(dotenvParsed.error) {
-    throw dotenvParsed.error;
+    console.error(chalk.bold('.env file not found!'));
 }
-console.log('Environment variables:', chalk.bold(JSON.stringify(dotenvParsed.parsed, null, 4)));
+console.log('Environment variables from .env:', chalk.bold(JSON.stringify(dotenvParsed.parsed, null, 4)));
 
 const app = express();
 

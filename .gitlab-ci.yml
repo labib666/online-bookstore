@@ -22,16 +22,10 @@ test_app:
         - cd resources
         - yarn run lint
         - yarn run test:unit
-deploy_staging:
-    stage: deploy
-    script:
-        - echo "Not implemented yet"
-    except:
-        - master
 
 deploy_production:
     stage: deploy
     script:
-        - echo "Not implemented yet"
+        - dpl --provider=heroku --app=swe-bookstore --api-key=$HEROKU_STAGING_API_KEY
     only:
         - master
