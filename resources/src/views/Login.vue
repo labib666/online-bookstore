@@ -19,7 +19,7 @@
 
                 <hr />
                 <div class="float-left">
-                    <a href="#" v-on:click="toggleLoginRegister">Create an account</a>
+                    <a href="#" v-on:click="toggleLoginRegister" class="uppercase">Create an account</a>
                 </div>
                 <div class="float-right">
                     <button @click="login" type="submit" class="btn btn-primary mb-2">Login</button>

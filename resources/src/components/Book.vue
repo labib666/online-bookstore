@@ -9,7 +9,7 @@
                         </div>
                         <div v-if="user.isModerator" class="float-right">
                             <router-link :to="'/moderator/edit/book/' + id">
-                                <button class="btn btn-light">
+                                <button class="btn btn-primary">
                                     <b>Edit</b>
                                 </button>
                             </router-link>

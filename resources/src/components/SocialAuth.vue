@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a ref="glogin" class="btn btn-primary">Login with Google</a>
+        <button ref="glogin" class="btn btn-primary">Login with Google</button>
     </div>
 </template>
 

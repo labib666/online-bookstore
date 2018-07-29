@@ -1,0 +1,42 @@
+#sidebar {
+    color: $secondary-text-color;
+    background-color: $light-secondary-color;
+    min-width: $sidebar-width;
+    max-width: $sidebar-width;
+    margin: 0px;
+    padding-top: $topbar-height + $default-padding;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 998;
+    transition: $default-transition;
+
+    a {
+        color: $secondary-text-color;
+        cursor: pointer;
+        display: block;
+        padding: $default-padding 0px;
+        text-align: center;
+        text-decoration: none;
+
+        &:hover, &.active, &.router-link-exact-active {
+            background-color: $dark-secondary-color;
+        }
+    }
+
+    &.toggle-active {
+        margin-left: -$sidebar-width;
+    }
+}
+
+@media(max-width: 768px) {
+    // For mobile device
+    #sidebar {
+        margin-left: -$sidebar-width;
+        &.toggle-active {
+            margin-left: 0px;
+        }
+    }
+}
