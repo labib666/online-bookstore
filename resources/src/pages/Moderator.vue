@@ -1,9 +1,7 @@
 <template>
     <div>
-        <AttemptAuth v-if="!isAuthSuccess"></AttemptAuth>
-        <div v-if="isAuthSuccess">
-            <Moderator></Moderator>
-        </div>
+        <AttemptAuth v-if="!isAuthSuccess" />
+        <Moderator v-if="isAuthSuccess" />
     </div>
 </template>
 

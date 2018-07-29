@@ -1,9 +1,7 @@
 <template>
     <div>
-        <AttemptAuth v-if="!isAuthSuccess"></AttemptAuth>
-        <div v-if="isAuthSuccess">
-            <Admin></Admin>
-        </div>
+        <AttemptAuth v-if="!isAuthSuccess" />
+        <Admin v-if="isAuthSuccess" />
     </div>
 </template>
 

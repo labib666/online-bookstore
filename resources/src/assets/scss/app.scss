@@ -25,9 +25,8 @@ $default-transition: all 0.3s;
     text-align: center;
 }
 
-a {
+a, a:hover {
     color: #42b983;
-    padding: 0 25px;
     font-weight: 1000;
     text-decoration: none;
 }

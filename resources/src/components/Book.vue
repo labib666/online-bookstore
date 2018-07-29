@@ -8,7 +8,11 @@
                             <h4>{{ title }}</h4>
                         </div>
                         <div v-if="user.isModerator" class="float-right">
-                            <router-link :to="'/moderator/edit/book/' + id">Edit</router-link>
+                            <router-link :to="'/moderator/edit/book/' + id">
+                                <button class="btn btn-light">
+                                    <b>Edit</b>
+                                </button>
+                            </router-link>
                         </div>
                     </div>
                 </div>
