@@ -6,7 +6,9 @@
             <Loading v-if="loading" />
             <div v-if="!loading" class="row mr-0">
                 <div v-for="book in books" :key="book.id" class="col-md-4">
-                    <Book :id="book.id" :title="book.title" :author="book.author" :isbn="book.isbn"></Book>
+                    <router-link :to="'/books/'+book.id">
+                        <Book :id="book.id" :title="book.title" :author="book.author" :isbn="book.isbn"></Book>
+                    </router-link>
                 </div>
             </div>
         </Main>
@@ -53,3 +55,11 @@ export default {
     }
 };
 </script>
+
+<style lang="scss" scoped>
+a, a:hover {
+    color: inherit;
+    text-decoration: inherit;
+    font-weight: inherit;
+}
+</style>
