@@ -21,10 +21,21 @@
         padding: $default-padding 0px;
         text-align: center;
         text-decoration: none;
+        transition: $default-transition;
 
         &:hover, &.active, &.router-link-exact-active {
             background-color: $dark-secondary-color;
         }
+    }
+
+    hr {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .title {
+        padding-top: $default-padding/2;
+        padding-bottom: $default-padding/2;
     }
 
     &.toggle-active {

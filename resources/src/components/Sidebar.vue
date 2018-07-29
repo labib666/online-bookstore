@@ -1,7 +1,7 @@
 <template>
     <div id="sidebar" :class="{'toggle-active': isSidebarActive}">
         <center>
-            <h3>{{ title }}</h3>
+            <h3 class="title">{{ title }}</h3>
             <hr />
         </center>
         <slot></slot>
