@@ -22,19 +22,28 @@ const BookController = {
      */
     getAllBooks: (req, res, next) => {
         // look up books in db
-        Book.find(req.params.id, {
-            createdAt: false,
-            updatedAt: false
-        })
+        Book.find()
             .catch( (err) => {
                 return next(err);
             })
-            .then( (books) => {
-                // respond with book profiles
-                res.status(200).json({
-                    message: 'books retrieved successfully',
-                    books: books
+            .then( (entries) => {
+                let promises = [];
+                entries.forEach( (entry) => {
+                    promises.push(
+                        fetchBookProfile(entry._id)
+                    );
                 });
+                Promise.all(promises)
+                    .catch( (err) => {
+                        return next(err);
+                    })
+                    .then( (books) => {
+                        // respond with book profiles
+                        res.status(200).json({
+                            message: 'books retrieved successfully',
+                            books: books
+                        });
+                    });
             });
     },
 
@@ -123,7 +132,7 @@ const BookController = {
      *      header: bearer-token
      * }
      * Responds: {
-     *      200: { body: book, categories } // success
+     *      200: { body: book }             // success
      *      401: {}                         // unauthorized for not logged in user
      *      404: {}                         // book not found
      *      500: {}                         // internal error
@@ -141,30 +150,15 @@ const BookController = {
         }
         
         // request is okay. look up the book
-        Book.findById(req.params.id)
+        fetchBookProfile(req.params.id)
             .catch( (err) => {
                 return next(err);
             })
             .then( (book) => {
-                // book not in db
-                if (!book) {
-                    const err = createError(404,'book not found');
-
-                    return next(err);
-                }
-                // book found. find the category it belongs to.
-                getBookCategory(book._id)
-                    .catch( (err) => {
-                        return next(err);
-                    })
-                    .then( (categories) => {
-                    // respond with book profile
-                        res.status(200).json({
-                            message: 'book retrieved successfully',
-                            book: book,
-                            categories: categories
-                        });
-                    });
+                res.status(200).json({
+                    message: 'successfully retrieved book',
+                    book: book
+                });
             });
     },
 
@@ -465,7 +459,7 @@ const BookController = {
             .then( (entries) => {
                 let promises = [];
                 entries.forEach((entry) => {
-                    promises.push(Book.findById(entry));
+                    promises.push(fetchBookProfile(entry));
                 });
                 // once we have all the book data, respond to query
                 Promise.all(promises)
@@ -481,6 +475,40 @@ const BookController = {
             });
     }
     
+};
+
+/**
+ * Fetches the book profile, including its categories
+ * @param {string} book_id 
+ */
+const fetchBookProfile = (book_id) => {
+    return new Promise((resolve,reject) => {
+        Book.findById(book_id, {
+            createdAt: false,
+            updatedAt: false
+        })
+            .catch( (err) => {
+                return reject(err);
+            })
+            .then( (book) => {
+                // book not in db
+                if (!book) {
+                    const err = createError(404,'book not found');
+
+                    return reject(err);
+                }
+                // book found. find the category it belongs to.
+                getBookCategory(book._id)
+                    .catch( (err) => {
+                        return reject(err);
+                    })
+                    .then( (categories) => {
+                        // respond with book profile
+                        book._doc.categories = categories;
+                        resolve(book);
+                    });
+            });
+    });
 };
 
 /**

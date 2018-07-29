@@ -165,6 +165,13 @@ const AuthController = {
                 .notEmpty().withMessage('\'category_name\' field must be non empty')
                 .trim().escape();
         },
+        // validate google id_token
+        id_token: (req) => {
+            req.checkBody('id_token')
+                .exists().withMessage('req must have a \'id_token\' field')
+                .notEmpty().withMessage('\'id_token\' field must be non empty')
+                .trim().escape();
+        },
         // validate mongo objectID
         isMongoObejectID: (req) => {
             req.checkParams('id')
