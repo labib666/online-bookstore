@@ -1,7 +1,7 @@
 <template>
     <div id="topbar">
             <div class="left">
-                <i class="material-icons" @click="toggleSidebar">menu</i>
+                <i class="fas fa-align-justify fa-lg" @click="toggleSidebar" />
                 <router-link to="/" tag="a" class="brand">Online Bookstore</router-link>
             </div>
             <div class="right">

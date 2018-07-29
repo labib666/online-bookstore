@@ -1,4 +1,6 @@
 @import "~bootstrap/scss/bootstrap";
+@import "~roboto-fontface/css/roboto/roboto-fontface.css";
+@import "~@fortawesome/fontawesome-free/css/all.css";
 
 @import "./variables";
 @import "./topbar";
@@ -9,4 +11,9 @@
 // Global design
 html, body {
     background-color: lighten($light-secondary-color, 60%);
+    font-family: 'Roboto-Light';
+}
+
+h1, h2, h3 {
+    font-family: 'Roboto-Thin';
 }

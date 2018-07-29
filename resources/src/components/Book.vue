@@ -9,9 +9,7 @@
                         </div>
                         <div v-if="user.isModerator" class="float-right">
                             <router-link :to="'/moderator/edit/book/' + id">
-                                <button class="btn btn-primary">
-                                    <b>Edit</b>
-                                </button>
+                                <i class="fas fa-edit fa-lg" />
                             </router-link>
                         </div>
                     </div>

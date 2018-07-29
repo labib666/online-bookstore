@@ -3,7 +3,7 @@
         <div v-if="!isAuthAttempted">Loading...</div>
         <div v-if="isAuthAttempted" class="flex-center full-height home">
             <div class="flex-container">
-                <h1 class="m-b-md center-content">Online Bookstore</h1>
+                <h1 class="center-content">Online Bookstore</h1>
                 <div class="col-md-12" v-if="!loginOrRegisterChoice">
                     <Register />
                 </div>
