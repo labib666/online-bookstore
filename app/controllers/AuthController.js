@@ -168,9 +168,25 @@ const AuthController = {
         // validate google id_token
         id_token: (req) => {
             req.checkBody('id_token')
-                .exists().withMessage('req must have a \'id_token\' field')
+                .exists().withMessage('body must have a \'id_token\' field')
                 .notEmpty().withMessage('\'id_token\' field must be non empty')
                 .trim().escape();
+        },
+        // validate booking quantity
+        quantity: (req) => {
+            req.checkBody('quantity')
+                .exists().withMessage('body must have a \'quantity\' field')
+                .notEmpty().withMessage('\'quantity\' field must be non empty')
+                .trim().escape()
+                .isInt({min: 1, max: 50}).withMessage('\'quantity\' must be between 1 and 50');
+        },
+        // validate the value of status
+        status: (req) => {
+            req.check('status')
+                .exists().withMessage('req must have a \'status\' field')
+                .notEmpty().withMessage('\'status\' field must be non empty')
+                .trim().escape()
+                .isIn(['Pending', 'Approved', 'Cancelled']).withMessage('\'status\' must be valid');
         },
         // validate mongo objectID
         isMongoObejectID: (req) => {
