@@ -97,7 +97,7 @@ export default {
             });
         },
 
-        saveNewCategory() {
+        saveNewCategory () {
             const newCategory = this.newCategory;
             this.$http.post(`/books/${this.id}/category`, {
                 category_name: newCategory
@@ -112,7 +112,7 @@ export default {
             });
         },
 
-        removeCategory(idx) {
+        removeCategory (idx) {
             this.$http.delete(`/books/${this.id}/category`, {
                 data: {
                     category_name: this.categories[idx]
