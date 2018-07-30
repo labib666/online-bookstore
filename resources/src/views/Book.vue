@@ -9,7 +9,7 @@
                         Loading...
                     </div>
                     <div v-if="book.loaded">
-                        <Book :id="book.id" :title="book.title" :author="book.author" :isbn="book.isbn"></Book>
+                        <Book :book="book"></Book>
                     </div>
                     <div v-if="!loading && !book.loaded">
                         <h1>Book not found</h1>
@@ -40,7 +40,8 @@ export default {
                 id: '',
                 title: '',
                 author: '',
-                isbn: ''
+                isbn: '',
+                categories: []
             }
         };
     },
@@ -52,6 +53,7 @@ export default {
             this.book.title = book.title;
             this.book.author = book.author;
             this.book.isbn = book.ISBN;
+            this.book.categories = book.categories;
 
             this.loading = false;
             this.book.loaded = true;

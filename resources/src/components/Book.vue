@@ -5,19 +5,21 @@
                 <div class="card-title">
                     <div class="clearfix">
                         <div class="float-left">
-                            <h4>{{ title }}</h4>
+                            <h4>{{ book.title }}</h4>
                         </div>
                         <div v-if="user.isModerator" class="float-right">
-                            <router-link :to="'/moderator/edit/book/' + id">
+                            <router-link :to="'/moderator/edit/book/' + book.id">
                                 <i class="fas fa-edit fa-lg" />
                             </router-link>
                         </div>
                     </div>
                 </div>
                 <div class="card-text">
-                    Author: {{ author }}
+                    Author: {{ book.author }}
                     <br />
-                    <small>ISBN: {{ isbn }}</small>
+                    <small>ISBN: {{ book.isbn }}</small>
+                    <hr />
+                    <button v-for="category in book.categories" :key="category" class="btn btn-primary category">{{category}}</button>
                 </div>
             </div>
         </div>
@@ -27,7 +29,7 @@
 <script>
 import { mapState } from 'vuex';
 export default {
-    props: ['id', 'title', 'author', 'isbn'],
+    props: ['book'],
 
     computed: {
         ...mapState([

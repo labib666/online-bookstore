@@ -1,6 +1,6 @@
 <template>
-    <div class="row-container flex-center" style="margin-top:50px;">
-        <div class="col-md-6">
+    <div class="row mr-0" style="margin-top:50px;">
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
                     <div class="form-group row">
@@ -29,6 +29,29 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Categories</h3>
+                    <hr />
+                    <div v-for="(category,idx) in categories" :key="category">
+                        <li>{{ category }}  <i class="fas fa-times cross" @click="removeCategory(idx)" /> </li>
+                    </div>
+                    <div v-if="!categories.length">
+                        <small>No categories</small>
+                    </div>
+                    <div class="form-group row" style="margin-top:20px;">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" v-model="newCategory" />
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary" @click="saveNewCategory">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -36,33 +59,66 @@
 export default {
     data () {
         return {
+            id: '',
             title: '',
             author: '',
-            isbn: ''
+            isbn: '',
+            categories: [],
+            newCategory: ''
         };
     },
 
     mounted () {
-        const bookID = this.$route.params.id;
-        this.$http.get(`/books/${bookID}`).then((response) => {
+        this.id = this.$route.params.id;
+        this.$http.get(`/books/${this.id}`).then((response) => {
             const book = response.data.book;
             this.title = book.title;
             this.author = book.author;
             this.isbn = book.ISBN;
+            this.categories = book.categories;
         });
     },
 
     methods: {
         save () {
-            const bookID = this.$route.params.id;
-            this.$http.patch(`/books/${bookID}`, {
+            this.$http.patch(`/books/${this.id}`, {
                 title: this.title,
                 author: this.author
             }).then(res => {
                 this.$notify({
                     text: 'Update sucessful'
                 });
-                this.$router.push(`/books/${bookID}`);
+                this.$router.push(`/books/${this.id}`);
+            }).catch(err => {
+                this.$notify({
+                    text: err.response.data.message,
+                    type: 'error'
+                });
+            });
+        },
+
+        saveNewCategory() {
+            const newCategory = this.newCategory;
+            this.$http.post(`/books/${this.id}/category`, {
+                category_name: newCategory
+            }).then(res => {
+                this.categories.push(newCategory);
+                this.newCategory = '';
+            }).catch(err => {
+                this.$notify({
+                    text: err.response.data.message,
+                    type: 'error'
+                });
+            });
+        },
+
+        removeCategory(idx) {
+            this.$http.delete(`/books/${this.id}/category`, {
+                data: {
+                    category_name: this.categories[idx]
+                }
+            }).then(res => {
+                this.categories.splice(idx, 1);
             }).catch(err => {
                 this.$notify({
                     text: err.response.data.message,

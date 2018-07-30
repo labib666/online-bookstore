@@ -7,7 +7,7 @@
             <div v-if="!loading" class="row mr-0">
                 <div v-for="book in books" :key="book.id" class="col-md-4">
                     <router-link :to="'/books/'+book.id" class="invisible-link">
-                        <Book :id="book.id" :title="book.title" :author="book.author" :isbn="book.isbn"></Book>
+                        <Book :book="book"></Book>
                     </router-link>
                 </div>
             </div>
@@ -45,7 +45,8 @@ export default {
                     id: book._id,
                     author: book.author,
                     title: book.title,
-                    isbn: book.ISBN
+                    isbn: book.ISBN,
+                    categories: book.categories
                 };
                 this.books.push(data);
             });
