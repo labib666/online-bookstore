@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const htmlspecialchars = require('htmlspecialchars');
 
 const Book = require('../models/Book');
 const Category = require('../models/Category');
@@ -85,11 +86,11 @@ const BookController = {
             err.message = error[0].msg;     // return the first error
 
             return next(err);
-        } 
+        }
         
         // Credentials are okay
-        const title = req.body.title;
-        const author = req.body.author;
+        const title = htmlspecialchars(req.body.title);
+        const author = htmlspecialchars(req.body.author);
         const ISBN = req.body.ISBN;
 
         Book.findOne({ ISBN: ISBN })
@@ -239,10 +240,10 @@ const BookController = {
                 }
                 // book exists, make necessary changes
                 if ('title' in req.body) {
-                    targetBook.title = req.body.title;
+                    targetBook.title = htmlspecialchars(req.body.title);
                 }
                 if ('author' in req.body) {
-                    targetBook.author = req.body.author;
+                    targetBook.author = htmlspecialchars(req.body.author);
                 }
                 
                 // save changed data in database
@@ -301,7 +302,7 @@ const BookController = {
         } 
         
         // Credentials are okay
-        const category_name = req.body.category_name;
+        const category_name = htmlspecialchars(req.body.category_name);
         const book_id = req.params.id;
 
         // look whether this book exists in db
@@ -386,7 +387,7 @@ const BookController = {
         } 
         
         // Credentials are okay
-        const category_name = req.body.category_name;
+        const category_name = htmlspecialchars(req.body.category_name);
         const book_id = req.params.id;
 
         // look whether this book exists in db

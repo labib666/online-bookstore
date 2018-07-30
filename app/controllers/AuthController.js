@@ -99,7 +99,6 @@ const AuthController = {
             req.checkBody('name')
                 .exists().withMessage('body must have a \'name\' field')
                 .notEmpty().withMessage('\'name\' field must be non empty')
-                .trim().escape()
                 .matches('^[A-Z a-z]+$').withMessage('\'name\' can contain only letters and spaces')
                 .isLength({ min: 4, max: 30 }).withMessage('\'name\' has a length in range[4,30]');
         },
@@ -108,7 +107,6 @@ const AuthController = {
             req.checkBody('username')
                 .exists().withMessage('body must have a \'username\' field')
                 .notEmpty().withMessage('\'username\' field must be non empty')
-                .trim().escape()
                 .isAlphanumeric().withMessage('\'username\' can contain only alphanumerics')
                 .isLength({ min: 4, max: 20 }).withMessage('\'username\' has a length in range[4,20]');
         },
@@ -117,7 +115,6 @@ const AuthController = {
             req.checkBody('email')
                 .exists().withMessage('body must have a \'email\' field')
                 .notEmpty().withMessage('\'email\' field must be non empty')
-                .trim().escape()
                 .isEmail().withMessage('\'email\' must be a valid email address');
         },
         // validate the password
@@ -125,7 +122,6 @@ const AuthController = {
             req.checkBody('password')
                 .exists().withMessage('body must have a \'password\' field')
                 .notEmpty().withMessage('\'password\' field must be non empty')
-                .trim().escape()
                 .matches('^[^ \t\n\r]+$').withMessage('\'password\' field cannot contain space or newlines')
                 .isLength({ min: 4, max: 20 }).withMessage('\'password\' has a length in range[4,20]');
         },
@@ -140,44 +136,38 @@ const AuthController = {
         title: (req) => {
             req.checkBody('title')
                 .exists().withMessage('body must have a \'title\' field')
-                .notEmpty().withMessage('\'title\' field must be non empty')
-                .trim().escape();
+                .notEmpty().withMessage('\'title\' field must be non empty');
         },
         // validate the book author
         author: (req) => {
             req.checkBody('author')
                 .exists().withMessage('body must have a \'author\' field')
-                .notEmpty().withMessage('\'author\' field must be non empty')
-                .trim().escape();
+                .notEmpty().withMessage('\'author\' field must be non empty');
         },
         // validate the ISBN
         ISBN: (req) => {
             req.checkBody('ISBN')
                 .exists().withMessage('body must have a \'ISBN\' field')
                 .notEmpty().withMessage('\'ISBN\' field must be non empty')
-                .trim().escape()
                 .isISBN(10).withMessage('\'ISBN\' must have a ISBN 10 value');
         },
         // validate the category-name
         category_name: (req) => {
             req.check('category_name')
                 .exists().withMessage('req must have a \'category_name\' field')
-                .notEmpty().withMessage('\'category_name\' field must be non empty')
-                .trim().escape();
+                .notEmpty().withMessage('\'category_name\' field must be non empty');
         },
         // validate google id_token
         id_token: (req) => {
             req.checkBody('id_token')
                 .exists().withMessage('body must have a \'id_token\' field')
-                .notEmpty().withMessage('\'id_token\' field must be non empty')
-                .trim().escape();
+                .notEmpty().withMessage('\'id_token\' field must be non empty');
         },
         // validate booking quantity
         quantity: (req) => {
             req.checkBody('quantity')
                 .exists().withMessage('body must have a \'quantity\' field')
                 .notEmpty().withMessage('\'quantity\' field must be non empty')
-                .trim().escape()
                 .isInt({min: 1, max: 50}).withMessage('\'quantity\' must be between 1 and 50');
         },
         // validate the value of status
@@ -185,7 +175,6 @@ const AuthController = {
             req.check('status')
                 .exists().withMessage('req must have a \'status\' field')
                 .notEmpty().withMessage('\'status\' field must be non empty')
-                .trim().escape()
                 .isIn(['pending', 'approved', 'cancelled']).withMessage('\'status\' must be valid');
         },
         // validate mongo objectID
@@ -193,7 +182,6 @@ const AuthController = {
             req.checkParams('id')
                 .exists().withMessage('params must have a \'id\' field')
                 .notEmpty().withMessage('\'id\' field must be non empty')
-                .trim().escape()
                 .isMongoId().withMessage('\'id\' field must be a valid Mongo ObjectID');
         }
     }
