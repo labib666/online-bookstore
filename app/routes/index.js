@@ -16,7 +16,7 @@ const databaseConnected = (req,res,next) => {
     if (connected) {
         return next();
     } else {
-        const err = createError('500', '500 Internal Server Error');
+        const err = createError('500', 'Internal Server Error');
 
         return next(err);
     }
