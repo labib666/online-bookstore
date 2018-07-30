@@ -59,6 +59,7 @@ const BookingController = {
      *      200: { body: bookings }     // success
      *      401: {}                     // unauthorized for not logged in users
      *      403: {}                     // forbidden for non moderator users
+     *      422: {}                     // invalid data
      *      500: {}                     // internal error
      * }
      */
@@ -77,7 +78,7 @@ const BookingController = {
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(404);
+            const err = createError(422);
             err.message = error[0].msg;
 
             return next(err);
@@ -119,15 +120,15 @@ const BookingController = {
      * }
      */
     getBookingsByUser: (req, res, next) => {
+        let error;
+
         // validate id field
         validate.isMongoObejectID(req);
-
-        const error = req.validationErrors();
+        error = req.validationErrors();
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(404);
-            err.message = error[0].msg;
+            const err = createError(404, 'user not found');
 
             return next(err);
         }
@@ -187,15 +188,15 @@ const BookingController = {
      * }
      */
     getBookingsForBook: (req, res, next) => {
+        let error;
+
         // validate id field
         validate.isMongoObejectID(req);
-
-        const error = req.validationErrors();
+        error = req.validationErrors();
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(404);
-            err.message = error[0].msg;
+            const err = createError(404, 'book not found');
 
             return next(err);
         }
@@ -246,22 +247,33 @@ const BookingController = {
      * Responds: {
      *      200: { body: booking }      // success
      *      401: {}                     // unauthorized for not logged in users
-     *      422: {}                     // invalid data
      *      404: {}                     // book not found
+     *      422: {}                     // invalid data
      *      500: {}                     // internal error
      * }
      */
     addBooking: (req, res, next) => {
-        // validate id and quantity field
+        let error;
+        
+        // validate id field
         validate.isMongoObejectID(req);
-        validate.quantity(req);
-
-        const error = req.validationErrors();
+        error = req.validationErrors();
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(404);
-            err.message = error[0].msg;
+            const err = createError(404, 'book not found');
+
+            return next(err);
+        }
+
+        // validate quantity field
+        validate.quantity(req);
+        error = req.validationErrors();
+
+        // errors faced while validating / sanitizing
+        if ( error ) {
+            const err = createError(422);
+            err.message = error[0].message;
 
             return next(err);
         }
@@ -289,7 +301,7 @@ const BookingController = {
      * PATCH /api/books/bookings/:id
      * Expects: {
      *      params: booking._id
-     *      body:   quantity
+     *      body:   quantity (optional), status (optional)
      *      header: bearer-token
      * }
      * Updates a booking for the user
@@ -297,29 +309,53 @@ const BookingController = {
      * Responds: {
      *      200: { body: booking }      // success
      *      401: {}                     // unauthorized for not logged in users
-     *      422: {}                     // invalid data
+     *      403: {}                     // forbidden actions attempted
      *      404: {}                     // book not found
+     *      422: {}                     // invalid data
      *      500: {}                     // internal error
      * }
      */
     updateBooking: (req, res, next) => {
-        // do not allow updates in user_id, book_id or status
-        // quantity must be there in request
-        if (!('quantity' in req.body) || 'user_id' in req.body 
-            || 'book_id' in req.body || 'status' in req.body) {
+        // do not allow updates in user_id, book_id
+        if ('user_id' in req.body || 'book_id' in req.body) {
             const err = createError(403, 'cannot change any attribute except quantity');
 
             return next(err);
         }
-        // validate id and quantity field
-        validate.isMongoObejectID(req);
-        validate.quantity(req);
 
-        const error = req.validationErrors();
+        // do not allow both status and quantity update
+        if ('quantity' in req.body && 'status' in req.body) {
+            const err = createError(403, 'cannot change any attribute except quantity');
+
+            return next(err);
+        }
+
+        let error;
+
+        // validate id field
+        validate.isMongoObejectID(req);
+        error = req.validationErrors();
+        
+        // errors faced while validating / sanitizing
+        if ( error ) {
+            const err = createError(404, 'book not found');
+            
+            return next(err);
+        }
+
+        // validate status and quantity field
+        if ('quantity' in req.body) {
+            validate.quantity(req);
+        }
+        if ('status' in req.body) {
+            validate.status(req);
+        }
+
+        error = req.validationErrors();
 
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(404);
+            const err = createError(422);
             err.message = error[0].msg;
 
             return next(err);
@@ -337,7 +373,31 @@ const BookingController = {
 
                     return next(err);
                 }
-                booking.quantity = req.body.quantity;
+
+                // already approved or cancelled booking cannot be updated
+                if (booking.status === 'Cancelled' || booking.status ==='Approved') {
+                    const err = createError(404, 'booking does not exist');
+
+                    return next(err);
+                } 
+
+                // booking exists
+                if ('quantity' in req.body) {
+                    booking.quantity = req.body.quantity;
+                }
+                if ('status' in req.body) {
+                    if (req.body.status === 'Approved') {
+                        // only moderator can approve
+                        if (!req.user.isModerator) {
+                            const err = createError(403, 'user is not authorized for this action');
+
+                            return next(err);
+                        }
+                    }
+                    booking.status = req.body.status;
+                }
+
+                // save the booking
                 booking.save()
                     .catch( (err) => {
                         return next(err);
@@ -349,7 +409,8 @@ const BookingController = {
                         });
                     });
             });
-    },
+    }
+    
 };
 
 module.exports = BookingController;
