@@ -46,7 +46,7 @@ export default {
                 ISBN: this.isbn
             }).then(res => {
                 const bookID = res.data.book;
-                this.$router.push(`/book/${bookID}`);
+                this.$router.push(`/books/${bookID}`);
             }).catch(err => {
                 this.$notify({
                     text: err.response.data.message,

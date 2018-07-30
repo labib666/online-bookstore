@@ -283,7 +283,7 @@ const BookingController = {
             user_id: req.user._id,
             book_id: req.params.id,
             quantity: req.body.quantity,
-            status: 'Pending'
+            status: 'pending'
         })
             .catch( (err) => {
                 return next(err);
@@ -318,14 +318,14 @@ const BookingController = {
     updateBooking: (req, res, next) => {
         // do not allow updates in user_id, book_id
         if ('user_id' in req.body || 'book_id' in req.body) {
-            const err = createError(403, 'cannot change any attribute except quantity');
+            const err = createError(403, 'cannot change any attribute except quantity and status');
 
             return next(err);
         }
 
         // do not allow both status and quantity update
         if ('quantity' in req.body && 'status' in req.body) {
-            const err = createError(403, 'cannot change any attribute except quantity');
+            const err = createError(403, 'cannot change status and quantity at once');
 
             return next(err);
         }
@@ -338,7 +338,7 @@ const BookingController = {
         
         // errors faced while validating / sanitizing
         if ( error ) {
-            const err = createError(404, 'book not found');
+            const err = createError(404, 'booking not found');
             
             return next(err);
         }
@@ -375,8 +375,8 @@ const BookingController = {
                 }
 
                 // already approved or cancelled booking cannot be updated
-                if (booking.status === 'Cancelled' || booking.status ==='Approved') {
-                    const err = createError(404, 'booking does not exist');
+                if (booking.status === 'cancelled' || booking.status ==='approved') {
+                    const err = createError(403, 'cannot update approved or cancelled booking');
 
                     return next(err);
                 } 
@@ -386,7 +386,7 @@ const BookingController = {
                     booking.quantity = req.body.quantity;
                 }
                 if ('status' in req.body) {
-                    if (req.body.status === 'Approved') {
+                    if (req.body.status === 'approved') {
                         // only moderator can approve
                         if (!req.user.isModerator) {
                             const err = createError(403, 'user is not authorized for this action');

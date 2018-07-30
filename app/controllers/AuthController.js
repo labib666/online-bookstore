@@ -186,7 +186,7 @@ const AuthController = {
                 .exists().withMessage('req must have a \'status\' field')
                 .notEmpty().withMessage('\'status\' field must be non empty')
                 .trim().escape()
-                .isIn(['Pending', 'Approved', 'Cancelled']).withMessage('\'status\' must be valid');
+                .isIn(['pending', 'approved', 'cancelled']).withMessage('\'status\' must be valid');
         },
         // validate mongo objectID
         isMongoObejectID: (req) => {
