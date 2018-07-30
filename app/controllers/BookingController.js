@@ -374,6 +374,13 @@ const BookingController = {
                     return next(err);
                 }
 
+                // check authorization of the user
+                if (!req.user.isModerator && req.user._id !== booking.user_id) {
+                    const err = createError(403, 'user does not have authorization for this action');
+
+                    return next(err);
+                }
+
                 // already approved or cancelled booking cannot be updated
                 if (booking.status === 'cancelled' || booking.status ==='approved') {
                     const err = createError(403, 'cannot update approved or cancelled booking');
