@@ -32,6 +32,12 @@
         align-items: center;
     }
 
+    .right {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
     .brand, .brand:hover {
         font-size: 20px;
         padding-left: $default-padding;
