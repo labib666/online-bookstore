@@ -1,7 +1,6 @@
 const createError = require('http-errors');
 
 const Book = require('../models/Book');
-const User = require('../models/User');
 const Booking = require('../models/Booking');
 const authenticator = require('../controllers/AuthController');
 
@@ -22,7 +21,7 @@ const BookingController = {
      *      500: {}                     // internal error
      * }
      */
-    getAllBooking: (req, res, next) => {
+    getAllBookings: (req, res, next) => {
         // only moderators have access
         if (!req.user.isModerator) {
             const err = createError(403, 'user not authorized for this action');
@@ -105,7 +104,7 @@ const BookingController = {
     },
 
     /**
-     * GET /api/users/:id/bookings
+     * GET /api/users/me/bookings
      * Returns bookings done by the given user
      * Expects: {
      *      params: user._id
@@ -120,62 +119,29 @@ const BookingController = {
      * }
      */
     getBookingsByUser: (req, res, next) => {
-        let error;
-
-        // validate id field
-        validate.isMongoObejectID(req);
-        error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(404, 'user not found');
-
-            return next(err);
-        }
-
-        // only moderators and the user have access
-        if (!req.user.isModerator && req.user._id !== req.params.id) {
-            const err = createError(403, 'user not authorized for this action');
-            
-            return next(err);
-        }
-
-        // look for the user in db
-        User.findById(req.params.id)
+        // find all the bookings by user
+        Booking.find({
+            user_id: req.user._id
+        },{},{
+            sort: {
+                updatedAt: -1
+            }
+        })
             .catch( (err) => {
                 return next(err);
-            })    
-            .then( (user) => {
-                // user does not exist
-                if (!user) {
-                    const err = createError(404, 'user does not exist');
-
-                    return next(err);
-                }
-                // find all the bookings by user
-                Booking.find({
-                    user_id: user.id
-                },{},{
-                    sort: {
-                        updatedAt: -1
-                    }
-                })
-                    .catch( (err) => {
-                        return next(err);
-                    })
-                    .then( (bookings) => {
-                        // respond with the bookings
-                        res.json({
-                            message: 'succesfully retrieved user bookings',
-                            bookings: bookings
-                        });
-                    });
+            })
+            .then( (bookings) => {
+                // respond with the bookings
+                res.json({
+                    message: 'succesfully retrieved user bookings',
+                    bookings: bookings
+                });
             });
     },
 
     /**
      * GET /api/books/:id/bookings
-     * Returns bookings done by current user for given book
+     * Returns bookings done by all user for given book
      * Expects: {
      *      params: book._id
      *      header: bearer-token
@@ -183,11 +149,19 @@ const BookingController = {
      * Responds: {
      *      200: { body: bookings }     // success
      *      401: {}                     // unauthorized for not logged in users
+     *      403: {}                     // forbidden for non moderators
      *      404: {}                     // book not found
      *      500: {}                     // internal error
      * }
      */
-    getBookingsForBook: (req, res, next) => {
+    getAllBookingsForBook: (req, res, next) => {
+        // only moderators have access to this
+        if (!req.user.isModerator) {
+            const err = createError(403, 'user not authorized for this action');
+
+            return next(err);
+        }
+
         let error;
 
         // validate id field
@@ -213,7 +187,68 @@ const BookingController = {
 
                     return next(err);
                 }
-                // find all the pending bookings
+                // find all the bookings for the book
+                Booking.find({
+                    book_id: req.params.id
+                },{},{
+                    sort: {
+                        updatedAt: -1
+                    }
+                })
+                    .catch( (err) => {
+                        return next(err);
+                    })
+                    .then( (bookings) => {
+                        // respond with the bookings
+                        res.json({
+                            message: 'succesfully retrieved user bookings for book',
+                            bookings: bookings
+                        });
+                    });
+            });
+    },
+
+    /**
+     * GET /api/books/:id/bookings/me
+     * Returns bookings done by current user for given book
+     * Expects: {
+     *      params: book._id
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: bookings }     // success
+     *      401: {}                     // unauthorized for not logged in users
+     *      404: {}                     // book not found
+     *      500: {}                     // internal error
+     * }
+     */
+    getUserBookingsForBook: (req, res, next) => {
+        let error;
+
+        // validate id field
+        validate.isMongoObejectID(req);
+        error = req.validationErrors();
+
+        // errors faced while validating / sanitizing
+        if ( error ) {
+            const err = createError(404, 'book not found');
+
+            return next(err);
+        }
+
+        // look for the book in db
+        Book.findById(req.params.id)
+            .catch( (err) => {
+                return next(err);
+            })    
+            .then( (book) => {
+                // book does not exist
+                if (!book) {
+                    const err = createError(404, 'book does not exist');
+
+                    return next(err);
+                }
+                // find all the bookings made by current user for this book
                 Booking.find({ 
                     user_id: req.user._id,
                     book_id: req.params.id
