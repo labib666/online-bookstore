@@ -23,7 +23,7 @@ const BookController = {
      */
     getAllBooks: (req, res, next) => {
         // look up books in db
-        Book.find()
+        Book.distinct('_id')
             .catch( (err) => {
                 return next(err);
             })
@@ -31,7 +31,7 @@ const BookController = {
                 let promises = [];
                 entries.forEach( (entry) => {
                     promises.push(
-                        fetchBookProfile(entry._id)
+                        fetchBookProfile(entry)
                     );
                 });
                 Promise.all(promises)
@@ -474,6 +474,70 @@ const BookController = {
                         });
                     });
             });
+    },
+
+    /**
+     * POST /api/books/search
+     * Fetches all the books that match the search
+     * Expects: {
+     *      body:   search
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: books }    // success
+     *      401: {}                 // unauthorized for not logged in users
+     *      500: {}                 // internal error
+     * }
+     */
+    searchBook: (req,res,next) => {
+        let search;
+        search = (req.body.search) ? htmlspecialchars(req.body.search) : null;
+        if (!search || search.length === 0) {
+            // search field does not exist or is empty
+            res.status(200).json({
+                message: 'search results',
+                books: []
+            });
+        } else {
+            // look for the searched string
+            Book.find({
+                $text: {
+                    $search: search
+                }
+            },{
+                score: {
+                    $meta: 'textScore'
+                }
+            }, {
+                sort: {
+                    score: {
+                        $meta: 'textScore'
+                    }
+                }
+            })
+                .catch( (err) => {
+                    return next(err);
+                })
+                .then( (entries) => {
+                    let promises = [];
+                    entries.forEach( (entry) => {
+                        promises.push(
+                            fetchBookProfile(entry._id)
+                        );
+                    });
+                    Promise.all(promises)
+                        .catch( (err) => {
+                            return next(err);
+                        })
+                        .then( (books) => {
+                        // respond with book profiles
+                            res.status(200).json({
+                                message: 'books retrieved successfully',
+                                books: books
+                            });
+                        });
+                });
+        }
     }
     
 };

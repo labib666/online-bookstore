@@ -9,6 +9,12 @@ var UserSchema = new mongoose.Schema({
     isModerator: Boolean
 });
 
+UserSchema.index({
+    name: 'text',
+    username: 'text',
+    email: 'text'
+});
+
 UserSchema.plugin(timestamps);
 
 mongoose.model('User', UserSchema, 'users');

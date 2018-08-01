@@ -8,6 +8,7 @@ const router = express.Router();
 // user interactions
 router.get('/', BookController.getAllBooks);
 router.post('/', BookController.addBook);
+router.post('/search', BookController.searchBook);
 router.get('/bookings', BookingController.getAllBooking);
 router.get('/bookings/:status', BookingController.getBookingsWithStatus);
 router.patch('/bookings/:id', BookingController.updateBooking);

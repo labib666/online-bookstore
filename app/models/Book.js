@@ -7,6 +7,12 @@ var BookSchema = new mongoose.Schema({
     ISBN: String
 });
 
+BookSchema.index({
+    title: 'text',
+    author: 'text',
+    ISBN: 'text'
+});
+
 BookSchema.plugin(timestamps);
 
 mongoose.model('Book', BookSchema, 'books');

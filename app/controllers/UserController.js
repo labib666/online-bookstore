@@ -3,6 +3,7 @@ const JWT = require('jsonwebtoken');
 const createError = require('http-errors');
 const randomstring = require('randomstring');
 const gAuth = require('google-auth-library');
+const htmlspecialchars = require('htmlspecialchars');
 
 const User = require('../models/User');
 const Token = require('../models/Token');
@@ -454,6 +455,66 @@ const UserController = {
                 });
         }
     },
+
+    /**
+     * POST /api/users/search
+     * Fetches all the users that match the search
+     * Expects: {
+     *      body:   search
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: users }    // success
+     *      401: {}                 // unauthorized for not logged in users
+     *      500: {}                 // internal error
+     * }
+     */
+    searchUser: (req,res,next) => {
+        let search;
+        search = (req.body.search) ? htmlspecialchars(req.body.search) : null;
+        if (!search || search.length === 0) {
+            // search field does not exist or is empty
+            res.status(200).json({
+                message: 'search results',
+                users: []
+            });
+        } else {
+            // look for the searched string
+            User.find({
+                $text: {
+                    $search: search
+                }
+            },{
+                password: false,
+                createdAt: false,
+                updatedAt: false,
+                score: {
+                    $meta: 'textScore'
+                }
+            }, {
+                sort: {
+                    score: {
+                        $meta: 'textScore'
+                    }
+                }
+            })
+                .catch( (err) => {
+                    return next(err);
+                })
+                .then( (users) => {
+                    // add isAdmin field to the results
+                    users.forEach( (user) => {
+                        user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                    });
+
+                    // reply with the user profiles
+                    res.status(200).json({
+                        message: 'successfully retrieved users',
+                        users: users
+                    });
+                });
+        }
+    }
     
 };
 
