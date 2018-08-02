@@ -2,9 +2,6 @@ const createError = require('http-errors');
 
 const Book = require('../models/Book');
 const Booking = require('../models/Booking');
-const authenticator = require('../controllers/AuthController');
-
-const validate = authenticator.validate;
 
 const BookingController = {
     /**
@@ -24,9 +21,7 @@ const BookingController = {
     getAllBookings: (req, res, next) => {
         // only moderators have access
         if (!req.user.isModerator) {
-            const err = createError(403, 'user not authorized for this action');
-            
-            return next(err);
+            return next(createError(403, 'user not authorized for this action'));
         }
 
         // find all the bookings
@@ -65,22 +60,7 @@ const BookingController = {
     getBookingsWithStatus: (req, res, next) => {
         // only moderators have access
         if (!req.user.isModerator) {
-            const err = createError(403, 'user not authorized for this action');
-            
-            return next(err);
-        }
-
-        // validate status field
-        validate.status(req);
-
-        const error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;
-
-            return next(err);
+            return next(createError(403, 'user not authorized for this action'));
         }
 
         // find all the bookings with this status
@@ -105,7 +85,7 @@ const BookingController = {
 
     /**
      * GET /api/users/me/bookings
-     * Returns bookings done by the given user
+     * Returns bookings done by the current user
      * Expects: {
      *      params: user._id
      *      header: bearer-token
@@ -157,39 +137,24 @@ const BookingController = {
     getAllBookingsForBook: (req, res, next) => {
         // only moderators have access to this
         if (!req.user.isModerator) {
-            const err = createError(403, 'user not authorized for this action');
-
-            return next(err);
+            return next(createError(403, 'user not authorized for this action'));
         }
 
-        let error;
-
-        // validate id field
-        validate.isMongoObejectID(req);
-        error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(404, 'book not found');
-
-            return next(err);
-        }
+        const targetBookID = req.params.id;
 
         // look for the book in db
-        Book.findById(req.params.id)
+        Book.findById(targetBookID)
             .catch( (err) => {
                 return next(err);
             })    
             .then( (book) => {
                 // book does not exist
                 if (!book) {
-                    const err = createError(404, 'book does not exist');
-
-                    return next(err);
+                    return next(createError(404, 'book does not exist'));
                 }
                 // find all the bookings for the book
                 Booking.find({
-                    book_id: req.params.id
+                    book_id: targetBookID
                 },{},{
                     sort: {
                         updatedAt: -1
@@ -223,21 +188,10 @@ const BookingController = {
      * }
      */
     getUserBookingsForBook: (req, res, next) => {
-        let error;
-
-        // validate id field
-        validate.isMongoObejectID(req);
-        error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(404, 'book not found');
-
-            return next(err);
-        }
+        const targetBookID = req.params.id;
 
         // look for the book in db
-        Book.findById(req.params.id)
+        Book.findById(targetBookID)
             .catch( (err) => {
                 return next(err);
             })    
@@ -251,7 +205,7 @@ const BookingController = {
                 // find all the bookings made by current user for this book
                 Booking.find({ 
                     user_id: req.user._id,
-                    book_id: req.params.id
+                    book_id: targetBookID
                 },{},{
                     sort: {
                         updatedAt: -1
@@ -288,31 +242,6 @@ const BookingController = {
      * }
      */
     addBooking: (req, res, next) => {
-        let error;
-        
-        // validate id field
-        validate.isMongoObejectID(req);
-        error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(404, 'book not found');
-
-            return next(err);
-        }
-
-        // validate quantity field
-        validate.quantity(req);
-        error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].message;
-
-            return next(err);
-        }
-
         // create the booking
         Booking.create({
             user_id: req.user._id,
@@ -351,93 +280,17 @@ const BookingController = {
      * }
      */
     updateBooking: (req, res, next) => {
-        // do not allow updates in user_id, book_id
-        if ('user_id' in req.body || 'book_id' in req.body) {
-            const err = createError(403, 'cannot change any attribute except quantity and status');
-
-            return next(err);
-        }
-
-        // do not allow both status and quantity update
-        if ('quantity' in req.body && 'status' in req.body) {
-            const err = createError(403, 'cannot change status and quantity at once');
-
-            return next(err);
-        }
-
-        let error;
-
-        // validate id field
-        validate.isMongoObejectID(req);
-        error = req.validationErrors();
-        
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(404, 'booking not found');
-            
-            return next(err);
-        }
-
-        // validate status and quantity field
-        if ('quantity' in req.body) {
-            validate.quantity(req);
-        }
-        if ('status' in req.body) {
-            validate.status(req);
-        }
-
-        error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;
-
-            return next(err);
-        }
-
         // look up the booking in db
-        Booking.findById(req.params.id)
+        const targetBookingID = req.params.id;
+
+        Booking.findById(targetBookingID)
             .catch( (err) => {
                 return next(err);
             })
             .then( (booking) => {
-                // booking does not exist
-                if (!booking) {
-                    const err = createError(404, 'booking does not exist');
-
-                    return next(err);
-                }
-
-                // check authorization of the user
-                if (!req.user.isModerator && req.user._id !== booking.user_id) {
-                    const err = createError(403, 'user does not have authorization for this action');
-
-                    return next(err);
-                }
-
-                // already approved or cancelled booking cannot be updated
-                if (booking.status === 'cancelled' || booking.status ==='approved') {
-                    const err = createError(403, 'cannot update approved or cancelled booking');
-
-                    return next(err);
-                } 
-
                 // booking exists
-                if ('quantity' in req.body) {
-                    booking.quantity = req.body.quantity;
-                }
-                if ('status' in req.body) {
-                    if (req.body.status === 'approved') {
-                        // only moderator can approve
-                        if (!req.user.isModerator) {
-                            const err = createError(403, 'user is not authorized for this action');
-
-                            return next(err);
-                        }
-                    }
-                    booking.status = req.body.status;
-                }
+                booking.quantity = req.body.quantity;
+                booking.status = req.body.status;
 
                 // save the booking
                 booking.save()

@@ -3,13 +3,10 @@ const JWT = require('jsonwebtoken');
 const createError = require('http-errors');
 const randomstring = require('randomstring');
 const gAuth = require('google-auth-library');
-const htmlspecialchars = require('htmlspecialchars');
 
 const User = require('../models/User');
 const Token = require('../models/Token');
-const authenticator = require('../controllers/AuthController');
 
-const validate = authenticator.validate;
 const client = new gAuth.OAuth2Client(
     process.env.GOOGLE_DEV_CLIENT_ID
 );
@@ -30,24 +27,8 @@ const UserController = {
      *      500: {}             // internal error
      * }
      */
-    register: (req, res, next) => {
-        // validate and sanitize the incoming data
-        validate.name(req);
-        validate.username(req);
-        validate.email(req);
-        validate.password(req);
-
-        const error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;     // return the first error
-
-            return next(err);
-        } 
-        
-        // Credentials are okay
+    register: (req, res, next) => {        
+        // credentials are okay
         const name = req.body.name;
         const username = req.body.username;
         const email = req.body.email;
@@ -61,9 +42,7 @@ const UserController = {
             .then( (user) => {
                 // same username or email exists
                 if (user) {
-                    const err = createError(409,'username or email already in use');
-
-                    return next(err);
+                    return next(createError(409,'username or email already in use'));
                 }
 
                 // duplicate does not exist. create new user
@@ -105,20 +84,7 @@ const UserController = {
      * }
      */
     login: (req, res, next) => {
-        // validate and sanitize the incoming data
-        validate.username(req);
-        validate.password(req);
-
-        const error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;     // return the first error
-
-            return next(err);
-        }
-
+        // credentials are okay
         const username = req.body.username;
         const password = req.body.password;
 
@@ -130,16 +96,12 @@ const UserController = {
             .then( (user) => {
                 // user does not exist
                 if (!user) {
-                    const err = createError(404,'user not found');
-
-                    return next(err);
+                    return next(createError(404,'user not found'));
                 }
                 // user exists, check password
                 // password does not match
                 if (!bcrypt.compareSync(password,user.password)) {
-                    const err = createError(401,'password mismatch');
-
-                    return next(err);
+                    return next(createError(401,'password mismatch'));
                 }
                 // password matches
                 // create an api token
@@ -169,22 +131,11 @@ const UserController = {
      *      500: {}                 // internal error
      */
     googleLogin: (req,res,next) => {
-        // validate the id_token
-        validate.id_token(req);
-
-        const error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;     // return the first error
-
-            return next(err);
-        }
-
         // id_token is usable
+        const id_token = req.body.id_token;
+
         client.verifyIdToken({
-            idToken: req.body.id_token,
+            idToken: id_token,
             audience: process.env.GOOGLE_DEV_CLIENT_ID
         })
             .catch( (err) => {
@@ -201,9 +152,7 @@ const UserController = {
                     .then( (user) => {
                         // user does not exist
                         if (!user) {
-                            const err = createError(404,'user not found');
-
-                            return next(err);
+                            return next(createError(404,'user not found'));
                         }
                         // user exists
                         // create an api token
@@ -313,21 +262,11 @@ const UserController = {
      * }
      */
     getProfile: (req, res, next) => {
-        // validate requested id
-        validate.isMongoObejectID(req);
-
-        const error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if (error) {
-            const err = createError(404);
-            err.message = error[0].msg;
-
-            return next(err);
-        }
+        // id is okay
+        const targetUserId = req.params.id;
 
         // look up user in db
-        User.findById(req.params.id, {
+        User.findById(targetUserId, {
             password: false,
             createdAt: false,
             updatedAt: false
@@ -338,9 +277,7 @@ const UserController = {
             .then( (user) => {
                 // user does not exist
                 if (!user) {
-                    const err = createError(404,'user not found');
-
-                    return next(err);
+                    return next(createError(404,'user not found'));
                 }
                 // reply with the user profile
                 user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
@@ -370,90 +307,27 @@ const UserController = {
      * }
      */
     updateProfile: (req,res,next) => {
-        // validate requested id
-        validate.isMongoObejectID(req);
-
-        let error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(404);
-            err.message = error[0].msg;
-
-            return next(err);
-        }
-
         // validated user id
         const targetUserId = req.params.id;
 
-        // check if the user has previlige for this
-        if (!req.user.isAdmin && req.user._id !== targetUserId) {
-            const err = createError(403, 'user not authorized for this action');
-
-            return next(err);
-        }
-
-        // username cannot be changed
-        if ('username' in req.body) {
-            const err = createError(403,'username cannot be changed');
-
-            return next(err);
-        }
-        
-        // only admin can give moderator previlige
-        if ('isModerator' in req.body) {
-            if (!req.user.isAdmin) {
-                const err = createError(403, 'user not authorized for this action');
-
+        // check if email in use
+        User.findOne({ email: req.body.email })
+            .catch( (err) => {
                 return next(err);
-            }
-            validate.isModerator(req);
-        }
-
-        // validate and sanitize the incoming data
-        if ('name' in req.body) validate.name(req);
-        if ('email' in req.body) validate.email(req);
-        if ('password' in req.body)validate.password(req);
-
-        error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;     // return the first error
-
-            return next(err);
-        }
-
-        if ('email' in req.body) {
-            User.findOne({ email: req.body.email })
-                .catch( (err) => {
-                    return next(err);
-                })
-                .then( (oldUser) => {
-                    if (oldUser) {
-                        const err = createError(409,'username or email already in use');
-
-                        return next(err);
-                    } else {
-                        updateDatabaseWithProfile(targetUserId,req)
-                            .catch( (err) => {
-                                return next(err);
-                            })
-                            .then( (response) => {
-                                res.status(200).json(response);
-                            });
-                    }
-                });
-        } else {
-            updateDatabaseWithProfile(targetUserId,req)
-                .catch( (err) => {
-                    return next(err);
-                })
-                .then( (response) => {
-                    res.status(200).json(response);
-                });
-        }
+            })
+            .then( (oldUser) => {
+                if (oldUser && oldUser._id.toString() !== targetUserId) {
+                    return next(createError(409,'email already in use'));
+                } else {
+                    updateDatabaseWithProfile(targetUserId,req)
+                        .catch( (err) => {
+                            return next(err);
+                        })
+                        .then( (response) => {
+                            res.status(200).json(response);
+                        });
+                }
+            });
     },
 
     /**
@@ -470,9 +344,9 @@ const UserController = {
      * }
      */
     searchUser: (req,res,next) => {
-        let search;
-        search = (req.body.search) ? htmlspecialchars(req.body.search) : null;
-        if (!search || search.length === 0) {
+        const search = req.body.search;
+
+        if (search.length === 0) {
             // search field does not exist or is empty
             res.status(200).json({
                 message: 'search results',
@@ -535,26 +409,11 @@ const updateDatabaseWithProfile = (targetUserId, req) => {
                 return reject(err);
             })
             .then( (targetUser) => {
-                // the target user does not exist
-                if (!targetUser) {
-                    const err = createError(404,'user not found');
-
-                    return reject(err);
-                }
-
                 // user exists, make necessary changes
-                if ('name' in req.body) {
-                    targetUser.name = req.body.name;
-                }
-                if ('email' in req.body) {
-                    targetUser.email = req.body.email;
-                }
-                if ('password' in req.body) {
-                    targetUser.password = bcrypt.hashSync(req.body.password,12);
-                }
-                if ('isModerator' in req.body) {
-                    targetUser.isModerator = req.body.isModerator;
-                }
+                targetUser.name = req.body.name;
+                targetUser.email = req.body.email;
+                targetUser.password = req.body.password;
+                targetUser.isModerator = req.body.isModerator;
 
                 // save changed data in database
                 targetUser.save()
