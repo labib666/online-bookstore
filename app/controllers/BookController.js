@@ -444,7 +444,8 @@ const fetchBookProfile = (book_id) => {
                             categories.push(entry.category_name);
                         });
                         // respond with book profile
-                        book._doc.categories = categories;
+                        book = book.toObject();
+                        book.categories = categories;
                         resolve(book);
                     });
             });

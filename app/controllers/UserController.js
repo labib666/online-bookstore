@@ -233,10 +233,13 @@ const UserController = {
             .catch( (err) => {
                 return next(err);
             })
-            .then( (users) => {
+            .then( (entries) => {
+                let users = [];
                 // add isAdmin field to the results
-                users.forEach( (user) => {
-                    user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                entries.forEach( (user) => {
+                    user = user.toObject();
+                    user.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                    users.push(user);
                 });
 
                 // reply with the user profiles
@@ -280,7 +283,8 @@ const UserController = {
                     return next(createError(404,'user not found'));
                 }
                 // reply with the user profile
-                user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                user = user.toObject();
+                user.isAdmin = (user.email === process.env.SUPER_ADMIN);
                 res.status(200).json({
                     message: 'successfully retrieved user data',
                     user: user
@@ -375,10 +379,13 @@ const UserController = {
                 .catch( (err) => {
                     return next(err);
                 })
-                .then( (users) => {
+                .then( (entries) => {
+                    const users = [];
                     // add isAdmin field to the results
-                    users.forEach( (user) => {
-                        user._doc.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                    entries.forEach( (user) => {
+                        user = user.toObject();
+                        user.isAdmin = (user.email === process.env.SUPER_ADMIN);
+                        users.push(user);
                     });
 
                     // reply with the user profiles
