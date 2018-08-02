@@ -2,15 +2,14 @@ const express = require('express');
 const createError = require('http-errors');
 
 const UserController = require('../controllers/UserController');
-const authenticator = require('../controllers/AuthController');
+const auth = require('../controllers/AuthController');
+const vc = auth.validatorChain;
 
 const userRouter = require('./userRouter');
 const bookRouter = require('./bookRouter');
 
 const HttpNotFound = (req, res, next) => {
-    const err = createError(404, 'Not Found');
-    
-    return next(err);
+    return next(createError(404, 'Not Found'));
 };
 
 const router = express.Router();
@@ -23,14 +22,14 @@ router.get('/', (req, res) => {
 });
 
 // authentication
-router.post('/register', authenticator.loggedOut, UserController.register);
-router.post('/login', authenticator.loggedOut, UserController.login);
-router.post('/social/google', authenticator.loggedOut, UserController.googleLogin);
+router.post('/register', auth.loggedOut, vc.register(), UserController.register);
+router.post('/login', auth.loggedOut, vc.login(), UserController.login);
+router.post('/social/google', auth.loggedOut, vc.googleLogin(), UserController.googleLogin);
 
 // request from logged-in user
-router.post('/logout', authenticator.loggedIn, UserController.logout);
-router.use('/users', authenticator.loggedIn, userRouter);
-router.use('/books', authenticator.loggedIn, bookRouter);
+router.post('/logout', auth.loggedIn, UserController.logout);
+router.use('/users', auth.loggedIn, userRouter);
+router.use('/books', auth.loggedIn, bookRouter);
 
 // could not find a good route. httpnotfound
 router.use(HttpNotFound);

@@ -3,10 +3,9 @@ const express = require('express');
 const chalk = require('chalk');
 const createError = require('http-errors');
 const bearerToken = require('express-bearer-token');
-const expressValidator = require('express-validator');
 
 const dbconnection = require('../../database/dbconnection');
-const authenticator = require('../controllers/AuthController');
+const auth = require('../controllers/AuthController');
 
 const web = require('./web');
 const api = require('./api');
@@ -16,9 +15,7 @@ const databaseConnected = (req,res,next) => {
     if (connected) {
         return next();
     } else {
-        const err = createError('500', 'Internal Server Error');
-
-        return next(err);
+        return next(createError('500', 'Internal Server Error'));
     }
 };
 
@@ -47,10 +44,7 @@ router.use(databaseConnected);
 
 // bind the user detail to req
 router.use(bearerToken());
-router.use(authenticator.getUserData);
-
-// bind validator to request
-router.use(expressValidator());
+router.use(auth.getUserData);
 
 router.use('/', web);
 router.use('/api', api);

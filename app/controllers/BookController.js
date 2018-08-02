@@ -1,11 +1,7 @@
 const createError = require('http-errors');
-const htmlspecialchars = require('htmlspecialchars');
 
 const Book = require('../models/Book');
 const Category = require('../models/Category');
-const authenticator = require('../controllers/AuthController');
-
-const validate = authenticator.validate;
 
 const BookController = {
 
@@ -68,29 +64,12 @@ const BookController = {
     addBook: (req, res, next) => {
         // check if the user has previlige for this
         if (!req.user.isModerator) {
-            const err = createError(403, 'user not authorized for this action');
-
-            return next(err);
-        }
-
-        // validate and sanitize the incoming data
-        validate.title(req);
-        validate.author(req);
-        validate.ISBN(req);
-
-        const error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;     // return the first error
-
-            return next(err);
+            return next(createError(403, 'user not authorized for this action'));
         }
         
         // Credentials are okay
-        const title = htmlspecialchars(req.body.title);
-        const author = htmlspecialchars(req.body.author);
+        const title = req.body.title;
+        const author = req.body.author;
         const ISBN = req.body.ISBN;
 
         Book.findOne({ ISBN: ISBN })
@@ -100,9 +79,7 @@ const BookController = {
             .then( (book) => {
                 // same book exists
                 if (book) {
-                    const err = createError(409,'book already in collection');
-
-                    return next(err);
+                    return next(createError(409,'book already in collection'));
                 }
 
                 // duplicate does not exist. create new book
@@ -139,17 +116,7 @@ const BookController = {
      *      500: {}                         // internal error
      * }
      */
-    getBook: (req, res, next) => {
-        // validate requested id
-        validate.isMongoObejectID(req);
-        const error = req.validationErrors();
-        if (error) {
-            const err = createError(404);
-            err.message = error[0].msg;
-
-            return next(err);
-        }
-        
+    getBook: (req, res, next) => {        
         // request is okay. look up the book
         fetchBookProfile(req.params.id)
             .catch( (err) => {
@@ -182,69 +149,17 @@ const BookController = {
      * }
      */
     updateBook: (req, res, next) => {
-        // validate requested id
-        validate.isMongoObejectID(req);
-        let error = req.validationErrors();
-        if ( error ) {
-            const err = createError(404);
-            err.message = error[0].msg;
-
-            return next(err);
-        }
-
         // validated book id
         const targetBookID = req.params.id;
-
-        // check if the user has previlige for this
-        if (!req.user.isModerator) {
-            const err = createError(403, 'user not authorized for this action');
-
-            return next(err);
-        }
-
-        // ISBN cannot be changed
-        if ('ISBN' in req.body) {
-            const err = createError(403, 'ISBN cannot be changed');
-
-            return next(err);
-        }
-
-        // validate and sanitize the incoming data
-        if ('title' in req.body) {
-            validate.title(req);
-        }
-        if ('author' in req.body) {
-            validate.author(req);
-        }
-
-        error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;     // return the first error
-
-            return next(err);
-        }
         
+        // look up the book in db
         Book.findById(targetBookID)
             .catch( (err) => {
                 return next(err);
             })
             .then( (targetBook) => {
-                // the target book does not exist
-                if (!targetBook) {
-                    const err = createError(404,'book not found');
-
-                    return next(err);
-                }
-                // book exists, make necessary changes
-                if ('title' in req.body) {
-                    targetBook.title = htmlspecialchars(req.body.title);
-                }
-                if ('author' in req.body) {
-                    targetBook.author = htmlspecialchars(req.body.author);
-                }
+                targetBook.title = req.body.title;
+                targetBook.author = req.body.author;
                 
                 // save changed data in database
                 targetBook.save()
@@ -282,27 +197,11 @@ const BookController = {
     addToCategory: (req, res, next) => {
         // check if the user has previlige for this
         if (!req.user.isModerator) {
-            const err = createError(403, 'user not authorized for this action');
-
-            return next(err);
+            return next(createError(403, 'user not authorized for this action'));
         }
-
-        // validate and sanitize the incoming data
-        validate.category_name(req);
-        validate.isMongoObejectID(req);
-
-        const error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;     // return the first error
-
-            return next(err);
-        } 
         
         // Credentials are okay
-        const category_name = htmlspecialchars(req.body.category_name);
+        const category_name = req.body.category_name;
         const book_id = req.params.id;
 
         // look whether this book exists in db
@@ -312,20 +211,19 @@ const BookController = {
             })
             .then( (book) => {
                 if (!book) {
-                    const err = createError(404,'book not found');
-
-                    return next(err);
+                    return next(createError(404,'book not found'));
                 }
                 // look for the book in this category
-                findBookInCategory(category_name,book_id)
+                Category.findOne({
+                    category_name: category_name,
+                    book_id: book_id
+                })
                     .catch( (err) => {
                         return next(err);
                     })
                     .then( (data) => {
                         if (data) {
-                            const err = createError(409,'book already exists in this category');
-
-                            return next(err);
+                            return next(createError(409,'book already exists in this category'));
                         }
                         // no duplicates found. add book to category
                         Category.create({
@@ -367,27 +265,11 @@ const BookController = {
     removeFromCategory: (req, res, next) => {
         // check if the user has previlige for this
         if (!req.user.isModerator) {
-            const err = createError(403, 'user not authorized for this action');
-
-            return next(err);
+            return next(createError(403, 'user not authorized for this action'));
         }
-
-        // validate and sanitize the incoming data
-        validate.category_name(req);
-        validate.isMongoObejectID(req);
-
-        const error = req.validationErrors();
-
-        // errors faced while validating / sanitizing
-        if ( error ) {
-            const err = createError(422);
-            err.message = error[0].msg;     // return the first error
-
-            return next(err);
-        } 
         
         // Credentials are okay
-        const category_name = htmlspecialchars(req.body.category_name);
+        const category_name = req.body.category_name;
         const book_id = req.params.id;
 
         // look whether this book exists in db
@@ -397,20 +279,19 @@ const BookController = {
             })
             .then( (book) => {
                 if (!book) {
-                    const err = createError(404,'book not found');
-
-                    return next(err);
+                    return next(createError(404,'book not found'));
                 }
                 // look for the book in this category
-                findBookInCategory(category_name,book_id)
+                Category.findOne({
+                    category_name: category_name,
+                    book_id: book_id
+                })
                     .catch( (err) => {
                         return next(err);
                     })
                     .then( (data) => {
                         if (!data) {
-                            const err = createError(404,'book does not belong to this category');
-
-                            return next(err);
+                            return next(createError(404,'book does not belong to this category'));
                         }
                         // book belongs to category. now remove it
                         Category.findByIdAndRemove(data._id)
@@ -442,16 +323,6 @@ const BookController = {
      * }
      */
     getBooksInCategory: (req, res, next) => {
-        // validate the category name
-        validate.category_name(req);
-        let error = req.validationErrors();
-        if ( error ) {
-            const err = createError(404);
-            err.message = error[0].msg;
-
-            return next(err);
-        }
-
         // request is okay. look up the books
         Category.distinct('book_id', {category_name: req.params.category_name})
             .catch( (err) => {
@@ -490,9 +361,9 @@ const BookController = {
      * }
      */
     searchBook: (req,res,next) => {
-        let search;
-        search = (req.body.search) ? htmlspecialchars(req.body.search) : null;
-        if (!search || search.length === 0) {
+        const search = req.body.search;
+
+        if (search.length === 0) {
             // search field does not exist or is empty
             res.status(200).json({
                 message: 'search results',
@@ -558,62 +429,25 @@ const fetchBookProfile = (book_id) => {
             .then( (book) => {
                 // book not in db
                 if (!book) {
-                    const err = createError(404,'book not found');
-
-                    return reject(err);
+                    return reject(createError(404,'book not found'));
                 }
                 // book found. find the category it belongs to.
-                getBookCategory(book._id)
+                Category.find({
+                    book_id: book._id
+                })
                     .catch( (err) => {
                         return reject(err);
                     })
-                    .then( (categories) => {
+                    .then( (entries) => {
+                        let categories = [];
+                        entries.forEach( (entry) => {
+                            categories.push(entry.category_name);
+                        });
                         // respond with book profile
-                        book._doc.categories = categories;
+                        book = book.toObject();
+                        book.categories = categories;
                         resolve(book);
                     });
-            });
-    });
-};
-
-/**
- * looks up whether the book exists in category or not
- * @param {string} category_name    // The category name to look inside
- * @param {string} book_id          // The book to look up
- */
-const findBookInCategory = (category_name, book_id) => {
-    return new Promise( (resolve, reject) => {
-        Category.findOne({
-            category_name: category_name,
-            book_id: book_id
-        })
-            .catch( (err) => {
-                reject(err);
-            })
-            .then( (data) => {
-                resolve(data);
-            });
-    });
-};
-
-/**
- * Returns the categories book belongs to
- * @param {string} targetBookID         // id of book to look up
- */
-const getBookCategory = (targetBookID) => {
-    return new Promise( (resolve, reject) => {
-        Category.find({
-            book_id: targetBookID
-        })
-            .catch( (err) => {
-                reject(err);
-            })
-            .then( (entries) => {
-                let categories = [];
-                entries.forEach( (entry) => {
-                    categories.push(entry.category_name);
-                });
-                resolve(categories);
             });
     });
 };
