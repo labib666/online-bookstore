@@ -10,7 +10,7 @@
                         <div v-for="booking in pending" :key="booking.id">
                             <div class="row">
                                 <div class="col-md-4">
-                                    {{ booking.user_id }} requested for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }}
+                                    <b>{{ booking.user.name }}</b> requested for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }}
                                 </div>
                                 <div class="col-md-8">
                                     <button class="btn btn-success" @click="approve(booking.id)">Approve</button>
@@ -29,7 +29,7 @@
                         <h1>Approved</h1>
                         <hr />
                         <div v-for="booking in approved" :key="booking.id" class="clearfix">
-                                {{ booking.user_id }} request for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} is approved
+                            <b>{{ booking.user.name }}</b>'s request for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} is approved
                             <hr />
                         </div>
                     </div>
@@ -39,7 +39,7 @@
                     <div class="card-text">
                         <h1>Cancelled</h1>
                         <div v-for="booking in cancelled" :key="booking.id" class="clearfix">
-                                {{ booking.user_id }} request for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} has been cancelled
+                            <b>{{ booking.user.name }}</b>'s request for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} has been cancelled
                             <hr />
                         </div>
                     </div>
@@ -66,9 +66,16 @@ export default {
     },
 
     methods: {
-        fetchBookings () {
-            this.$http.get(`/books/${this.book.id}/bookings`).then((response) => {
-                const bookings = response.data.bookings.map((booking) => {
+        async fetchBookings () {
+            try {
+                let response = await this.$http.get(`/books/${this.book.id}/bookings`);
+                let bookings = response.data.bookings;
+                bookings.sort((a, b) => {
+                    return new Date(a.createdAt) - new Date(b.createdAt);
+                });
+
+                // Extract necessary data from booking object
+                bookings = bookings.map((booking) => {
                     return {
                         id: booking._id,
                         user_id: booking.user_id,
@@ -77,6 +84,38 @@ export default {
                     };
                 });
 
+                // List all user IDs
+                let userIDs = bookings.map((booking) => {
+                    return booking.user_id;
+                });
+
+                // Find unique id's of users.
+                userIDs = [...new Set(userIDs)];
+
+                // Create promise array of HTTP requests
+                // for fetching user's information
+                userIDs = userIDs.map((id) => {
+                    return this.$http.get(`/users/${id}`);
+                });
+
+                // Create a map {id => userObject}
+                let userMap = {};
+                for (let p of userIDs) {
+                    let response = await p;
+                    userMap[response.data.user._id] = response.data.user;
+                };
+
+                // Replace userID with user object using the previous map
+                bookings = bookings.map((booking) => {
+                    return {
+                        id: booking.id,
+                        user: userMap[booking.user_id],
+                        quantity: booking.quantity,
+                        status: booking.status
+                    };
+                });
+
+                // Now we will to update states of the component
                 this.pending = bookings.filter((booking) => {
                     return booking.status === 'pending';
                 });
@@ -88,10 +127,16 @@ export default {
                 this.approved = bookings.filter((booking) => {
                     return booking.status === 'approved';
                 });
-            });
+            } catch (err) {
+                this.$notify({
+                    text: 'Something went wrong',
+                    type: 'error'
+                });
+            }
         },
 
         approve (bookingID) {
+            // Approve the booking
             this.$http.patch(`/books/bookings/${bookingID}`, {
                 status: 'approved'
             }).then(() => {
@@ -100,6 +145,7 @@ export default {
         },
 
         update (bookingID, quantity) {
+            // Update booking with new quantity
             this.$http.patch(`/books/bookings/${bookingID}`, {
                 quantity
             }).then(() => {
@@ -108,6 +154,7 @@ export default {
         },
 
         cancel (bookingID) {
+            // Cancel the booking
             this.$http.patch(`/books/bookings/${bookingID}`, {
                 status: 'cancelled'
             }).then(() => {
