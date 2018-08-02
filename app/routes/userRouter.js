@@ -1,16 +1,19 @@
 const express = require('express');
 
-const UserController = require('../controllers/UserController');
-const BookingController = require('../controllers/BookingController');
+const auth = require('../controllers/AuthController');
+const UC = require('../controllers/UserController');
+const BKC = require('../controllers/BookingController');
+
+const vc = auth.validatorChain;
 
 const router = express.Router();
 
 // user interactions
-router.get('/', UserController.getAllProfiles);
-router.post('/search', UserController.searchUser);
-router.get('/me', UserController.getOwnProfile);
-router.get('/me/bookings', BookingController.getBookingsByUser);
-router.get('/:id', UserController.getProfile);
-router.patch('/:id', UserController.updateProfile);
+router.get('/', UC.getAllProfiles);
+router.post('/search', vc.search(), UC.searchUser);
+router.get('/me', UC.getOwnProfile);
+router.get('/me/bookings', BKC.getBookingsByUser);
+router.get('/:id', vc.checkID(), UC.getProfile);
+router.patch('/:id', vc.checkID(), vc.updateProfile(), UC.updateProfile);
 
 module.exports = router;
