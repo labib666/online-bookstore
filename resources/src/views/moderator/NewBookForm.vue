@@ -1,6 +1,6 @@
 <template>
     <div class="row-container flex-center" style="margin-top:50px;">
-        <div class="col-md-6">
+        <div class="col-lg-8 col-md-12">
             <div class="card">
                 <div class="card-body">
                     <h1 class="center-content">Add new book information</h1>
