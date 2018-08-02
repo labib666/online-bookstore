@@ -14,7 +14,7 @@
                     <div class="card-text">
                         <h1>Pending for reviews</h1>
                         <hr />
-                        <div v-if="pending.length != 0">You haven't booked <b>{{ book.title }}</b> yet</div>
+                        <div v-if="pending.length === 0">You haven't booked <b>{{ book.title }}</b> yet</div>
                         <div v-for="booking in pending" :key="booking.id">
                             <div class="row">
                                 <div class="col-md-6">
