@@ -92,7 +92,7 @@ const BookController = {
                         return next(err);
                     })
                     .then( (newBook) => {
-                        // new user created
+                        // new book created
                         // send back the book id
                         res.status(200).json({
                             message: 'book successfully added',

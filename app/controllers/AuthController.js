@@ -391,7 +391,7 @@ const vs = {
  * @param {string} field // the field to sanitize
  */
 const s = (field) => {
-    return sanitize(field).trim().escape();
+    return sanitize(field).trim();
 };
 
 /**
