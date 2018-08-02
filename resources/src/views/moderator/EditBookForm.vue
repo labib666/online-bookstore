@@ -84,12 +84,12 @@ export default {
             this.$http.patch(`/books/${this.id}`, {
                 title: this.title,
                 author: this.author
-            }).then(res => {
+            }).then((res) => {
                 this.$notify({
                     text: 'Update sucessful'
                 });
                 this.$router.push(`/books/${this.id}`);
-            }).catch(err => {
+            }).catch((err) => {
                 this.$notify({
                     text: err.response.data.message,
                     type: 'error'
@@ -101,10 +101,10 @@ export default {
             const newCategory = this.newCategory;
             this.$http.post(`/books/${this.id}/category`, {
                 category_name: newCategory
-            }).then(res => {
+            }).then((res) => {
                 this.categories.push(newCategory);
                 this.newCategory = '';
-            }).catch(err => {
+            }).catch((err) => {
                 this.$notify({
                     text: err.response.data.message,
                     type: 'error'
@@ -117,9 +117,9 @@ export default {
                 data: {
                     category_name: this.categories[idx]
                 }
-            }).then(res => {
+            }).then((res) => {
                 this.categories.splice(idx, 1);
-            }).catch(err => {
+            }).catch((err) => {
                 this.$notify({
                     text: err.response.data.message,
                     type: 'error'

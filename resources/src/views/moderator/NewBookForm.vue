@@ -50,10 +50,10 @@ export default {
                 title: this.title,
                 author: this.author,
                 ISBN: this.isbn
-            }).then(res => {
+            }).then((res) => {
                 const bookID = res.data.book;
                 this.$router.push(`/books/${bookID}`);
-            }).catch(err => {
+            }).catch((err) => {
                 this.$notify({
                     text: err.response.data.message,
                     type: 'error'

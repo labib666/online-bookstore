@@ -14,6 +14,10 @@ module.exports = {
           "error",
           4
       ],
+      "arrow-parens": [
+          "error",
+          "always"
+      ],
       "indent": [
           "error",
           4
