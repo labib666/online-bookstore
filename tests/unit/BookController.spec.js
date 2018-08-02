@@ -1,6 +1,5 @@
 const sinon = require('sinon');
 const chai = require('chai');
-const chaiHTTP = require('chai-http');
 
 let AuthController, server;
 const Book = require('../../app/models/Book');
@@ -8,7 +7,6 @@ const dbconnection = require('../../database/dbconnection');
 
 const sandbox = sinon.createSandbox();
 const expect = chai.expect;
-chai.use(chaiHTTP);
 
 describe('Test for BookController:addBook', () => {
     // before and after each test
