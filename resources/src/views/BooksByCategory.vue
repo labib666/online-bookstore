@@ -3,13 +3,9 @@
         <Topbar></Topbar>
         <Sidebar title="All books"></Sidebar>
         <Main>
-            Search: {{ this.query }}
             <Loading v-if="loading" />
             <div v-if="!loading">
                 <Books :books="books" />
-            </div>
-            <div v-if="!loading && books.length == 0" class="flex-center">
-                <h1>No books found</h1>
             </div>
         </Main>
     </div>
@@ -39,31 +35,27 @@ export default {
     },
 
     computed: {
-        query () {
-            return this.$route.params.query;
+        category () {
+            return this.$route.params.category;
+        }
+    },
+
+    watch: {
+        // Watch the `category` props
+        category () {
+            this.fetch();
         }
     },
 
     mounted () {
-        this.fetchSearch();
-    },
-
-    watch: {
-        // Watch the `query` props
-        query () {
-            this.fetchSearch();
-        }
+        this.fetch();
     },
 
     methods: {
-        fetchSearch () {
-            this.books = [];
+        fetch () {
             this.loading = true;
-            const query = this.query;
-
-            this.$http.post('/books/search', {
-                search: query
-            }).then((response) => {
+            this.$http.get(`/books/category/${this.category}`).then((response) => {
+                this.books = [];
                 response.data.books.forEach((book) => {
                     const data = {
                         id: book._id,
@@ -75,6 +67,12 @@ export default {
                     this.books.push(data);
                 });
 
+                this.loading = false;
+            }).catch(() => {
+                this.$notify({
+                    text: 'Something went wrong',
+                    type: 'error'
+                });
                 this.loading = false;
             });
         }
