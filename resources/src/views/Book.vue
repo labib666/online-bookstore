@@ -1,7 +1,7 @@
 <template>
     <div>
         <Topbar></Topbar>
-        <div id="sidebar"></div>
+        <Sidebar title="Book details" />
         <Main>
             <div class="row mr-0">
                 <div class="col-md-12">
@@ -31,6 +31,7 @@
 <script>
 import Main from '@/components/Main';
 import Topbar from '@/components/Topbar';
+import Sidebar from '@/components/Sidebar';
 import Book from '@/components/Book';
 import UsersBooking from '@/components/UsersBooking';
 import ModeratorsBooking from '@/components/ModeratorsBooking';
@@ -40,6 +41,7 @@ export default {
     components: {
         Main,
         Topbar,
+        Sidebar,
         Book,
         UsersBooking,
         ModeratorsBooking

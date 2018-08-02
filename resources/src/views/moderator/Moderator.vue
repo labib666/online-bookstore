@@ -1,9 +1,7 @@
 <template>
     <div id="moderator">
         <Topbar></Topbar>
-        <Sidebar title="Moderator panel">
-            <router-link to="/moderator">Add new book</router-link>
-        </Sidebar>
+        <Sidebar title="Moderator panel"></Sidebar>
 
         <Main>
             <router-view />

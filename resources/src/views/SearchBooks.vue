@@ -1,7 +1,7 @@
 <template>
     <div>
         <Topbar></Topbar>
-        <Sidebar title="All books"></Sidebar>
+        <Sidebar title="Search results"></Sidebar>
         <Main>
             Search: {{ this.query }}
             <Loading v-if="loading" />

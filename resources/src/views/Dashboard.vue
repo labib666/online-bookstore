@@ -1,13 +1,7 @@
 <template>
     <div>
         <Topbar></Topbar>
-        <Sidebar title="Dashboard">
-            <router-link to="/admin">Admin panel</router-link>
-            <hr />
-            <router-link to="/moderator">Moderator panel</router-link>
-            <hr />
-            <router-link to="/books">All books</router-link>
-        </Sidebar>
+        <Sidebar title="Dashboard"></Sidebar>
 
     </div>
 </template>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <Topbar></Topbar>
-        <Sidebar title="All books"></Sidebar>
+        <Sidebar :title="'Book category: ' + category"></Sidebar>
         <Main>
             <Loading v-if="loading" />
             <div v-if="!loading">
