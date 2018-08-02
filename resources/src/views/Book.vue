@@ -15,6 +15,7 @@
                             </div>
                             <div class="col-md-6">
                                 <UsersBooking v-if="!user.isModerator" :book="book" />
+                                <ModeratorsBooking v-if="user.isModerator" :book="book" />
                             </div>
                         </div>
                     </div>
@@ -32,6 +33,7 @@ import Main from '@/components/Main';
 import Topbar from '@/components/Topbar';
 import Book from '@/components/Book';
 import UsersBooking from '@/components/UsersBooking';
+import ModeratorsBooking from '@/components/ModeratorsBooking';
 import { mapState } from 'vuex';
 
 export default {
@@ -39,7 +41,8 @@ export default {
         Main,
         Topbar,
         Book,
-        UsersBooking
+        UsersBooking,
+        ModeratorsBooking
     },
 
     data () {
