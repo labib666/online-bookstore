@@ -1,149 +1,99 @@
 const sinon = require('sinon');
 const chai = require('chai');
-const chaiHTTP = require('chai-http');
-
 const bcrypt = require('bcrypt');
 
-let AuthController, server;
 const User = require('../../app/models/User');
-const dbconnection = require('../../database/dbconnection');
+const UC = require('../../app/controllers/UserController');
 
-const sandbox = sinon.createSandbox();
-const expect = chai.expect;
-chai.use(chaiHTTP);
+let sandbox = sinon.createSandbox();
+let expect = chai.expect;
 
-describe('Test for UserController:register', () => {
-    // before and after each test
-    let bcrypt_hashsync_stub, db_online_stub;
-
-    beforeEach( (done) => {
-        AuthController = require('../../app/controllers/AuthController');
-        sandbox.stub(AuthController,'getUserData')
-            .callsFake( (req,res,next) => {
-                next();
-            });
-        db_online_stub = sandbox.stub(dbconnection, 'isOnline')
-            .callsFake( () => {
-                return true;
-            });
-        bcrypt_hashsync_stub = sandbox.stub(bcrypt,'hashSync')
-            .callsFake( () => {
+describe('Test for UserController:register', function () { 
+    let req, res, resJsonSpy, resStatusSpy, nextSpy;
+    
+    // before each test
+    beforeEach( function (done) {
+        sandbox.stub(bcrypt,'hashSync')
+            .callsFake( function () {
                 return 'password';
             });
-        server = require('../../app');
+        req = {
+            body: {
+                name: 'test name',
+                username: 'testname',
+                email: 'abc@abc.com',
+                password: '0123456789'
+            }
+        };
+        resJsonSpy = sandbox.spy();
+        res = {
+            json: resJsonSpy
+        };
+        resStatusSpy = sandbox.stub().returns(res);
+        nextSpy =  sandbox.spy();
         done();
     });
 
-    afterEach( (done) => {
+    // after each test
+    afterEach( function (done) {
         sandbox.restore();
         done();
     });
 
     // tests
-    it('placeholder', (done) => {
+
+    it('placeholder', function (done) {
         expect(1+1).to.equal(2);
         done();
     });
 
-    it('a valid user registration', (done) => {
-        const user_findOne_stub = sandbox.stub(User, 'findOne')
-            .callsFake( () => {
-                return new Promise((resolve) => {
+    it('a valid user registration', function (done) {
+        sandbox.stub(User, 'findOne')
+            .callsFake( function () {
+                return new Promise(function (resolve) {
                     resolve(null);
                 });
             });
-        const user_create_stub = sandbox.stub(User, 'create')
-            .callsFake( (user) => {
-                return new Promise( (resolve) => {
+        sandbox.stub(User, 'create')
+            .callsFake( function (user) {
+                return new Promise( function (resolve) {
                     user._id = '1234';
                     resolve(user);
                 });
             });
 
-        const server = require('../../app');
-        chai.request(server)
-            .post('/api/register')
-            .send({
-                name: 'test user',
-                username: 'testuser',
-                email: 'test@user.com',
-                password: 'avalidpassword'
-            })
-            .end( (err,res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('user').eql('1234');
-                expect(db_online_stub.callCount).to.equal(1);
-                expect(bcrypt_hashsync_stub.callCount).to.equal(1);
-                expect(user_findOne_stub.callCount).to.equal(1);
-                expect(user_create_stub.callCount).to.equal(1);
-                done();
-            });
+        UC.register(req, { status: resStatusSpy }, nextSpy);
+        
+        setTimeout(function() {
+            expect(nextSpy.callCount).to.equal(0);
+            expect(resJsonSpy.callCount).to.equal(1);
+            expect(resJsonSpy.args[0][0].user).to.equal('1234');
+            done();
+        }, 250);
     });
 
-    it('user already exists', (done) => {
-        const user_findOne_stub = sandbox.stub(User, 'findOne')
-            .callsFake( (user) => {
-                return new Promise((resolve) => {
+    it('user already exists', function (done) {
+        sandbox.stub(User, 'findOne')
+            .callsFake( function (user) {
+                return new Promise( function (resolve) {
                     resolve(user);
                 });
             });
-        const user_create_stub = sandbox.stub(User, 'create')
-            .callsFake( (user) => {
-                return new Promise( (resolve) => {
+        sandbox.stub(User, 'create')
+            .callsFake( function (user) {
+                return new Promise( function (resolve) {
                     user._id = '1234';
                     resolve(user);
                 });
             });
         
-        chai.request(server)
-            .post('/api/register')
-            .send({
-                name: 'test user',
-                username: 'testuser',
-                email: 'test@user.com',
-                password: 'avalidpassword'
-            })
-            .end( (err,res) => {
-                expect(res).to.have.status(409);
-                expect(db_online_stub.callCount).to.equal(1);
-                expect(bcrypt_hashsync_stub.callCount).to.equal(1);
-                expect(user_findOne_stub.callCount).to.equal(1);
-                expect(user_create_stub.callCount).to.equal(0);
-                done();
-            });
-    });
-
-    it('invalid name should not be allowed', (done) => {
-        const user_findOne_stub = sandbox.stub(User, 'findOne')
-            .callsFake( () => {
-                return new Promise((resolve) => {
-                    resolve(null);
-                });
-            });
-        const user_create_stub = sandbox.stub(User, 'create')
-            .callsFake( (user) => {
-                return new Promise( (resolve) => {
-                    user._id = '1234';
-                    resolve(user);
-                });
-            });
-        
-        const server = require('../../app');
-        chai.request(server)
-            .post('/api/register')
-            .send({
-                name: 'test123user',
-                username: 'testuser',
-                email: 'test@user.com',
-                password: 'avalidpassword'
-            })
-            .end( (err,res) => {
-                expect(res).to.have.status(422);
-                expect(db_online_stub.callCount).to.equal(1);
-                expect(bcrypt_hashsync_stub.callCount).to.equal(0);
-                expect(user_findOne_stub.callCount).to.equal(0);
-                expect(user_create_stub.callCount).to.equal(0);
-                done();
-            });
+        UC.register(req, { status: resStatusSpy }, nextSpy);
+            
+        setTimeout(function() {
+            expect(nextSpy.callCount).to.equal(1);
+            expect(resJsonSpy.callCount).to.equal(0);
+            expect(nextSpy.args[0][0].status).to.equal(409);
+            done();
+        }, 250);
     });
 });

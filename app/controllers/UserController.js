@@ -36,9 +36,6 @@ const UserController = {
         const hashedPassword = bcrypt.hashSync(password,12);
 
         User.findOne({ $or:[ { username: username }, { email: email } ] })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (user) => {
                 // same username or email exists
                 if (user) {
@@ -53,16 +50,19 @@ const UserController = {
                     password: hashedPassword,
                     isModerator: (email === process.env.SUPER_ADMIN)
                 })
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (newUser) => {
                         // new user created
                         res.status(200).json({
                             message: 'registration successful',
                             user: newUser._id
                         });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -90,9 +90,6 @@ const UserController = {
 
         // look for a user with this credential
         User.findOne({ username: username })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (user) => {
                 // user does not exist
                 if (!user) {
@@ -106,12 +103,15 @@ const UserController = {
                 // password matches
                 // create an api token
                 createLoginToken(user)
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (token) => {
                         res.status(200).json(token);
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -138,17 +138,11 @@ const UserController = {
             idToken: id_token,
             audience: process.env.GOOGLE_DEV_CLIENT_ID
         })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (ticket) => {
                 const payload = ticket.getPayload();
 
                 // found user email. check if this email exists in db
                 User.findOne({ email: payload.email })
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (user) => {
                         // user does not exist
                         if (!user) {
@@ -157,13 +151,19 @@ const UserController = {
                         // user exists
                         // create an api token
                         createLoginToken(user)
-                            .catch( (err) => {
-                                return next(err);
-                            })
                             .then( (token) => {
                                 res.status(200).json(token);
+                            })
+                            .catch( (err) => {
+                                return next(err);
                             });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -183,14 +183,14 @@ const UserController = {
     logout: (req, res, next) => {
         // logout the user
         Token.findByIdAndRemove(req.token)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (token) => {
                 res.status(200).json({
                     message: 'logout successful',
                     removedToken: token.token
                 });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -230,9 +230,6 @@ const UserController = {
             createdAt: false,
             updatedAt: false
         })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (entries) => {
                 let users = [];
                 // add isAdmin field to the results
@@ -247,6 +244,9 @@ const UserController = {
                     message: 'successfully retrieved users',
                     users: users
                 });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -274,9 +274,6 @@ const UserController = {
             createdAt: false,
             updatedAt: false
         })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (user) => {
                 // user does not exist
                 if (!user) {
@@ -289,6 +286,9 @@ const UserController = {
                     message: 'successfully retrieved user data',
                     user: user
                 });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -316,21 +316,21 @@ const UserController = {
 
         // check if email in use
         User.findOne({ email: req.body.email })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (oldUser) => {
                 if (oldUser && oldUser._id.toString() !== targetUserId) {
                     return next(createError(409,'email already in use'));
                 } else {
                     updateDatabaseWithProfile(targetUserId,req)
-                        .catch( (err) => {
-                            return next(err);
-                        })
                         .then( (response) => {
                             res.status(200).json(response);
+                        })
+                        .catch( (err) => {
+                            return next(err);
                         });
                 }
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -376,9 +376,6 @@ const UserController = {
                     }
                 }
             })
-                .catch( (err) => {
-                    return next(err);
-                })
                 .then( (entries) => {
                     const users = [];
                     // add isAdmin field to the results
@@ -393,6 +390,9 @@ const UserController = {
                         message: 'successfully retrieved users',
                         users: users
                     });
+                })
+                .catch( (err) => {
+                    return next(err);
                 });
         }
     }
@@ -412,9 +412,6 @@ const updateDatabaseWithProfile = (targetUserId, req) => {
     return new Promise( (resolve,reject) => {
         // everything is fine. look the user up and update
         User.findById(targetUserId)
-            .catch( (err) => {
-                return reject(err);
-            })
             .then( (targetUser) => {
                 // user exists, make necessary changes
                 targetUser.name = req.body.name;
@@ -424,9 +421,6 @@ const updateDatabaseWithProfile = (targetUserId, req) => {
 
                 // save changed data in database
                 targetUser.save()
-                    .catch( (err) => {
-                        return reject(err);
-                    })
                     .then( (updatedUser) => {
                         const response = {
                             message: 'user successfully updated',
@@ -434,7 +428,13 @@ const updateDatabaseWithProfile = (targetUserId, req) => {
                         };
 
                         return resolve(response);
+                    })
+                    .catch( (err) => {
+                        return reject(err);
                     });
+            })
+            .catch( (err) => {
+                return reject(err);
             });
     });
 };
@@ -466,15 +466,15 @@ const createLoginToken = (user) => {
 
         // save the token and respond to user
         Token.create({ token: token })
-            .catch( (err) => {
-                return reject(err);
-            })
             .then( (newToken) => {
                 // new token created
                 resolve({
                     message: 'login successful',
                     token: newToken.token
                 });
+            })
+            .catch( (err) => {
+                return reject(err);
             });
     });
 };
