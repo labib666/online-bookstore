@@ -173,15 +173,9 @@ const UserController = {
      *      header: bearer-token
      * }
      * Responds: {
-<<<<<<< HEAD
      *      200: { body: removedToken }     // success
      *      401: {}                         // unauthorized for not logged in user
      *      500: {}                         // internal error
-=======
-     *      200: { body: removedToken }    // success
-     *      401: {}                 // unauthorized for not logged in user
-     *      500: {}                 // internal error
->>>>>>> origin/29-add-api-documentation
      * }
      */
     logout: (req, res, next) => {

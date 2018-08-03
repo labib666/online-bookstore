@@ -492,7 +492,7 @@ const v = {
         return check('rating')
             .exists().withMessage('req must have a \'rating\' field')
             .not().isEmpty().withMessage('\'rating\' field must be non empty')
-            .inInt({min: 1, max: 5});
+            .isInt({min: 1, max: 5});
     },
     // validate the review field
     review: () => {

@@ -95,7 +95,7 @@ const RatingController = {
      * Responds: {
      *      200: { body: rating }       // success
      *      401: {}                     // unauthorized for not logged in users
-     *      404: {}                     // book not found
+     *      404: {}                     // book/rating not found
      *      500: {}                     // internal error
      * }
      */
@@ -115,9 +115,13 @@ const RatingController = {
                     book_id: targetBookID
                 })
                     .then( (rating) => {
+                        // rating does not exist
+                        if (!rating) {
+                            return next(createError(404, 'rating does not exist'));
+                        }
                         // respond with the rating
                         res.json({
-                            message: 'succesfully retrieved user ratins for book',
+                            message: 'succesfully retrieved user ratings for book',
                             rating: rating
                         });
                     })

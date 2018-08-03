@@ -24,7 +24,7 @@ router.put('/:id/ratings', vc.checkID(), vc.addOrUpdateRating(), RC.addOrUpdateR
 router.get('/:id/bookings', vc.checkID(), BKC.getAllBookingsForBook);
 router.get('/:id/ratings', vc.checkID(), RC.getAllRatingsForBook);
 router.get('/:id/bookings/me', vc.checkID(), BKC.getUserBookingsForBook);
-router.get('/:id/bookings/me', vc.checkID(), RC.getUserRatingsForBook);
+router.get('/:id/ratings/me', vc.checkID(), RC.getUserRatingsForBook);
 router.post('/:id/category', vc.checkID(), vc.category(), BC.addToCategory);
 router.delete('/:id/category', vc.checkID(), vc.category(), BC.removeFromCategory);
 
