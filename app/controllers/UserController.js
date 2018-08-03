@@ -427,14 +427,14 @@ const updateDatabaseWithProfile = (targetUserId, req) => {
                             user: updatedUser._id
                         };
 
-                        return resolve(response);
+                        resolve(response);
                     })
                     .catch( (err) => {
-                        return reject(err);
+                        reject(err);
                     });
             })
             .catch( (err) => {
-                return reject(err);
+                reject(err);
             });
     });
 };
@@ -461,7 +461,7 @@ const createLoginToken = (user) => {
             };
             token = JWT.sign(payload, jwtSecret, jwtOptions);
         } catch (err) {
-            return reject(err);
+            reject(err);
         }
 
         // save the token and respond to user
@@ -474,7 +474,7 @@ const createLoginToken = (user) => {
                 });
             })
             .catch( (err) => {
-                return reject(err);
+                reject(err);
             });
     });
 };

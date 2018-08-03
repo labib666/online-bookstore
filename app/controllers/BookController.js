@@ -20,9 +20,6 @@ const BookController = {
     getAllBooks: (req, res, next) => {
         // look up books in db
         Book.distinct('_id')
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (entries) => {
                 let promises = [];
                 entries.forEach( (entry) => {
@@ -31,16 +28,19 @@ const BookController = {
                     );
                 });
                 Promise.all(promises)
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (books) => {
                         // respond with book profiles
                         res.status(200).json({
                             message: 'books retrieved successfully',
                             books: books
                         });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -73,9 +73,6 @@ const BookController = {
         const ISBN = req.body.ISBN;
 
         Book.findOne({ ISBN: ISBN })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (book) => {
                 // same book exists
                 if (book) {
@@ -88,9 +85,6 @@ const BookController = {
                     author: author,
                     ISBN: ISBN
                 })
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (newBook) => {
                         // new book created
                         // send back the book id
@@ -98,7 +92,13 @@ const BookController = {
                             message: 'book successfully added',
                             book: newBook._id
                         });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -119,14 +119,14 @@ const BookController = {
     getBook: (req, res, next) => {        
         // request is okay. look up the book
         fetchBookProfile(req.params.id)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (book) => {
                 res.status(200).json({
                     message: 'successfully retrieved book',
                     book: book
                 });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -154,24 +154,24 @@ const BookController = {
         
         // look up the book in db
         Book.findById(targetBookID)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (targetBook) => {
                 targetBook.title = req.body.title;
                 targetBook.author = req.body.author;
                 
                 // save changed data in database
                 targetBook.save()
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (updatedBook) => {
                         res.status(200).json({
                             message: 'book updated successfully',
                             book: updatedBook._id
                         });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -206,9 +206,6 @@ const BookController = {
 
         // look whether this book exists in db
         Book.findById(book_id)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (book) => {
                 if (!book) {
                     return next(createError(404,'book not found'));
@@ -218,9 +215,6 @@ const BookController = {
                     category_name: category_name,
                     book_id: book_id
                 })
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (data) => {
                         if (data) {
                             return next(createError(409,'book already exists in this category'));
@@ -230,17 +224,23 @@ const BookController = {
                             category_name: category_name,
                             book_id: book_id
                         })
-                            .catch( (err) => {
-                                return next(err);
-                            })
                             .then( (data) => {
                                 // send book id back
                                 res.status(200).json({
                                     message: 'successfully added book to category',
                                     book: data.book_id
                                 });
+                            })
+                            .catch( (err) => {
+                                return next(err);
                             });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -274,9 +274,6 @@ const BookController = {
 
         // look whether this book exists in db
         Book.findById(book_id)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (book) => {
                 if (!book) {
                     return next(createError(404,'book not found'));
@@ -286,25 +283,28 @@ const BookController = {
                     category_name: category_name,
                     book_id: book_id
                 })
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (data) => {
                         if (!data) {
                             return next(createError(404,'book does not belong to this category'));
                         }
                         // book belongs to category. now remove it
                         Category.findByIdAndRemove(data._id)
-                            .catch( (err) => {
-                                return next(err);
-                            })
                             .then( (deletedData) => {
                                 res.status(200).json({
                                     message: 'successfully removed book from category',
                                     book: deletedData.book_id
                                 });
+                            })
+                            .catch( (err) => {
+                                return next(err);
                             });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -325,9 +325,6 @@ const BookController = {
     getBooksInCategory: (req, res, next) => {
         // request is okay. look up the books
         Category.distinct('book_id', {category_name: req.params.category_name})
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (entries) => {
                 let promises = [];
                 entries.forEach((entry) => {
@@ -335,15 +332,18 @@ const BookController = {
                 });
                 // once we have all the book data, respond to query
                 Promise.all(promises)
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (books) => {
                         res.status(200).json({
                             message: 'successfully retrieved books of given category',
                             books: books
                         });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -386,9 +386,6 @@ const BookController = {
                     }
                 }
             })
-                .catch( (err) => {
-                    return next(err);
-                })
                 .then( (entries) => {
                     let promises = [];
                     entries.forEach( (entry) => {
@@ -397,16 +394,19 @@ const BookController = {
                         );
                     });
                     Promise.all(promises)
-                        .catch( (err) => {
-                            return next(err);
-                        })
                         .then( (books) => {
                         // respond with book profiles
                             res.status(200).json({
                                 message: 'books retrieved successfully',
                                 books: books
                             });
+                        })
+                        .catch( (err) => {
+                            return next(err);
                         });
+                })
+                .catch( (err) => {
+                    return next(err);
                 });
         }
     }
@@ -423,31 +423,32 @@ const fetchBookProfile = (book_id) => {
             createdAt: false,
             updatedAt: false
         })
-            .catch( (err) => {
-                return reject(err);
-            })
             .then( (book) => {
                 // book not in db
                 if (!book) {
-                    return reject(createError(404,'book not found'));
-                }
-                // book found. find the category it belongs to.
-                Category.find({
-                    book_id: book._id
-                })
-                    .catch( (err) => {
-                        return reject(err);
+                    reject(createError(404,'book not found'));
+                } else {
+                    // book found. find the category it belongs to.
+                    Category.find({
+                        book_id: book._id
                     })
-                    .then( (entries) => {
-                        let categories = [];
-                        entries.forEach( (entry) => {
-                            categories.push(entry.category_name);
+                        .then( (entries) => {
+                            let categories = [];
+                            entries.forEach( (entry) => {
+                                categories.push(entry.category_name);
+                            });
+                            // respond with book profile
+                            book = book.toObject();
+                            book.categories = categories;
+                            resolve(book);
+                        })
+                        .catch( (err) => {
+                            reject(err);
                         });
-                        // respond with book profile
-                        book = book.toObject();
-                        book.categories = categories;
-                        resolve(book);
-                    });
+                }
+            })
+            .catch( (err) => {
+                reject(err);
             });
     });
 };

@@ -46,9 +46,6 @@ const AuthController = {
 
         // see if the token exists in database
         Token.findOne({ token: req.token })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (token) => {
                 // no such token exists. user is logged out
                 if (!token) {
@@ -64,6 +61,9 @@ const AuthController = {
                 req.token = token._id;
 
                 return next();
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -253,9 +253,6 @@ const vs = {
         }
 
         User.findById(targetUserId)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (targetUser) => {
                 // the target user does not exist
                 if (!targetUser) {
@@ -284,6 +281,9 @@ const vs = {
                 }
 
                 next();
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
     
@@ -304,9 +304,6 @@ const vs = {
 
         // look up the book in db
         Book.findById(targetBookID)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (targetBook) => {
                 // the target book does not exist
                 if (!targetBook) {
@@ -325,6 +322,9 @@ const vs = {
                 }
 
                 next();
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -345,9 +345,6 @@ const vs = {
         
         // look up the booking for original data
         Booking.findById(targetBooking)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (booking) => {
                 // booking does not exist
                 if (!booking) {
@@ -381,6 +378,9 @@ const vs = {
                 }
 
                 next();
+            })
+            .catch( (err) => {
+                return next(err);
             });
     }
 };
