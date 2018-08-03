@@ -171,6 +171,12 @@ const AuthController = {
                 v.quantity(), v.status(), validationPassCheck,
                 s('quantity'), s('status')
             ];
+        },
+        addOrUpdateRating: () => {
+            return [
+                v.rating(), v.review(), validationPassCheck,
+                s('rating'), s('review')
+            ];
         }
     },
 };
@@ -480,6 +486,19 @@ const v = {
             .exists().withMessage('req must have a \'status\' field')
             .not().isEmpty().withMessage('\'status\' field must be non empty')
             .isIn(['pending', 'approved', 'cancelled']).withMessage('\'status\' must be valid');
+    },
+    // validate the rating
+    rating: () => {
+        return check('rating')
+            .exists().withMessage('req must have a \'rating\' field')
+            .not().isEmpty().withMessage('\'rating\' field must be non empty')
+            .inInt({min: 1, max: 5});
+    },
+    // validate the review field
+    review: () => {
+        return check('review')
+            .exists().withMessage('req must have a \'review\' field')
+            .isLength({min: 0, max: 500});
     },
     // validate mongo objectID
     isMongoObjectID: () => {

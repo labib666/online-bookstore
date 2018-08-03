@@ -72,7 +72,6 @@ const UserController = {
      * Returns created token
      * Expects: {
      *      body:   username, password
-     *      header: bearer-token
      * }
      * Responds: {
      *      200: { body: token }    // success
@@ -120,8 +119,7 @@ const UserController = {
      * Logs in an existing user
      * Returns created token
      * Expects: {
-     *      body:   username, password
-     *      header: bearer-token
+     *      body:   idToken
      * }
      * Responds: {
      *      200: { body: token }    // success
@@ -175,9 +173,9 @@ const UserController = {
      *      header: bearer-token
      * }
      * Responds: {
-     *      200: { body: token }    // success
-     *      401: {}                 // unauthorized for not logged in user
-     *      500: {}                 // internal error
+     *      200: { body: removedToken }     // success
+     *      401: {}                         // unauthorized for not logged in user
+     *      500: {}                         // internal error
      * }
      */
     logout: (req, res, next) => {
@@ -306,6 +304,7 @@ const UserController = {
      *      401: {}             // unauthorized for not logged in user
      *      403: {}             // forbidden (changing username)
      *      404: {}             // user not found
+     *      409: {}             // conflict with existing data
      *      422: {}             // invalid data provided
      *      500: {}             // internal error
      * }
