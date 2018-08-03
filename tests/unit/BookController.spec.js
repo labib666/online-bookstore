@@ -8,7 +8,7 @@ const sandbox = sinon.createSandbox();
 const expect = chai.expect;
 
 describe('Test for BookController:addBook', function () {
-    let req, res, next;
+    let req, res, resJsonSpy, resStatusSpy, nextSpy;
 
     // before each test
     beforeEach( function (done) {
@@ -22,17 +22,12 @@ describe('Test for BookController:addBook', function () {
                 ISBN: '0123456789'
             }
         };
+        resJsonSpy = sandbox.spy();
         res = {
-            status: sandbox.stub().returns(res),
-            json: sandbox.stub().callsFake(
-                function(response) {
-                    console.log(response);
-                })
+            json: resJsonSpy
         };
-        next = sandbox.stub().callsFake(
-            function(response) {
-                console.log(response);
-            });
+        resStatusSpy = sandbox.stub().returns(res);
+        nextSpy =  sandbox.spy();
         done();
     });
 
@@ -64,14 +59,14 @@ describe('Test for BookController:addBook', function () {
                 });
             });
         
-        //console.log(req, res, next);
-        BC.addBook(req, res, next);
-
+        BC.addBook(req, { status: resStatusSpy }, nextSpy);
+        
         setTimeout(function() {
-            //expect(next.called).to.be.true();
-            //expect(res.json.callcount).to.equal(1);
+            expect(nextSpy.callCount).to.equal(0);
+            expect(resJsonSpy.callCount).to.equal(1);
+            expect(resJsonSpy.args[0][0].book).to.equal('1234');
             done();
-        }, 1000);
+        }, 250);
     });
 
     it('book already exists', function (done) {
@@ -89,8 +84,13 @@ describe('Test for BookController:addBook', function () {
                 });
             });
         
-        BC.addBook(req, res, next);
-
-        done();
+        BC.addBook(req, { status: resStatusSpy }, nextSpy);
+            
+        setTimeout(function() {
+            expect(resJsonSpy.callCount).to.equal(0);
+            expect(nextSpy.callCount).to.equal(1);
+            expect(nextSpy.args[0][0].status).to.equal(409);
+            done();
+        }, 250);
     });
 });

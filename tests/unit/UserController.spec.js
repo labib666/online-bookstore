@@ -5,11 +5,11 @@ const bcrypt = require('bcrypt');
 const User = require('../../app/models/User');
 const UC = require('../../app/controllers/UserController');
 
-const sandbox = sinon.createSandbox();
-const expect = chai.expect;
+let sandbox = sinon.createSandbox();
+let expect = chai.expect;
 
-describe('Test for UserController:register', function () {
-    let req, res, next;
+describe('Test for UserController:register', function () { 
+    let req, res, resJsonSpy, resStatusSpy, nextSpy;
     
     // before each test
     beforeEach( function (done) {
@@ -18,24 +18,22 @@ describe('Test for UserController:register', function () {
                 return 'password';
             });
         req = {
+            user: {
+                isModerator: true
+            },
             body: {
                 name: 'test name',
                 username: 'testname',
-                email: 'email@gmail.com',
-                password: 'password'
+                email: 'abc@abc.com',
+                password: '0123456789'
             }
         };
+        resJsonSpy = sandbox.spy();
         res = {
-            status: sandbox.stub().returns(res),
-            json: sandbox.stub().callsFake(
-                function(response) {
-                    console.log(response);
-                })
+            json: resJsonSpy
         };
-        next = sandbox.stub().callsFake(
-            function(response) {
-                console.log(response);
-            });
+        resStatusSpy = sandbox.stub().returns(res);
+        nextSpy =  sandbox.spy();
         done();
     });
 
@@ -67,13 +65,14 @@ describe('Test for UserController:register', function () {
                 });
             });
 
-        UC.register(req, res, next);
+        UC.register(req, { status: resStatusSpy }, nextSpy);
         
         setTimeout(function() {
-            //expect(next.callcount).to.equal(0);
-            //expect(res.json.callcount).to.equal(1);
+            expect(nextSpy.callCount).to.equal(0);
+            expect(resJsonSpy.callCount).to.equal(1);
+            expect(resJsonSpy.args[0][0].user).to.equal('1234');
             done();
-        }, 1000);
+        }, 250);
     });
 
     it('user already exists', function (done) {
@@ -91,8 +90,13 @@ describe('Test for UserController:register', function () {
                 });
             });
         
-        UC.register(req, res, next);
-
-        done();
+        UC.register(req, { status: resStatusSpy }, nextSpy);
+            
+        setTimeout(function() {
+            expect(nextSpy.callCount).to.equal(1);
+            expect(resJsonSpy.callCount).to.equal(0);
+            expect(nextSpy.args[0][0].status).to.equal(409);
+            done();
+        }, 250);
     });
 });
