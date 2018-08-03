@@ -175,7 +175,7 @@ const UserController = {
      *      header: bearer-token
      * }
      * Responds: {
-     *      200: { body: token }    // success
+     *      200: { body: removedToken }    // success
      *      401: {}                 // unauthorized for not logged in user
      *      500: {}                 // internal error
      * }

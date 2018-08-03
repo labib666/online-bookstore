@@ -16,6 +16,24 @@
     }
 ```
 
+# POST /logout
+
++ Request (application/json)
+
+    + Headers
+
+    ```
+        Authorization: Bearer 2erefkhjwrqr1i23rssndfiqwherakjhdfsfqer
+    ```
+
++ Response (application/json)
+
+```json
+    {
+        "removedToken": "2erefkhjwrqr1i23rssndfiqwherakjhdfsfqer"
+    }
+```
+
 # POST /user/{userID}
 
 + Request (application/json)
