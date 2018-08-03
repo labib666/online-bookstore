@@ -30,15 +30,15 @@ const BookingController = {
                 updatedAt: -1
             }
         })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (bookings) => {
                 // respond with the bookings
                 res.json({
                     message: 'succesfully retrieved bookings',
                     bookings: bookings
                 });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
     
@@ -71,15 +71,15 @@ const BookingController = {
                 updatedAt: -1
             }
         })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (bookings) => {
                 // respond with the bookings
                 res.json({
                     message: 'succesfully retrieved bookings',
                     bookings: bookings
                 });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -107,15 +107,15 @@ const BookingController = {
                 updatedAt: -1
             }
         })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (bookings) => {
                 // respond with the bookings
                 res.json({
                     message: 'succesfully retrieved user bookings',
                     bookings: bookings
                 });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -144,9 +144,6 @@ const BookingController = {
 
         // look for the book in db
         Book.findById(targetBookID)
-            .catch( (err) => {
-                return next(err);
-            })    
             .then( (book) => {
                 // book does not exist
                 if (!book) {
@@ -160,16 +157,19 @@ const BookingController = {
                         updatedAt: -1
                     }
                 })
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (bookings) => {
                         // respond with the bookings
                         res.json({
                             message: 'succesfully retrieved user bookings for book',
                             bookings: bookings
                         });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -191,10 +191,7 @@ const BookingController = {
         const targetBookID = req.params.id;
 
         // look for the book in db
-        Book.findById(targetBookID)
-            .catch( (err) => {
-                return next(err);
-            })    
+        Book.findById(targetBookID)    
             .then( (book) => {
                 // book does not exist
                 if (!book) {
@@ -211,16 +208,19 @@ const BookingController = {
                         updatedAt: -1
                     }
                 })
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (bookings) => {
                         // respond with the bookings
                         res.json({
                             message: 'succesfully retrieved user bookings for book',
                             bookings: bookings
                         });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -249,16 +249,16 @@ const BookingController = {
             quantity: req.body.quantity,
             status: 'pending'
         })
-            .catch( (err) => {
-                return next(err);
-            })    
             .then( (booking) => {
-                // booking completed. return the id
+            // booking completed. return the id
                 res.status(200).json({
                     message: 'successfully completed booking',
                     booking: booking._id
                 });
-            });
+            })
+            .catch( (err) => {
+                return next(err);
+            });    
     },
 
     /**
@@ -284,9 +284,7 @@ const BookingController = {
         const targetBookingID = req.params.id;
 
         Booking.findById(targetBookingID)
-            .catch( (err) => {
-                return next(err);
-            })
+            
             .then( (booking) => {
                 // booking exists
                 booking.quantity = req.body.quantity;
@@ -294,15 +292,18 @@ const BookingController = {
 
                 // save the booking
                 booking.save()
-                    .catch( (err) => {
-                        return next(err);
-                    })
                     .then( (updatedBooking) => {
                         res.status(200).json({
                             message: 'successfully updated booking',
                             booking: updatedBooking._id
                         });
+                    })
+                    .catch( (err) => {
+                        return next(err);
                     });
+            })
+            .catch( (err) => {
+                return next(err);
             });
     }
     

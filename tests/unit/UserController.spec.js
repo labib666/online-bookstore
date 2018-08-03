@@ -18,9 +18,6 @@ describe('Test for UserController:register', function () {
                 return 'password';
             });
         req = {
-            user: {
-                isModerator: true
-            },
             body: {
                 name: 'test name',
                 username: 'testname',
