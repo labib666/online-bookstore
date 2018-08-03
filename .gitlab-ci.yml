@@ -19,6 +19,7 @@ test_app:
     stage: test
     script:
         - yarn run lint
+        - yarn run test
         - cd resources
         - yarn run lint
         - yarn run test:unit
