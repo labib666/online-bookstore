@@ -16,6 +16,7 @@ router.post('/search', vc.search(), BC.searchBook);
 router.get('/bookings', BKC.getAllBookings);
 router.patch('/bookings/:id', vc.checkID(), vc.updateBooking(), BKC.updateBooking);
 router.get('/bookings/:status', vc.getBookingsWithStatus(), BKC.getBookingsWithStatus);
+router.get('/category/names', BC.getCategoryNames);
 router.get('/category/:category_name', vc.getBooksInCategory(), BC.getBooksInCategory);
 router.get('/:id', vc.checkID(), BC.getBook);
 router.patch('/:id', vc.checkID(), vc.updateBook(), BC.updateBook);
@@ -25,6 +26,7 @@ router.get('/:id/bookings', vc.checkID(), BKC.getAllBookingsForBook);
 router.get('/:id/ratings', vc.checkID(), RC.getAllRatingsForBook);
 router.get('/:id/bookings/me', vc.checkID(), BKC.getUserBookingsForBook);
 router.get('/:id/ratings/me', vc.checkID(), RC.getUserRatingsForBook);
+router.get('/:id/ratings/average', vc.checkID(), RC.getAverageRating);
 router.post('/:id/category', vc.checkID(), vc.category(), BC.addToCategory);
 router.delete('/:id/category', vc.checkID(), vc.category(), BC.removeFromCategory);
 

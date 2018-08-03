@@ -135,6 +135,59 @@ const RatingController = {
     },
 
     /**
+     * GET /api/books/:id/ratings/average
+     * Returns ratings given by all user for given book
+     * Expects: {
+     *      params: book._id
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: rating }      // success
+     *      401: {}                     // unauthorized for not logged in users
+     *      404: {}                     // book not found
+     *      500: {}                     // internal error
+     * }
+     */
+    getAverageRating: (req, res, next) => {
+        const targetBookID = req.params.id;
+
+        // look for the book in db
+        Book.findById(targetBookID)
+            .then( (book) => {
+                // book does not exist
+                if (!book) {
+                    return next(createError(404, 'book does not exist'));
+                }
+                // find all the ratings for the book
+                Rating.find({
+                    book_id: targetBookID
+                })
+                    .then( (ratings) => {
+                        let ratedBy = 0, totalRating = 0, avgRating = 0;
+                        ratings.forEach( (rating) => {
+                            totalRating += rating.rating;
+                            ratedBy++;
+                        });
+                        avgRating = totalRating/ratedBy;
+                        // respond with the ratings
+                        res.json({
+                            message: 'succesfully retrieved average ratings for book',
+                            rating: {
+                                avgRating: avgRating,
+                                ratedBy: ratedBy
+                            }
+                        });
+                    })
+                    .catch( (err) => {
+                        return next(err);
+                    });
+            })
+            .catch( (err) => {
+                return next(err);
+            });
+    },
+
+    /**
      * PUT /api/books/:id/ratings
      * Expects: {
      *      params: book._id

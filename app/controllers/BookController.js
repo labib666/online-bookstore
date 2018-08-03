@@ -309,6 +309,33 @@ const BookController = {
     },
 
     /**
+     * GET /api/books/category/names
+     * Fetches all the category names
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: categories }   // success
+     *      401: {}                     // unauthorized for not logged in users
+     *      500: {}                     // internal error
+     * }
+     */
+    getCategoryNames: (req,res,next) => {
+        // look up the category names
+        Category.distinct('category_name')
+            .then( (categories) => {
+                // respond with the names
+                res.json({
+                    message: 'successfully retrieved category names',
+                    categories: categories
+                });
+            })
+            .catch( (err) => {
+                return next(err);
+            });
+    },
+
+    /**
      * GET /api/books/category/:category_name
      * Fetches all the books from the given category
      * Expects: {
