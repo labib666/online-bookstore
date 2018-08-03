@@ -39,7 +39,7 @@ export default new Vuex.Store({
         },
 
         clearState (store) {
-            Object.keys(baseState).forEach(key => {
+            Object.keys(baseState).forEach((key) => {
                 store[key] = baseState[key];
             });
         }

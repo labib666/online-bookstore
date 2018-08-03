@@ -1,5 +1,5 @@
 .full-height {
-    height: 100vh;
+    min-height: 80vh;
 }
 
 .flex-center {
@@ -43,4 +43,16 @@
     margin: 5px;
     padding: 0px 10px;
     border-radius: 10px !important;
+}
+
+.pending-booking {
+    background-color: lighten($secondary-color, 70%);
+}
+
+.approved-booking {
+    background-color: teal;
+}
+
+.cancelled-booking {
+    background-color: lighten($light-tertiary-color, 28%);
 }

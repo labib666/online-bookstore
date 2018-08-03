@@ -1,15 +1,23 @@
 <template>
     <div>
         <Topbar></Topbar>
-        <div id="sidebar"></div>
+        <Sidebar title="Book details" />
         <Main>
-            <div class="row-container flex-center">
-                <div class="col-md-6">
+            <div class="row mr-0">
+                <div class="col-md-12">
                     <div v-if="loading">
                         Loading...
                     </div>
                     <div v-if="book.loaded">
-                        <Book :book="book"></Book>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <Book :book="book"></Book>
+                            </div>
+                            <div class="col-md-6">
+                                <UsersBooking v-if="!user.isModerator" :book="book" />
+                                <ModeratorsBooking v-if="user.isModerator" :book="book" />
+                            </div>
+                        </div>
                     </div>
                     <div v-if="!loading && !book.loaded">
                         <h1>Book not found</h1>
@@ -23,13 +31,20 @@
 <script>
 import Main from '@/components/Main';
 import Topbar from '@/components/Topbar';
+import Sidebar from '@/components/Sidebar';
 import Book from '@/components/Book';
+import UsersBooking from '@/components/UsersBooking';
+import ModeratorsBooking from '@/components/ModeratorsBooking';
+import { mapState } from 'vuex';
 
 export default {
     components: {
         Main,
         Topbar,
-        Book
+        Sidebar,
+        Book,
+        UsersBooking,
+        ModeratorsBooking
     },
 
     data () {
@@ -44,6 +59,12 @@ export default {
                 categories: []
             }
         };
+    },
+
+    computed: {
+        ...mapState([
+            'user'
+        ])
     },
 
     mounted () {
