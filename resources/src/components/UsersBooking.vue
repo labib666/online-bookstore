@@ -21,9 +21,9 @@
                                     You requested for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }}
                                 </div>
                                 <div class="col-md-6">
-                                    <button class="btn btn-danger" @click="cancel(booking.id)" >Cancel</button>
-                                    <button class="btn btn-primary" @click="update(booking.id, booking.quantity + 1)">Add one</button>
-                                    <button class="btn btn-primary" @click="update(booking.id, booking.quantity - 1)">Remove one</button>
+                                    <button class="btn btn-sm btn-danger" @click="cancel(booking.id)" >Cancel</button>
+                                    <button class="btn btn-sm btn-primary" @click="update(booking.id, booking.quantity + 1)">Add one</button>
+                                    <button class="btn btn-sm btn-primary" @click="update(booking.id, booking.quantity - 1)">Remove one</button>
                                 </div>
                             </div>
                             <hr />
@@ -76,7 +76,11 @@ export default {
     methods: {
         fetchBookings () {
             this.$http.get(`/books/${this.book.id}/bookings/me`).then((response) => {
-                const bookings = response.data.bookings.map((booking) => {
+                let bookings = response.data.bookings;
+                bookings.sort((a, b) => {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+                bookings = bookings.map((booking) => {
                     return {
                         id: booking._id,
                         quantity: booking.quantity,
