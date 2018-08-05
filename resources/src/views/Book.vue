@@ -13,6 +13,7 @@
                             <div class="col-md-6">
                                 <Book :book="book"></Book>
                                 <WriteReview :book="book" />
+                                <BookReviews :book="book" />
                             </div>
                             <div class="col-md-6">
                                 <UsersBooking v-if="!user.isModerator" :book="book" />
@@ -35,6 +36,7 @@ import Topbar from '@/components/Topbar';
 import Sidebar from '@/components/Sidebar';
 import Book from '@/components/Book';
 import WriteReview from '@/components/WriteReview';
+import BookReviews from '@/components/BookReviews';
 import UsersBooking from '@/components/UsersBooking';
 import ModeratorsBooking from '@/components/ModeratorsBooking';
 import { mapState } from 'vuex';
@@ -46,6 +48,7 @@ export default {
         Sidebar,
         Book,
         WriteReview,
+        BookReviews,
         UsersBooking,
         ModeratorsBooking
     },
