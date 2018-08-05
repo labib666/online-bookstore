@@ -8,7 +8,7 @@ const RC = require('../../app/controllers/RatingController');
 const sandbox = sinon.createSandbox();
 const expect = chai.expect;
 
-describe('Test for RatiingController:addOrUpdateRating', function () {
+describe('Test for RatingController:addOrUpdateRating', function () {
     let req, res, resJsonSpy, resStatusSpy, nextSpy;
 
     // before each test

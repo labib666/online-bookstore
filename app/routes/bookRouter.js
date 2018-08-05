@@ -13,6 +13,7 @@ const router = express.Router();
 router.get('/', BC.getAllBooks);
 router.post('/', vc.addBook(), BC.addBook);
 router.post('/search', vc.search(), BC.searchBook);
+router.get('/recommend', RC.recommendForUser);
 router.get('/bookings', BKC.getAllBookings);
 router.patch('/bookings/:id', vc.checkID(), vc.updateBooking(), BKC.updateBooking);
 router.get('/bookings/:status', vc.getBookingsWithStatus(), BKC.getBookingsWithStatus);

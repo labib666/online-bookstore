@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const raccoon = require('raccoon');
 
 const Book = require('../models/Book');
 const Rating = require('../models/Rating');
@@ -229,11 +230,23 @@ const RatingController = {
                                 message: 'successfully created/updated rating',
                                 rating: newRating._id
                             });
+                            
+                            return newRating;
+                        })
+                        .then( (newRating) => {
+                            console.log(newRating);
                         })
                         .catch( (err) => {
                             return next(err);
                         });
                 } else {
+                    // undo previous raccoon preference
+                    if (userRating.rating >= 3) {
+                        raccoon.unliked(userRating.user_id, userRating.book_id);
+                    } else {
+                        raccoon.undisliked(userRating.user_id, userRating.book_id);
+                    }
+
                     // rating exists. update it
                     userRating.rating = rating;
                     userRating.review = review;
@@ -246,6 +259,16 @@ const RatingController = {
                                 message: 'successfully created/updated rating',
                                 rating: savedRating._id
                             });
+                            
+                            return savedRating;
+                        })
+                        .then( (savedRating) => {
+                            // update raccoon preference
+                            if (savedRating.rating >= 3) {
+                                raccoon.liked(savedRating.user_id, savedRating.book_id);
+                            } else {
+                                raccoon.disliked(savedRating.user_id, savedRating.book_id);
+                            }
                         })
                         .catch( (err) => {
                             return next(err);
@@ -256,6 +279,35 @@ const RatingController = {
                 return next(err);
             });
     },
+
+    /**
+     * GET /api/books/recommend
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Recommends user books he/she may like
+     * Returns the book ids
+     * Responds: {
+     *      200: { body: books }        // success
+     *      401: {}                     // unauthorized for not logged in users
+     *      500: {}                     // internal error
+     * }
+     */
+    recommendForUser: (req, res, next) => {
+        const targetUserID = req.user._id;
+
+        // ask raccoon for recoms
+        raccoon.recommendFor(targetUserID, 1)
+            .then( (results) => {
+                res.json({
+                    message: 'recommended books',
+                    books: results
+                });
+            })
+            .catch( (err) => {
+                return next(err);
+            });
+    }
     
 };
 
