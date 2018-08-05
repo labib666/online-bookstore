@@ -3,6 +3,65 @@ const createError = require('http-errors');
 const Book = require('../models/Book');
 const Category = require('../models/Category');
 
+/**
+ * Fetches the book profile, including its categories
+ * @param {string} book_ids // array of book ids to fetch
+ */
+const getBookProfiles = (book_ids) => {
+    return new Promise((resolve,reject) => {
+        let promises = [];
+        book_ids.forEach( (entry) => {
+            promises.push(
+                fetchBookProfile(entry)
+            );
+        });
+        Promise.all(promises)
+            .then( (books) => {
+                // respond with book profiles
+                resolve(books);
+            })
+            .catch( (err) => {
+                reject(err);
+            });
+    });
+};
+
+/**
+ * Fetches the book profile, including its categories
+ * @param {string} book_id 
+ */
+const fetchBookProfile = (book_id) => {
+    return new Promise((resolve,reject) => {
+        Book.findById(book_id, {
+            createdAt: false,
+            updatedAt: false
+        })
+            .then( (book) => {
+                // book not in db
+                if (!book) {
+                    reject(createError(404,'book not found'));
+                } else {
+                    // book found. find the category it belongs to.
+                    Category.distinct('category_name',{
+                        book_id: book._id
+                    })
+                        .then( (categories) => {
+                            // respond with book profile
+                            book = book.toObject();
+                            book.categories = categories;
+                            resolve(book);
+                        })
+                        .catch( (err) => {
+                            reject(err);
+                        });
+                }
+            })
+            .catch( (err) => {
+                reject(err);
+            });
+    });
+};
+
 const BookController = {
 
     /**
@@ -21,15 +80,8 @@ const BookController = {
         // look up books in db
         Book.distinct('_id')
             .then( (entries) => {
-                let promises = [];
-                entries.forEach( (entry) => {
-                    promises.push(
-                        fetchBookProfile(entry)
-                    );
-                });
-                Promise.all(promises)
+                getBookProfiles(entries)
                     .then( (books) => {
-                        // respond with book profiles
                         res.status(200).json({
                             message: 'books retrieved successfully',
                             books: books
@@ -353,13 +405,8 @@ const BookController = {
         // request is okay. look up the books
         Category.distinct('book_id', {category_name: req.params.category_name})
             .then( (entries) => {
-                let promises = [];
-                entries.forEach((entry) => {
-                    promises.push(fetchBookProfile(entry));
-                });
-                // once we have all the book data, respond to query
-                Promise.all(promises)
-                    .then( (books) => {
+                getBookProfiles(entries)
+                    .then((books) => {
                         res.status(200).json({
                             message: 'successfully retrieved books of given category',
                             books: books
@@ -436,48 +483,8 @@ const BookController = {
                     return next(err);
                 });
         }
-    }
-    
-};
-
-/**
- * Fetches the book profile, including its categories
- * @param {string} book_id 
- */
-const fetchBookProfile = (book_id) => {
-    return new Promise((resolve,reject) => {
-        Book.findById(book_id, {
-            createdAt: false,
-            updatedAt: false
-        })
-            .then( (book) => {
-                // book not in db
-                if (!book) {
-                    reject(createError(404,'book not found'));
-                } else {
-                    // book found. find the category it belongs to.
-                    Category.find({
-                        book_id: book._id
-                    })
-                        .then( (entries) => {
-                            let categories = [];
-                            entries.forEach( (entry) => {
-                                categories.push(entry.category_name);
-                            });
-                            // respond with book profile
-                            book = book.toObject();
-                            book.categories = categories;
-                            resolve(book);
-                        })
-                        .catch( (err) => {
-                            reject(err);
-                        });
-                }
-            })
-            .catch( (err) => {
-                reject(err);
-            });
-    });
+    },
+    getBookProfiles: getBookProfiles
 };
 
 module.exports = BookController;

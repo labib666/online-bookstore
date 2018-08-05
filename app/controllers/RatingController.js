@@ -3,6 +3,7 @@ const raccoon = require('raccoon');
 
 const Book = require('../models/Book');
 const Rating = require('../models/Rating');
+const BC = require('./BookController');
 
 const RatingController = {    
     /**
@@ -234,7 +235,12 @@ const RatingController = {
                             return newRating;
                         })
                         .then( (newRating) => {
-                            console.log(newRating);
+                            // update raccoon preference
+                            if (newRating.rating >= 3) {
+                                raccoon.liked(newRating.user_id, newRating.book_id);
+                            } else {
+                                raccoon.disliked(newRating.user_id, newRating.book_id);
+                            }
                         })
                         .catch( (err) => {
                             return next(err);
@@ -285,7 +291,7 @@ const RatingController = {
      * Expects: {
      *      header: bearer-token
      * }
-     * Recommends user books he/she may like
+     * Recommends user 5 books he/she may like
      * Returns the book ids
      * Responds: {
      *      200: { body: books }        // success
@@ -297,12 +303,18 @@ const RatingController = {
         const targetUserID = req.user._id;
 
         // ask raccoon for recoms
-        raccoon.recommendFor(targetUserID, 1)
+        raccoon.recommendFor(targetUserID, 5)
             .then( (results) => {
-                res.json({
-                    message: 'recommended books',
-                    books: results
-                });
+                BC.getBookProfiles(results)
+                    .then( (books) => {
+                        res.json({
+                            message: 'recommended books',
+                            books: books
+                        });
+                    })
+                    .catch( (err) => {
+                        return next(err);
+                    });
             })
             .catch( (err) => {
                 return next(err);
