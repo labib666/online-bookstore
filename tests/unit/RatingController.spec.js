@@ -1,6 +1,34 @@
 const sinon = require('sinon');
 var createError = require('http-errors');
 const chai = require('chai');
+const mock = require('mock-require');
+
+mock('raccoon', {
+    liked: function(a,b) {
+        return new Promise(resolve => {
+            console.log('liked',a,b);
+            resolve();
+        });
+    },
+    unliked: function(a,b) {
+        return new Promise(resolve => {
+            console.log('unliked',a,b);
+            resolve();
+        });
+    },
+    disliked: function(a,b) {
+        return new Promise(resolve => {
+            console.log('disliked',a,b);
+            resolve();
+        });
+    },
+    undisliked: function(a,b) {
+        return new Promise(resolve => {
+            console.log('undisliked',a,b);
+            resolve();
+        });
+    }
+});
 
 const Rating = require('../../app/models/Rating');
 const RC = require('../../app/controllers/RatingController');
@@ -10,6 +38,12 @@ const expect = chai.expect;
 
 describe('Test for RatingController:addOrUpdateRating', function () {
     let req, res, resJsonSpy, resStatusSpy, nextSpy;
+
+    // after all tests
+    after( function(done) {
+        mock.stopAll();
+        done();
+    });
 
     // before each test
     beforeEach( function (done) {
