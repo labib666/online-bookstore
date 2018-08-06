@@ -6,26 +6,22 @@ const mock = require('mock-require');
 mock('raccoon', {
     liked: function(a,b) {
         return new Promise(resolve => {
-            console.log('liked',a,b);
-            resolve();
+            resolve('liked '+a+' '+b);
         });
     },
     unliked: function(a,b) {
         return new Promise(resolve => {
-            console.log('unliked',a,b);
-            resolve();
+            resolve('unliked '+a+' '+b);
         });
     },
     disliked: function(a,b) {
         return new Promise(resolve => {
-            console.log('disliked',a,b);
-            resolve();
+            resolve('disliked '+a+' '+b);
         });
     },
     undisliked: function(a,b) {
         return new Promise(resolve => {
-            console.log('undisliked',a,b);
-            resolve();
+            resolve('undisliked '+a+' '+b);
         });
     }
 });
