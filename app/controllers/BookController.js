@@ -228,10 +228,10 @@ const BookController = {
     },
 
     /**
-     * POST /api/books/search
+     * GET /api/books/search
      * Fetches all the books that match the search
      * Expects: {
-     *      body:   search
+     *      query:  search
      *      header: bearer-token
      * }
      * Responds: {
@@ -241,7 +241,7 @@ const BookController = {
      * }
      */
     searchBook: (req,res,next) => {
-        const search = req.body.search;
+        const search = req.query.search;
 
         if (search.length === 0) {
             // search field does not exist or is empty

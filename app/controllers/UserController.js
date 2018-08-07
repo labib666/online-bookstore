@@ -395,10 +395,10 @@ const UserController = {
     },
 
     /**
-     * POST /api/users/search
+     * GET /api/users/search
      * Fetches all the users that match the search
      * Expects: {
-     *      body:   search
+     *      query:  search
      *      header: bearer-token
      * }
      * Responds: {
@@ -408,7 +408,7 @@ const UserController = {
      * }
      */
     searchUser: (req,res,next) => {
-        const search = req.body.search;
+        const search = req.query.search;
 
         if (search.length === 0) {
             // search field does not exist or is empty

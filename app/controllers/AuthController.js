@@ -224,8 +224,8 @@ const vs = {
     // helps with search endpoints
     search: (req, res, next) => {
         // add search field if not already there
-        if (!('search' in req.body)) {
-            res.body.search = '';
+        if (!('search' in req.query)) {
+            req.query.search = '';
         }
         
         return next();

@@ -11,7 +11,7 @@ const router = express.Router();
 
 // user interactions
 router.get('/', UC.getAllProfiles);
-router.post('/search', vc.search(), UC.searchUser);
+router.get('/search', vc.search(), UC.searchUser);
 router.get('/me', UC.getOwnProfile);
 router.get('/me/bookings', BKC.getBookingsByUser);
 router.get('/me/ratings', RC.getRatingsByUser);
