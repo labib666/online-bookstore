@@ -3,6 +3,7 @@ const JWT = require('jsonwebtoken');
 const createError = require('http-errors');
 const randomstring = require('randomstring');
 const gAuth = require('google-auth-library');
+const axios = require('axios');
 
 const User = require('../models/User');
 const Token = require('../models/Token');
@@ -72,7 +73,6 @@ const UserController = {
      * Returns created token
      * Expects: {
      *      body:   username, password
-     *      header: bearer-token
      * }
      * Responds: {
      *      200: { body: token }    // success
@@ -120,8 +120,7 @@ const UserController = {
      * Logs in an existing user
      * Returns created token
      * Expects: {
-     *      body:   username, password
-     *      header: bearer-token
+     *      body:   id_Token
      * }
      * Responds: {
      *      200: { body: token }    // success
@@ -168,6 +167,66 @@ const UserController = {
     },
 
     /**
+     * POST /api/social/facebook
+     * Logs in an existing user
+     * Returns created token
+     * Expects: {
+     *      body:   id_Token, userID
+     * }
+     * Responds: {
+     *      200: { body: token }    // success
+     *      401: {}                 // credential mismatch
+     *      403: {}                 // forbidden for logged in user
+     *      404: {}                 // user not found
+     *      422: {}                 // invalid data provided
+     *      500: {}                 // internal error
+     */
+    facebookLogin: (req,res,next) => {
+        // user access-token is usable
+        const id_token = req.body.id_token;
+        const userID = req.body.userID;
+
+        verifyFacebookToken(id_token,userID)
+            .then( () => {
+                // verified. fetch user data
+                const graphURI = 'https://graph.facebook.com'
+                                    +'/'+userID
+                                    +'?fields=name,email'
+                                    +'&access_token='+id_token;
+                axios.get(graphURI)
+                    .then( (response) => {
+                        const data = response.data;
+                        // found user email. check if this email exists in db
+                        User.findOne({ email: data.email })
+                            .then( (user) => {
+                                // user does not exist
+                                if (!user) {
+                                    return next(createError(404,'user not found'));
+                                }
+                                // user exists
+                                // create an api token
+                                createLoginToken(user)
+                                    .then( (token) => {
+                                        res.status(200).json(token);
+                                    })
+                                    .catch( (err) => {
+                                        return next(err);
+                                    });
+                            })
+                            .catch( (err) => {
+                                return next(err);
+                            });
+                    })
+                    .catch( (err) => {
+                        return next(err);
+                    });
+            })
+            .catch( (err) => {
+                return next(err);
+            });
+    },
+
+    /**
      * POST /api/logout
      * Logs out an existing user
      * Returns removed token
@@ -175,9 +234,9 @@ const UserController = {
      *      header: bearer-token
      * }
      * Responds: {
-     *      200: { body: token }    // success
-     *      401: {}                 // unauthorized for not logged in user
-     *      500: {}                 // internal error
+     *      200: { body: removedToken }     // success
+     *      401: {}                         // unauthorized for not logged in user
+     *      500: {}                         // internal error
      * }
      */
     logout: (req, res, next) => {
@@ -306,6 +365,7 @@ const UserController = {
      *      401: {}             // unauthorized for not logged in user
      *      403: {}             // forbidden (changing username)
      *      404: {}             // user not found
+     *      409: {}             // conflict with existing data
      *      422: {}             // invalid data provided
      *      500: {}             // internal error
      * }
@@ -335,10 +395,10 @@ const UserController = {
     },
 
     /**
-     * POST /api/users/search
+     * GET /api/users/search
      * Fetches all the users that match the search
      * Expects: {
-     *      body:   search
+     *      query:  search
      *      header: bearer-token
      * }
      * Responds: {
@@ -348,7 +408,7 @@ const UserController = {
      * }
      */
     searchUser: (req,res,next) => {
-        const search = req.body.search;
+        const search = req.query.search;
 
         if (search.length === 0) {
             // search field does not exist or is empty
@@ -427,14 +487,58 @@ const updateDatabaseWithProfile = (targetUserId, req) => {
                             user: updatedUser._id
                         };
 
-                        return resolve(response);
+                        resolve(response);
                     })
                     .catch( (err) => {
-                        return reject(err);
+                        reject(err);
                     });
             })
             .catch( (err) => {
-                return reject(err);
+                reject(err);
+            });
+    });
+};
+
+/**
+ * Verify the user access token sent to the server
+ * @param {string} id_token // access token of user
+ * @param {string} user_id  // facebook user id
+ */
+const verifyFacebookToken = (id_token, userID) => {
+    return new Promise( (resolve,reject) => {
+        const redirect_uri = process.env.APP_HOST + ':' + process.env.PORT;
+        const appTokenURI = 'https://graph.facebook.com/oauth/access_token'
+                                +'?client_id='+process.env.FB_CLIENT_ID
+                                +'&client_secret='+process.env.FB_CLIENT_SECRET
+                                +'&redirect_uri='+redirect_uri+'/api/social/facebook'
+                                +'&grant_type=client_credentials';
+        
+        // get your app-token
+        axios.get(appTokenURI)
+            .then( (response) => {
+                const app_token = response.data.access_token;
+                
+                // now validate the token received from user
+                const validationURI = 'https://graph.facebook.com/debug_token'
+                                            +'?input_token=' + id_token 
+                                            +'&access_token=' + app_token;
+                
+                axios.get(validationURI)
+                    .then( (response) => {
+                        const rdata = response.data;
+                        if (rdata.data.app_id !== process.env.FB_CLIENT_ID
+                                || rdata.data.user_id !== userID) {
+                            reject(createError(401, 'credentials do not match'));
+                        }
+
+                        // credentials match. resolve
+                        resolve();
+                    })
+                    .catch( (err) => {
+                        reject(err);
+                    });
+            }).catch( (err) => {
+                reject(err);
             });
     });
 };
@@ -461,7 +565,7 @@ const createLoginToken = (user) => {
             };
             token = JWT.sign(payload, jwtSecret, jwtOptions);
         } catch (err) {
-            return reject(err);
+            reject(err);
         }
 
         // save the token and respond to user
@@ -474,7 +578,7 @@ const createLoginToken = (user) => {
                 });
             })
             .catch( (err) => {
-                return reject(err);
+                reject(err);
             });
     });
 };

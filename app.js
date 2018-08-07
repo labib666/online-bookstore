@@ -5,7 +5,6 @@ const chalk = require('chalk');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 
-const routes = require('./app/routes/index');
 const dbconnection = require('./database/dbconnection');
 
 // Importing Environment variables from .env file
@@ -16,6 +15,7 @@ if(dotenvParsed.error) {
 }
 console.log('Environment variables from .env:', chalk.bold(JSON.stringify(dotenvParsed.parsed, null, 4)));
 
+const routes = require('./app/routes/index');
 const app = express();
 
 // Add logger, body parser and public assets

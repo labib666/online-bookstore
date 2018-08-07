@@ -13,10 +13,10 @@
                                     <b>{{ booking.user.name }}</b> requested for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }}
                                 </div>
                                 <div class="col-md-8">
-                                    <button class="btn btn-success" @click="approve(booking.id)">Approve</button>
-                                    <button class="btn btn-danger" @click="cancel(booking.id)" >Cancel</button>
-                                    <button class="btn btn-primary" @click="update(booking.id, booking.quantity + 1)">Add one</button>
-                                    <button class="btn btn-primary" @click="update(booking.id, booking.quantity - 1)">Remove one</button>
+                                    <button class="btn btn-sm btn-success" @click="approve(booking.id)">Approve</button>
+                                    <button class="btn btn-sm btn-danger" @click="cancel(booking.id)" >Cancel</button>
+                                    <button class="btn btn-sm btn-primary" @click="update(booking.id, booking.quantity + 1)">Add one</button>
+                                    <button class="btn btn-sm btn-primary" @click="update(booking.id, booking.quantity - 1)">Remove one</button>
                                 </div>
                             </div>
                             <hr />

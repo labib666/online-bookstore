@@ -46,9 +46,6 @@ const AuthController = {
 
         // see if the token exists in database
         Token.findOne({ token: req.token })
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (token) => {
                 // no such token exists. user is logged out
                 if (!token) {
@@ -64,6 +61,9 @@ const AuthController = {
                 req.token = token._id;
 
                 return next();
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -119,7 +119,12 @@ const AuthController = {
                 s('id_token')
             ];
         },
-        
+        facebookLogin: () => {
+            return [
+                v.id_token(), v.userID(), validationPassCheck,
+                s('id_token'), s('userID')
+            ];
+        },
         updateProfile: () => {
             return [
                 vs.userUpdate,
@@ -171,6 +176,12 @@ const AuthController = {
                 v.quantity(), v.status(), validationPassCheck,
                 s('quantity'), s('status')
             ];
+        },
+        addOrUpdateRating: () => {
+            return [
+                v.rating(), v.review(), validationPassCheck,
+                s('rating'), s('review')
+            ];
         }
     },
 };
@@ -213,8 +224,8 @@ const vs = {
     // helps with search endpoints
     search: (req, res, next) => {
         // add search field if not already there
-        if (!('search' in req.body)) {
-            res.body.search = '';
+        if (!('search' in req.query)) {
+            req.query.search = '';
         }
         
         return next();
@@ -253,9 +264,6 @@ const vs = {
         }
 
         User.findById(targetUserId)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (targetUser) => {
                 // the target user does not exist
                 if (!targetUser) {
@@ -284,6 +292,9 @@ const vs = {
                 }
 
                 next();
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
     
@@ -304,9 +315,6 @@ const vs = {
 
         // look up the book in db
         Book.findById(targetBookID)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (targetBook) => {
                 // the target book does not exist
                 if (!targetBook) {
@@ -325,6 +333,9 @@ const vs = {
                 }
 
                 next();
+            })
+            .catch( (err) => {
+                return next(err);
             });
     },
 
@@ -345,9 +356,6 @@ const vs = {
         
         // look up the booking for original data
         Booking.findById(targetBooking)
-            .catch( (err) => {
-                return next(err);
-            })
             .then( (booking) => {
                 // booking does not exist
                 if (!booking) {
@@ -381,6 +389,9 @@ const vs = {
                 }
 
                 next();
+            })
+            .catch( (err) => {
+                return next(err);
             });
     }
 };
@@ -461,11 +472,17 @@ const v = {
             .exists().withMessage('req must have a \'category_name\' field')
             .not().isEmpty().withMessage('\'category_name\' field must be non empty');
     },
-    // validate google id_token
+    // validate google/facebook id_token
     id_token: () => {
         return check('id_token')
             .exists().withMessage('body must have a \'id_token\' field')
             .not().isEmpty().withMessage('\'id_token\' field must be non empty');
+    },
+    // validate facebook userID
+    userID: () => {
+        return check('userID')
+            .exists().withMessage('body must have a \'userID\' field')
+            .not().isEmpty().withMessage('\'userID\' field must be non empty');
     },
     // validate booking quantity
     quantity: () => {
@@ -480,6 +497,19 @@ const v = {
             .exists().withMessage('req must have a \'status\' field')
             .not().isEmpty().withMessage('\'status\' field must be non empty')
             .isIn(['pending', 'approved', 'cancelled']).withMessage('\'status\' must be valid');
+    },
+    // validate the rating
+    rating: () => {
+        return check('rating')
+            .exists().withMessage('req must have a \'rating\' field')
+            .not().isEmpty().withMessage('\'rating\' field must be non empty')
+            .isInt({min: 1, max: 5});
+    },
+    // validate the review field
+    review: () => {
+        return check('review')
+            .exists().withMessage('req must have a \'review\' field')
+            .isLength({min: 0, max: 500});
     },
     // validate mongo objectID
     isMongoObjectID: () => {

@@ -6,9 +6,8 @@ const Booking = require('../models/Booking');
 const BookingController = {
     /**
      * GET /api/books/bookings/
-     * Returns bookings with the given status
+     * Returns all bookings
      * Expects: {
-     *      params: status
      *      header: bearer-token
      * }
      * Responds: {
@@ -53,7 +52,7 @@ const BookingController = {
      *      200: { body: bookings }     // success
      *      401: {}                     // unauthorized for not logged in users
      *      403: {}                     // forbidden for non moderator users
-     *      422: {}                     // invalid data
+     *      404: {}                     // category not found
      *      500: {}                     // internal error
      * }
      */
@@ -87,14 +86,11 @@ const BookingController = {
      * GET /api/users/me/bookings
      * Returns bookings done by the current user
      * Expects: {
-     *      params: user._id
      *      header: bearer-token
      * }
      * Responds: {
      *      200: { body: bookings }     // success
      *      401: {}                     // unauthorized for not logged in users
-     *      403: {}                     // forbidden for non moderator users != user
-     *      404: {}                     // user not found
      *      500: {}                     // internal error
      * }
      */
@@ -195,9 +191,7 @@ const BookingController = {
             .then( (book) => {
                 // book does not exist
                 if (!book) {
-                    const err = createError(404, 'book does not exist');
-
-                    return next(err);
+                    return next(createError(404, 'book does not exist'));
                 }
                 // find all the bookings made by current user for this book
                 Booking.find({ 
@@ -226,13 +220,13 @@ const BookingController = {
 
     /**
      * POST /api/books/:id/bookings
+     * Creates a booking for the current user
+     * Returns the new booking id
      * Expects: {
      *      params: book._id
      *      body:   quantity
      *      header: bearer-token
      * }
-     * Creates a booking for the current user
-     * Returns the new booking id
      * Responds: {
      *      200: { body: booking }      // success
      *      401: {}                     // unauthorized for not logged in users
@@ -263,13 +257,13 @@ const BookingController = {
 
     /**
      * PATCH /api/books/bookings/:id
+     * Updates a booking for the user
+     * Returns the updated booking id
      * Expects: {
      *      params: booking._id
      *      body:   quantity (optional), status (optional)
      *      header: bearer-token
      * }
-     * Updates a booking for the user
-     * Returns the updated booking id
      * Responds: {
      *      200: { body: booking }      // success
      *      401: {}                     // unauthorized for not logged in users

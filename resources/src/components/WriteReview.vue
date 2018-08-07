@@ -49,17 +49,10 @@ export default {
 
     async mounted () {
         try {
-            let response = await new Promise((resolve, reject) => {
-                resolve({
-                    data: {
-                        rating: 5,
-                        review: 'Best book ever'
-                    }
-                });
-            });
+            let response = await this.$http.get(`/books/${this.book.id}/ratings/me`);
 
-            this.rating = response.data.rating;
-            this.review = response.data.review;
+            this.rating = response.data.rating.rating;
+            this.review = response.data.rating.review;
             this.synced = true;
         } catch (err) {
             // No operation
@@ -67,9 +60,20 @@ export default {
     },
 
     methods: {
-        save () {
-            this.editMode = false;
-            this.synced = true;
+        async save () {
+            try {
+                await this.$http.put(`/books/${this.book.id}/ratings`, {
+                    rating: this.rating,
+                    review: this.review
+                });
+                this.editMode = false;
+                this.synced = true;
+            } catch (err) {
+                this.$notify({
+                    'text': 'Something went wrong',
+                    'type': 'error'
+                });
+            }
         },
 
         makeEditable () {
