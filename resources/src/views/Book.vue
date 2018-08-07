@@ -10,12 +10,12 @@
                     </div>
                     <div v-if="book.loaded">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <Book :book="book"></Book>
                                 <WriteReview :book="book" />
                                 <BookReviews :book="book" />
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <UsersBooking v-if="!user.isModerator" :book="book" />
                                 <ModeratorsBooking v-if="user.isModerator" :book="book" />
                             </div>

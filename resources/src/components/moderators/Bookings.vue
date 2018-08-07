@@ -8,11 +8,11 @@
                         <hr />
                         <div v-if="pending.length === 0"> No pending requests</div>
                         <div v-for="booking in pending" :key="booking.id">
-                            <div class="row">
-                                <div class="col-md-4">
+                            <div class="clearfix">
+                                <div class="float-left">
                                     <b>{{ booking.user.name }}</b> requested for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }}
                                 </div>
-                                <div class="col-md-8">
+                                <div class="float-right">
                                     <button class="btn btn-sm btn-success" @click="approve(booking.id)">Approve</button>
                                     <button class="btn btn-sm btn-danger" @click="cancel(booking.id)" >Cancel</button>
                                     <button class="btn btn-sm btn-primary" @click="update(booking.id, booking.quantity + 1)">Add one</button>

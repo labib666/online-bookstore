@@ -9,7 +9,7 @@
                 </div>
             </div>
             <div class="row mr-0">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <h3>Your reviews</h3>
                     <div v-for="review in reviews" :key="review.id" class="card">
                         <div class="card-body">
@@ -25,8 +25,10 @@
                         </div>
                     </div>
                 </div>
-                <UsersAllBookings v-if="!user.isModerator" />
-                <ModeratorsAllBookings v-if="user.isModerator" />
+                <div class="col-md-7">
+                    <UsersAllBookings v-if="!user.isModerator" />
+                    <ModeratorsAllBookings v-if="user.isModerator" />
+                </div>
             </div>
         </Main>
     </div>
