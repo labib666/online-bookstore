@@ -10,12 +10,12 @@
                     </div>
                     <div v-if="book.loaded">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <Book :book="book"></Book>
                                 <WriteReview :book="book" />
                                 <BookReviews :book="book" />
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <UsersBooking v-if="!user.isModerator" :book="book" />
                                 <ModeratorsBooking v-if="user.isModerator" :book="book" />
                             </div>
@@ -37,8 +37,8 @@ import Sidebar from '@/components/Sidebar';
 import Book from '@/components/Book';
 import WriteReview from '@/components/WriteReview';
 import BookReviews from '@/components/BookReviews';
-import UsersBooking from '@/components/UsersBooking';
-import ModeratorsBooking from '@/components/ModeratorsBooking';
+import UsersBooking from '@/components/users/Bookings';
+import ModeratorsBooking from '@/components/moderators/Bookings';
 import { mapState } from 'vuex';
 
 export default {

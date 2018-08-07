@@ -20,6 +20,10 @@ export default {
         ...mapState([
             'isAuthSuccess'
         ])
+    },
+
+    mounted () {
+        document.title = 'All Books';
     }
 };
 </script>
