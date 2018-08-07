@@ -11,8 +11,10 @@
                 <div class="col-md-12" v-if="loginOrRegisterChoice">
                     <Login />
                 </div>
-                <div class="col-md-12 social-auth center-content">
-                    <social-auth />
+                <div class="social-auth">
+                    <center>
+                        <social-auth />
+                    </center>
                 </div>
             </div>
         </div>
