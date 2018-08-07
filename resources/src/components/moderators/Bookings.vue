@@ -2,25 +2,18 @@
     <div>
         <div id="new-booking">
             <div class="card">
-                <div class="card-header">
-                    <div class="float-left">
-                        Bookings
-                    </div>
-                    <div class="float-right">
-                        <button class="btn btn-primary" @click="createBooking">New booking</button>
-                    </div>
-                </div>
                 <div class="card-body pending-booking">
                     <div class="card-text">
                         <h1>Pending for reviews</h1>
                         <hr />
-                        <div v-if="pending.length === 0">You haven't booked <b>{{ book.title }}</b> yet</div>
+                        <div v-if="pending.length === 0"> No pending requests</div>
                         <div v-for="booking in pending" :key="booking.id">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    You requested for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }}
+                            <div class="clearfix">
+                                <div class="float-left">
+                                    <b>{{ booking.user.name }}</b> requested for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }}
                                 </div>
-                                <div class="col-md-6">
+                                <div class="float-right">
+                                    <button class="btn btn-sm btn-success" @click="approve(booking.id)">Approve</button>
                                     <button class="btn btn-sm btn-danger" @click="cancel(booking.id)" >Cancel</button>
                                     <button class="btn btn-sm btn-primary" @click="update(booking.id, booking.quantity + 1)">Add one</button>
                                     <button class="btn btn-sm btn-primary" @click="update(booking.id, booking.quantity - 1)">Remove one</button>
@@ -34,10 +27,9 @@
                 <div class="card-body approved-booking">
                     <div class="card-text">
                         <h1>Approved</h1>
+                        <hr />
                         <div v-for="booking in approved" :key="booking.id" class="clearfix">
-                            <div class="float-left">
-                                You request for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} is approved
-                            </div>
+                            <b>{{ booking.user.name }}</b>'s request for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} is approved
                             <hr />
                         </div>
                     </div>
@@ -47,7 +39,7 @@
                     <div class="card-text">
                         <h1>Cancelled</h1>
                         <div v-for="booking in cancelled" :key="booking.id" class="clearfix">
-                                You requested for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} has been cancelled
+                            <b>{{ booking.user.name }}</b>'s request for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} has been cancelled
                             <hr />
                         </div>
                     </div>
@@ -74,20 +66,56 @@ export default {
     },
 
     methods: {
-        fetchBookings () {
-            this.$http.get(`/books/${this.book.id}/bookings/me`).then((response) => {
+        async fetchBookings () {
+            try {
+                let response = await this.$http.get(`/books/${this.book.id}/bookings`);
                 let bookings = response.data.bookings;
                 bookings.sort((a, b) => {
-                    return new Date(b.createdAt) - new Date(a.createdAt);
+                    return new Date(a.createdAt) - new Date(b.createdAt);
                 });
+
+                // Extract necessary data from booking object
                 bookings = bookings.map((booking) => {
                     return {
                         id: booking._id,
+                        user_id: booking.user_id,
                         quantity: booking.quantity,
                         status: booking.status
                     };
                 });
 
+                // List all user IDs
+                let userIDs = bookings.map((booking) => {
+                    return booking.user_id;
+                });
+
+                // Find unique id's of users.
+                userIDs = [...new Set(userIDs)];
+
+                // Create promise array of HTTP requests
+                // for fetching user's information
+                userIDs = userIDs.map((id) => {
+                    return this.$http.get(`/users/${id}`);
+                });
+
+                // Create a map {id => userObject}
+                let userMap = {};
+                for (let p of userIDs) {
+                    let response = await p;
+                    userMap[response.data.user._id] = response.data.user;
+                };
+
+                // Replace userID with user object using the previous map
+                bookings = bookings.map((booking) => {
+                    return {
+                        id: booking.id,
+                        user: userMap[booking.user_id],
+                        quantity: booking.quantity,
+                        status: booking.status
+                    };
+                });
+
+                // Now we will to update states of the component
                 this.pending = bookings.filter((booking) => {
                     return booking.status === 'pending';
                 });
@@ -99,18 +127,25 @@ export default {
                 this.approved = bookings.filter((booking) => {
                     return booking.status === 'approved';
                 });
-            });
+            } catch (err) {
+                this.$notify({
+                    text: 'Something went wrong',
+                    type: 'error'
+                });
+            }
         },
 
-        createBooking () {
-            this.$http.post(`/books/${this.book.id}/bookings`, {
-                quantity: 1
+        approve (bookingID) {
+            // Approve the booking
+            this.$http.patch(`/books/bookings/${bookingID}`, {
+                status: 'approved'
             }).then(() => {
                 this.fetchBookings();
             });
         },
 
         update (bookingID, quantity) {
+            // Update booking with new quantity
             this.$http.patch(`/books/bookings/${bookingID}`, {
                 quantity
             }).then(() => {
@@ -119,6 +154,7 @@ export default {
         },
 
         cancel (bookingID) {
+            // Cancel the booking
             this.$http.patch(`/books/bookings/${bookingID}`, {
                 status: 'cancelled'
             }).then(() => {
