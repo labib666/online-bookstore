@@ -119,7 +119,12 @@ const AuthController = {
                 s('id_token')
             ];
         },
-        
+        facebookLogin: () => {
+            return [
+                v.id_token(), v.userID(), validationPassCheck,
+                s('id_token'), s('userID')
+            ];
+        },
         updateProfile: () => {
             return [
                 vs.userUpdate,
@@ -467,11 +472,17 @@ const v = {
             .exists().withMessage('req must have a \'category_name\' field')
             .not().isEmpty().withMessage('\'category_name\' field must be non empty');
     },
-    // validate google id_token
+    // validate google/facebook id_token
     id_token: () => {
         return check('id_token')
             .exists().withMessage('body must have a \'id_token\' field')
             .not().isEmpty().withMessage('\'id_token\' field must be non empty');
+    },
+    // validate facebook userID
+    userID: () => {
+        return check('userID')
+            .exists().withMessage('body must have a \'userID\' field')
+            .not().isEmpty().withMessage('\'userID\' field must be non empty');
     },
     // validate booking quantity
     quantity: () => {
