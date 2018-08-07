@@ -1,7 +1,7 @@
-const sinon = require('sinon');
-var createError = require('http-errors');
 const chai = require('chai');
+const sinon = require('sinon');
 const mock = require('mock-require');
+const createError = require('http-errors');
 
 mock('raccoon', {
     liked: function(a,b) {
