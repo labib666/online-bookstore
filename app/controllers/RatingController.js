@@ -29,7 +29,7 @@ const RatingController = {
         })
             .then( (ratings) => {
                 // respond with the bookings
-                res.json({
+                res.status(200).json({
                     message: 'succesfully retrieved user ratings',
                     ratings: ratings
                 });
@@ -73,7 +73,7 @@ const RatingController = {
                 })
                     .then( (ratings) => {
                         // respond with the ratings
-                        res.json({
+                        res.status(200).json({
                             message: 'succesfully retrieved user ratings for book',
                             ratings: ratings
                         });
@@ -122,7 +122,7 @@ const RatingController = {
                             return next(createError(404, 'rating does not exist'));
                         }
                         // respond with the rating
-                        res.json({
+                        res.status(200).json({
                             message: 'succesfully retrieved user ratings for book',
                             rating: rating
                         });
@@ -172,7 +172,7 @@ const RatingController = {
                         });
                         avgRating = totalRating/ratedBy;
                         // respond with the ratings
-                        res.json({
+                        res.status(200).json({
                             message: 'succesfully retrieved average ratings for book',
                             rating: {
                                 avgRating: avgRating,
@@ -307,7 +307,7 @@ const RatingController = {
             .then( (results) => {
                 BC.getBookProfiles(results)
                     .then( (books) => {
-                        res.json({
+                        res.status(200).json({
                             message: 'recommended books',
                             books: books
                         });

@@ -16,6 +16,7 @@ router.post('/', vc.addBook(), BC.addBook);
 router.get('/search', vc.search(), BC.searchBook);
 router.get('/recommend', RC.recommendForUser);
 router.get('/bookings', BKC.getAllBookings);
+router.get('/report', vc.salesReport(), BKC.salesReport);
 router.patch('/bookings/:id', vc.checkID(), vc.updateBooking(), BKC.updateBooking);
 router.get('/bookings/:status', vc.getBookingsWithStatus(), BKC.getBookingsWithStatus);
 router.get('/category/names', CC.getCategoryNames);

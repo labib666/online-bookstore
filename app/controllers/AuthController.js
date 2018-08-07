@@ -177,6 +177,11 @@ const AuthController = {
                 s('quantity'), s('status')
             ];
         },
+        salesReport: () => {
+            return [
+                
+            ];
+        },
         addOrUpdateRating: () => {
             return [
                 v.rating(), v.review(), validationPassCheck,
