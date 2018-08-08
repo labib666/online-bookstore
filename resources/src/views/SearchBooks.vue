@@ -61,8 +61,10 @@ export default {
             this.loading = true;
             const query = this.query;
 
-            this.$http.post('/books/search', {
-                search: query
+            this.$http.get('/books/search', {
+                params: {
+                    search: query
+                }
             }).then((response) => {
                 response.data.books.forEach((book) => {
                     const data = {
