@@ -332,16 +332,53 @@ const BookingController = {
         }
 
         // dates are okay. fetch record
-        BC.getBookProfiles([])
-            .then( (books) => {
-                res.json({
-                    message: 'successfully retrieved report',
-                    books: books,
-                    start,
-                    end
+        Booking.aggregate([
+            {
+                $match: {
+                    createdAt: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: '$book_id',
+                    count: { $sum: '$quantity' }
+                }
+            },
+            {
+                $sort: {
+                    count: -1
+                }
+            }
+        ])
+            .then( (records) => {
+                // fetch book profiles
+                let entries = [], data = {};
+                records.forEach( (record) => {
+                    const id = record._id;
+                    entries.push(id);
+                    data[id] = record.count;
                 });
-            })
-            .catch( (err) => {
+                BC.getBookProfiles(entries)
+                    .then( (responses) => {
+                        // tag the booking quatity sum to books
+                        let books = [];
+                        responses.forEach( (book) => {
+                            book.count = data[book._id];
+                            books.push(book);
+                        });
+                        // respond with books
+                        res.json({
+                            message: 'successfully retrieved report',
+                            books: books
+                        });
+                    })
+                    .catch( (err) => {
+                        return next(err);
+                    });
+            }).catch( (err) => {
                 return next(err);
             });
     }
