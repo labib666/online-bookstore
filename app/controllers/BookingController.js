@@ -1,8 +1,8 @@
 const createError = require('http-errors');
 
 const Book = require('../models/Book');
-const Booking = require('../models/Booking');
 const BC = require('./BookController');
+const Booking = require('../models/Booking');
 
 const BookingController = {
     /**
@@ -319,8 +319,31 @@ const BookingController = {
      * }
      */
     salesReport: (req, res, next) => {
-        BC.getBookProfiles([]);
-        next();
+        // non admins cannot access
+        if (req.user.isAdmin !== true) {
+            return next(createError(403, 'user not authorized for this action'));
+        }
+
+        const start = req.query.startDate;
+        const end = req.query.endDate;
+
+        if (start > end) {
+            return next(createError(422, 'start must be before end'));
+        }
+
+        // dates are okay. fetch record
+        BC.getBookProfiles([])
+            .then( (books) => {
+                res.json({
+                    message: 'successfully retrieved report',
+                    books: books,
+                    start,
+                    end
+                });
+            })
+            .catch( (err) => {
+                return next(err);
+            });
     }
 };
 
