@@ -5,6 +5,7 @@ const checkLib = require('express-validator/check');
 const sanitizeLib = require('express-validator/filter');
 
 const check = checkLib.check;
+const oneOf = checkLib.oneOf;
 const sanitize = sanitizeLib.sanitize;
 const validationResult = checkLib.validationResult;
 
@@ -181,6 +182,17 @@ const AuthController = {
             return [
                 v.rating(), v.review(), validationPassCheck,
                 s('rating'), s('review')
+            ];
+        },
+        salesReport: () => {
+            return [
+                v.dateCheck('startDate'),
+                v.dateCheck('endDate'),
+                check('endDate')
+                    .isBefore('12-31-2099'),
+                check('startDate')
+                    .isAfter('01-01-2000'),
+                validationPassCheck
             ];
         }
     },
@@ -510,6 +522,15 @@ const v = {
         return check('review')
             .exists().withMessage('req must have a \'review\' field')
             .isLength({min: 0, max: 500});
+    },
+    // validates whether 'field' is a date
+    dateCheck: (field) => {
+        return oneOf([
+            check(field)
+                .exists().toDate().isISO8601(),
+            check(field)
+                .exists().toDate().isRFC3339()
+        ], field+' must be a valid date');
     },
     // validate mongo objectID
     isMongoObjectID: () => {

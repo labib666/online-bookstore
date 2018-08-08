@@ -156,7 +156,7 @@ const CategoryController = {
         Category.distinct('category_name')
             .then( (categories) => {
                 // respond with the names
-                res.json({
+                res.status(200).json({
                     message: 'successfully retrieved category names',
                     categories: categories
                 });

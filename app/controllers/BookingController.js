@@ -1,6 +1,7 @@
 const createError = require('http-errors');
 
 const Book = require('../models/Book');
+const BC = require('./BookController');
 const Booking = require('../models/Booking');
 
 const BookingController = {
@@ -31,7 +32,7 @@ const BookingController = {
         })
             .then( (bookings) => {
                 // respond with the bookings
-                res.json({
+                res.status(200).json({
                     message: 'succesfully retrieved bookings',
                     bookings: bookings
                 });
@@ -72,7 +73,7 @@ const BookingController = {
         })
             .then( (bookings) => {
                 // respond with the bookings
-                res.json({
+                res.status(200).json({
                     message: 'succesfully retrieved bookings',
                     bookings: bookings
                 });
@@ -105,7 +106,7 @@ const BookingController = {
         })
             .then( (bookings) => {
                 // respond with the bookings
-                res.json({
+                res.status(200).json({
                     message: 'succesfully retrieved user bookings',
                     bookings: bookings
                 });
@@ -155,7 +156,7 @@ const BookingController = {
                 })
                     .then( (bookings) => {
                         // respond with the bookings
-                        res.json({
+                        res.status(200).json({
                             message: 'succesfully retrieved user bookings for book',
                             bookings: bookings
                         });
@@ -204,7 +205,7 @@ const BookingController = {
                 })
                     .then( (bookings) => {
                         // respond with the bookings
-                        res.json({
+                        res.status(200).json({
                             message: 'succesfully retrieved user bookings for book',
                             bookings: bookings
                         });
@@ -299,8 +300,51 @@ const BookingController = {
             .catch( (err) => {
                 return next(err);
             });
+    },
+
+    /**
+     * GET /api/books/report
+     * Takes two dates. 
+     * Returns the book sales in between the dates.
+     * Expects: {
+     *      query:  startDate, endDate
+     *      header: bearer-token
+     * }
+     * Responds: {
+     *      200: { body: books }        // success
+     *      401: {}                     // unauthorized for not logged in users
+     *      403: {}                     // forbidden for non-admin
+     *      422: {}                     // invalid data
+     *      500: {}                     // internal error
+     * }
+     */
+    salesReport: (req, res, next) => {
+        // non admins cannot access
+        if (req.user.isAdmin !== true) {
+            return next(createError(403, 'user not authorized for this action'));
+        }
+
+        const start = req.query.startDate;
+        const end = req.query.endDate;
+
+        if (start > end) {
+            return next(createError(422, 'start must be before end'));
+        }
+
+        // dates are okay. fetch record
+        BC.getBookProfiles([])
+            .then( (books) => {
+                res.json({
+                    message: 'successfully retrieved report',
+                    books: books,
+                    start,
+                    end
+                });
+            })
+            .catch( (err) => {
+                return next(err);
+            });
     }
-    
 };
 
 module.exports = BookingController;
