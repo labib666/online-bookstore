@@ -43,7 +43,7 @@ export default {
 
         // Facebook
         window.fbAsyncInit = () => {
-            FB.init({
+            window.FB.init({
                 appId: process.env.VUE_APP_FACEBOOK_APP_ID,
                 autoLogAppEvents: false,
                 xfbml: false,
@@ -65,27 +65,22 @@ export default {
 
     methods: {
         fblogin () {
+            let FB = window.FB;
             FB.login(async (response) => {
                 if (response.authResponse) {
-                    this.$http.post('/social/facebook', {
+                    try {
+                        let r = await this.$http.post('/social/facebook', {
                             id_token: response.authResponse.accessToken,
                             userID: response.authResponse.userID
-                        })
-                        .then( (response) => {
-                            const data = response.data;
-                            window.localStorage.apitoken = data.token;
-                            this.$notify({
-                                text: 'Login Successful'
-                            });
-                            const path = this.$route.query.redirect || '/dashboard';
-                            this.$router.push(path);
-                        })
-                        .catch( (err) => {
-                            this.$notify({
-                                text: 'Login failed!',
-                                type: 'error'
-                            });
                         });
+                        window.localStorage.apitoken = r.data.token;
+                        this.$router.push('/dashboard');
+                    } catch (err) {
+                        this.$notify({
+                            text: 'Login failed!',
+                            type: 'error'
+                        });
+                    }
                 } else {
                     this.$notify({
                         text: 'Login failed!',
