@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
+import Reports from './pages/Reports';
 import Moderator from './pages/Moderator';
 import NewBookForm from './views/moderator/NewBookForm';
 import EditBookForm from './views/moderator/EditBookForm';
@@ -30,6 +31,10 @@ export default new Router({
             path: '/admin',
             name: 'admin',
             component: Admin
+        },
+        {
+            path: '/reports',
+            component: Reports
         },
         {
             path: '/moderator',

@@ -11,6 +11,10 @@
             <hr />
             <router-link to="/admin">Admin panel</router-link>
         </div>
+        <div v-if="user.isAdmin">
+            <hr />
+            <router-link to="/reports">Sales Report</router-link>
+        </div>
         <div v-if="user.isModerator">
             <hr />
             <router-link to="/moderator">Moderator panel</router-link>
