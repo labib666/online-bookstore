@@ -115,8 +115,6 @@ export default {
                 };
             });
 
-            console.log(bookings);
-
             this.pending = bookings.filter((booking) => {
                 return booking.status === 'pending';
             });

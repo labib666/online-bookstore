@@ -9,6 +9,11 @@
                 </div>
             </div>
             <div class="row mr-0">
+                <div v-for="book in recommended" class="col-lg-6 col-xl-4">
+                    <Book :book="book" />
+                </div>
+            </div>
+            <div class="row mr-0">
                 <div class="col-md-5">
                     <h3>Your reviews</h3>
                     <div v-for="review in reviews" :key="review.id" class="card">
@@ -38,6 +43,7 @@
 import Topbar from '@/components/Topbar';
 import Sidebar from '@/components/Sidebar';
 import Main from '@/components/Main';
+import Book from '@/components/Book';
 import StarRatings from '@/components/StarRatings';
 import UsersAllBookings from '@/components/users/AllBookings';
 import ModeratorsAllBookings from '@/components/moderators/AllBookings';
@@ -48,6 +54,7 @@ export default {
         Topbar,
         Sidebar,
         Main,
+        Book,
         StarRatings,
         UsersAllBookings,
         ModeratorsAllBookings
@@ -78,7 +85,13 @@ export default {
     methods: {
         async fetchRecommended () {
             let recommended = await this.$http.get('/books/recommend');
-            console.log(recommended.data.books);
+            this.recommended = recommended.data.books.map((book) => {
+                return {
+                    ...book,
+                    id: book._id,
+                    isbn: book.ISBN,
+                };
+            });
         },
 
         async fetchReviews () {
