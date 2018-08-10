@@ -6,16 +6,18 @@
             <div class="row mr-0">
                 <div class="col-md-12">
                     <h3>Recommended for you</h3>
+                    <h3 v-if="!recommended.length"><small>Browse and review some books to get suggestions</small></h3>
                 </div>
             </div>
-            <div class="row mr-0">
-                <div v-for="book in recommended" class="col-lg-6 col-xl-4">
+            <div class="row mr-0 mb-5">
+                <div v-for="book in recommended" :key="book.id" class="col-lg-6 col-xl-4">
                     <Book :book="book" />
                 </div>
             </div>
             <div class="row mr-0">
                 <div class="col-md-5">
                     <h3>Your reviews</h3>
+                    <h3 v-if="!reviews.length"><small>You haven't reviewed any book yet</small></h3>
                     <div v-for="review in reviews" :key="review.id" class="card">
                         <div class="card-body">
                             <div class="clearfix">
@@ -89,7 +91,7 @@ export default {
                 return {
                     ...book,
                     id: book._id,
-                    isbn: book.ISBN,
+                    isbn: book.ISBN
                 };
             });
         },

@@ -5,7 +5,10 @@
                 <router-link to="/" tag="a" class="brand">Online Bookstore</router-link>
             </div>
             <div class="right">
-                <input type="text" class="form-control search" placeholder="Search books" v-model="query" @keyup.enter="searchBooks" />
+                <div class="mr-2">{{ user.name }}</div>
+                <form class="mr-2">
+                    <input type="text" class="form-control" placeholder="Search books" v-model="query" @keyup.enter="searchBooks" />
+                </form>
                 <Logout></Logout>
             </div>
     </div>
@@ -13,7 +16,7 @@
 
 <script>
 import Logout from './Logout';
-import { mapMutations } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 export default {
     data () {
         return {
@@ -23,6 +26,12 @@ export default {
 
     components: {
         Logout
+    },
+
+    computed: {
+        ...mapState([
+            'user'
+        ])
     },
 
     methods: {
@@ -38,9 +47,3 @@ export default {
     }
 };
 </script>
-
-<style lang="scss" scoped>
-.search {
-    margin-right: 10px;
-}
-</style>

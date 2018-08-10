@@ -26,6 +26,7 @@
             <div class="card-body approved-booking">
                 <div class="card-text">
                     <h1>Approved</h1>
+                    <div v-if="approved.length === 0">You have no approved booking yet</div>
                     <div v-for="booking in approved" :key="booking.id" class="clearfix">
                         <div class="float-left">
                             {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} of
@@ -39,6 +40,7 @@
             <div class="card-body cancelled-booking">
                 <div class="card-text">
                     <h1>Cancelled</h1>
+                    <div v-if="approved.length === 0">Yay! No cancelled booking!</div>
                     <div v-for="booking in cancelled" :key="booking.id">
                         {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} of
                         <router-link :to="'/books/' + booking.book.id">{{ booking.book.title }}</router-link>  has been cancelled

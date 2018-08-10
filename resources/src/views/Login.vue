@@ -1,31 +1,33 @@
 <template>
     <div id="login">
-        <div class="card">
-            <div class="card-header">Login</div>
-            <div class="card-body">
-                <div class="form-group row">
-                    <label for="username" class="col-md-4 col-form-label col-form-label-lg">Username</label>
-                    <div class="col-md-8">
-                        <input id="username" v-model="username" class="form-control form-control-lg" />
+        <form @submit.prevent="login">
+            <div class="card">
+                <div class="card-header">Login</div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="username" class="col-md-4 col-form-label col-form-label-lg">Username</label>
+                        <div class="col-md-8">
+                            <input id="username" v-model="username" class="form-control form-control-lg" />
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group row">
-                    <label for="password" class="col-md-4 col-form-label col-form-label-lg">Password</label>
-                    <div class="col-md-8">
-                        <input type="password" v-model="password" id="password" class="form-control form-control-lg" />
+                    <div class="form-group row">
+                        <label for="password" class="col-md-4 col-form-label col-form-label-lg">Password</label>
+                        <div class="col-md-8">
+                            <input type="password" v-model="password" id="password" class="form-control form-control-lg" />
+                        </div>
                     </div>
-                </div>
 
-                <hr />
-                <div class="float-left">
-                    <a href="#" v-on:click="toggleLoginRegister" class="uppercase">Create an account</a>
-                </div>
-                <div class="float-right">
-                    <button @click="login" type="submit" class="btn btn-primary mb-2">Login</button>
+                    <hr />
+                    <div class="float-left">
+                        <a href="#" v-on:click="toggleLoginRegister" class="uppercase">Create an account</a>
+                    </div>
+                    <div class="float-right">
+                        <button type="submit" @click="login" class="btn btn-primary mb-2">Login</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </template>
 

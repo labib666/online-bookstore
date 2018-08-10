@@ -73,7 +73,7 @@ export default {
             this.authSuccess(res.data.user);
             const path = this.$route.query.redirect || '/dashboard';
             this.$router.push(path);
-        }).catch((err) => {
+        }).catch(() => {
             this.isAuthAttempted = true;
         });
     }

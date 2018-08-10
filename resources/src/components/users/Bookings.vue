@@ -31,7 +31,7 @@
                     </div>
                 </div>
 
-                <div class="card-body approved-booking">
+                <div v-if="approved.length" class="card-body approved-booking">
                     <div class="card-text">
                         <h1>Approved</h1>
                         <div v-for="booking in approved" :key="booking.id" class="clearfix">
@@ -43,7 +43,7 @@
                     </div>
                 </div>
 
-                <div class="card-body cancelled-booking">
+                <div v-if="cancelled.length" class="card-body cancelled-booking">
                     <div class="card-text">
                         <h1>Cancelled</h1>
                         <div v-for="booking in cancelled" :key="booking.id" class="clearfix">
