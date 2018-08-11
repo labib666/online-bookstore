@@ -17,6 +17,7 @@ import Topbar from '@/components/Topbar';
 import Sidebar from '@/components/Sidebar';
 import Loading from '@/components/Loading';
 import Books from '@/components/Books';
+import { mapMutations } from 'vuex';
 
 export default {
     components: {
@@ -48,10 +49,15 @@ export default {
     },
 
     mounted () {
+        this.setCategoriesOpen(true);
         this.fetch();
     },
 
     methods: {
+        ...mapMutations([
+            'setCategoriesOpen'
+        ]),
+
         fetch () {
             this.loading = true;
             this.$http.get(`/books/category/${this.category}`).then((response) => {

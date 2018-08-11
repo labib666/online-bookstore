@@ -7,8 +7,10 @@ const baseState = {
     isSidebarActive: false,
     loginOrRegisterChoice: true,
     isAuthSuccess: false,
+    isCategoriesOpen: false,
     user: null,
-    users: {}
+    users: {},
+    categories: []
 };
 
 export default new Vuex.Store({
@@ -24,9 +26,21 @@ export default new Vuex.Store({
             state.loginOrRegisterChoice = !state.loginOrRegisterChoice;
         },
 
+        toggleCategoriesOpen (store) {
+            store.isCategoriesOpen = !store.isCategoriesOpen;
+        },
+
+        setCategoriesOpen (store, val) {
+            store.isCategoriesOpen = val;
+        },
+
         authSuccess (store, user) {
             store.isAuthSuccess = true;
             store.user = user;
+        },
+
+        updateCategories (store, categories) {
+            store.categories = categories;
         },
 
         // Call this mutation when you fetch users list

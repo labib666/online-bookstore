@@ -13,13 +13,12 @@
     z-index: 998;
     transition: $default-transition;
 
-    a {
+    li {
         color: $secondary-text-color;
         background-color: $secondary-color;
         cursor: pointer;
         display: block;
-        padding: $default-padding 0px;
-        text-align: center;
+        padding: $default-padding;
         text-decoration: none;
         transition: $default-transition;
 
@@ -41,7 +40,26 @@
     &.toggle-active {
         margin-left: -$sidebar-width;
     }
+
+    .categories {
+        max-height: 0px;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+
+        div {
+            li {
+                padding-left: 2.5*$default-padding;
+            }
+        }
+
+        &.active {
+            max-height: 1000px;
+        }
+    }
 }
+
+
+
 
 @media(max-width: 768px) {
     // For mobile device
