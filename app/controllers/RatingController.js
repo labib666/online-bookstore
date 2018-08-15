@@ -5,6 +5,12 @@ const Book = require('../models/Book');
 const Rating = require('../models/Rating');
 const BC = require('./BookController');
 
+/**
+ * Finds the average rating of a book.
+ * Returns null if no one rated the book.
+ * Returns the average rating, when ratings are found.
+ * @param {Mongo Object ID} targetBookID // book to look for
+ */
 const getAverageRating = (targetBookID) => {
     // look for the book in db
     return new Promise( (resolve,reject) => {    
@@ -24,7 +30,8 @@ const getAverageRating = (targetBookID) => {
                     {
                         $group: {
                             _id: '$book_id',
-                            rating: { $avg: '$rating' }
+                            rating: { $avg: '$rating' },
+                            count: { $sum: 1 }
                         }
                     }
                 ])
@@ -32,7 +39,10 @@ const getAverageRating = (targetBookID) => {
                         if (records.length === 0) {
                             resolve (null);
                         } else {
-                            resolve (records[0].rating);
+                            resolve ({
+                                rating: records[0].rating,
+                                count: records[0].count
+                            });
                         }
                     }).catch( (err) => {
                         return reject(err);
