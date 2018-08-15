@@ -29,7 +29,6 @@ router.get('/:id/bookings', vc.checkID(), BKC.getAllBookingsForBook);
 router.get('/:id/ratings', vc.checkID(), RC.getAllRatingsForBook);
 router.get('/:id/bookings/me', vc.checkID(), BKC.getUserBookingsForBook);
 router.get('/:id/ratings/me', vc.checkID(), RC.getUserRatingsForBook);
-router.get('/:id/ratings/average', vc.checkID(), RC.getAverageRating);
 router.post('/:id/category', vc.checkID(), vc.category(), CC.addToCategory);
 router.delete('/:id/category', vc.checkID(), vc.category(), CC.removeFromCategory);
 

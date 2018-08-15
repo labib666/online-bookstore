@@ -5,6 +5,45 @@ const Book = require('../models/Book');
 const Rating = require('../models/Rating');
 const BC = require('./BookController');
 
+const getAverageRating = (targetBookID) => {
+    // look for the book in db
+    return new Promise( (resolve,reject) => {    
+        Book.findById (targetBookID)
+            .then( (book) => {
+                // book does not exist
+                if (!book) {
+                    return reject (createError(404, 'book does not exist'));
+                }
+                // find the average rating for the book
+                Rating.aggregate([
+                    {
+                        $match: {
+                            book_id: targetBookID
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: '$book_id',
+                            rating: { $avg: '$rating' }
+                        }
+                    }
+                ])
+                    .then( (records) => {
+                        if (records.length === 0) {
+                            resolve (null);
+                        } else {
+                            resolve (records[0].rating);
+                        }
+                    }).catch( (err) => {
+                        return reject(err);
+                    });
+            })
+            .catch( (err) => {
+                return reject(err);
+            });
+    });
+};
+
 const RatingController = {    
     /**
      * GET /api/users/me/ratings
@@ -135,59 +174,8 @@ const RatingController = {
                 return next(err);
             });
     },
-
-    /**
-     * GET /api/books/:id/ratings/average
-     * Returns ratings given by all user for given book
-     * Expects: {
-     *      params: book._id
-     *      header: bearer-token
-     * }
-     * Responds: {
-     *      200: { body: rating }      // success
-     *      401: {}                     // unauthorized for not logged in users
-     *      404: {}                     // book not found
-     *      500: {}                     // internal error
-     * }
-     */
-    getAverageRating: (req, res, next) => {
-        const targetBookID = req.params.id;
-
-        // look for the book in db
-        Book.findById(targetBookID)
-            .then( (book) => {
-                // book does not exist
-                if (!book) {
-                    return next(createError(404, 'book does not exist'));
-                }
-                // find all the ratings for the book
-                Rating.find({
-                    book_id: targetBookID
-                })
-                    .then( (ratings) => {
-                        let ratedBy = 0, totalRating = 0, avgRating = 0;
-                        ratings.forEach( (rating) => {
-                            totalRating += rating.rating;
-                            ratedBy++;
-                        });
-                        avgRating = totalRating/ratedBy;
-                        // respond with the ratings
-                        res.status(200).json({
-                            message: 'succesfully retrieved average ratings for book',
-                            rating: {
-                                avgRating: avgRating,
-                                ratedBy: ratedBy
-                            }
-                        });
-                    })
-                    .catch( (err) => {
-                        return next(err);
-                    });
-            })
-            .catch( (err) => {
-                return next(err);
-            });
-    },
+    
+    getAverageRating: getAverageRating,
 
     /**
      * PUT /api/books/:id/ratings

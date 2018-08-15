@@ -2,6 +2,7 @@ const createError = require('http-errors');
 
 const Book = require('../models/Book');
 const Category = require('../models/Category');
+const RC = require('./RatingController');
 
 /**
  * Fetches the book profile, including its categories
@@ -46,10 +47,15 @@ const fetchBookProfile = (book_id) => {
                         book_id: book._id
                     })
                         .then( (categories) => {
-                            // respond with book profile
                             book = book.toObject();
                             book.categories = categories;
-                            resolve(book);
+                            // look for the rating of the book
+                            RC.getAverageRating(book._id).then( (rating) => {
+                                book.rating = rating;
+                                resolve(book);
+                            }).catch( (err) => {
+                                reject(err);
+                            });
                         })
                         .catch( (err) => {
                             reject(err);

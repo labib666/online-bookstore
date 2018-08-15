@@ -380,7 +380,7 @@ const vs = {
                 }
 
                 // check authorization of the user
-                if (!req.user.isModerator && req.user._id !== booking.user_id) {
+                if (!req.user.isModerator && req.user._id != booking.user_id) {
                     return next(createError(403, 'user does not have authorization for this action'));
                 }
 
