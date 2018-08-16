@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Register from '@/views/Register';
 import { setup, cleanUp } from './setup';
-import { type, checkAtNthLoop, click } from '../utils';
+import { type, checkAtNthLoop } from '../utils';
 import sinon from 'sinon';
 
 describe('Register.vue', () => {
@@ -52,7 +52,7 @@ describe('Register.vue', () => {
         type(wrapper, '#email', 'test@example.com');
         type(wrapper, '#name', 'Name');
 
-        click(wrapper, 'button');
+        wrapper.vm.register();
 
         checkAtNthLoop(() => {
             sinon.assert.calledOnce(stub);

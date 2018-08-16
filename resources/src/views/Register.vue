@@ -37,7 +37,7 @@
                         <a href="#" v-on:click="toggleLoginRegister">Already have an account?</a>
                     </div>
                     <div class="float-right">
-                        <button type="submit" @click="register" class="btn btn-primary mb-2">Register</button>
+                        <button type="submit" class="btn btn-primary mb-2">Register</button>
                     </div>
                 </div>
             </div>

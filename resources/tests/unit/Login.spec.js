@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Login from '@/views/Login';
 import { setup, cleanUp } from './setup';
-import { type, checkAtNthLoop, click } from '../utils';
+import { type, checkAtNthLoop } from '../utils';
 import sinon from 'sinon';
 
 describe('Login.vue', () => {
@@ -47,7 +47,7 @@ describe('Login.vue', () => {
         type(wrapper, '#username', 'user');
         type(wrapper, '#password', '123456');
 
-        click(wrapper, 'button');
+        wrapper.vm.login();
 
         checkAtNthLoop(() => {
             sinon.assert.calledOnce(stub);
