@@ -7,7 +7,7 @@
             <div class="right">
                 <div class="mr-2">{{ user.name }}</div>
                 <form class="mr-2">
-                    <input type="text" class="form-control" placeholder="Search books" v-model="query" @keyup.enter="searchBooks" />
+                    <input id="searchInput" type="text" class="form-control" placeholder="Search books" v-model="query" @keyup.enter="searchBooks" />
                 </form>
                 <Logout></Logout>
             </div>

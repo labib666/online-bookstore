@@ -6,7 +6,7 @@ import Router from 'vue-router';
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
 
-export function setup (component) {
+export function setup (component, config) {
     const router = new Router({});
 
     const localVue = createLocalVue();
@@ -16,11 +16,13 @@ export function setup (component) {
     localVue.use(Router);
 
     window.localStorage = {};
+    config = config || {};
 
     return mount(component, {
         localVue,
         router,
-        store
+        store,
+        ...config
     });
 }
 

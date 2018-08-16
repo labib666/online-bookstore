@@ -23,7 +23,7 @@
                         <a href="#" v-on:click="toggleLoginRegister" class="uppercase">Create an account</a>
                     </div>
                     <div class="float-right">
-                        <button type="submit" @click="login" class="btn btn-primary mb-2">Login</button>
+                        <button type="submit" class="btn btn-primary mb-2">Login</button>
                     </div>
                 </div>
             </div>
