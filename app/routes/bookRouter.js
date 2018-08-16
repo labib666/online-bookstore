@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/', BC.getAllBooks);
 router.post('/', vc.addBook(), BC.addBook);
 router.get('/search', vc.search(), BC.searchBook);
-router.get('/recommend', RC.recommendForUser);
+router.get('/recommend', BC.recommendForUser);
 router.get('/bookings', BKC.getAllBookings);
 router.get('/report', vc.salesReport(), BKC.salesReport);
 router.patch('/bookings/:id', vc.checkID(), vc.updateBooking(), BKC.updateBooking);

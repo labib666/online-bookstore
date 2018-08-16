@@ -1,7 +1,9 @@
 const createError = require('http-errors');
+const raccoon = require('raccoon');
 
 const Book = require('../models/Book');
 const Category = require('../models/Category');
+
 const RC = require('./RatingController');
 
 /**
@@ -296,7 +298,43 @@ const BookController = {
                 });
         }
     },
-    getBookProfiles: getBookProfiles
+
+    /**
+     * GET /api/books/recommend
+     * Expects: {
+     *      header: bearer-token
+     * }
+     * Recommends user 5 books he/she may like
+     * Returns the book ids
+     * Responds: {
+     *      200: { body: books }        // success
+     *      401: {}                     // unauthorized for not logged in users
+     *      500: {}                     // internal error
+     * }
+     */
+    recommendForUser: (req, res, next) => {
+        const targetUserID = req.user._id;
+
+        // ask raccoon for recoms
+        raccoon.recommendFor(targetUserID, 5)
+            .then( (results) => {
+                getBookProfiles(results)
+                    .then( (books) => {
+                        res.status(200).json({
+                            message: 'recommended books',
+                            books: books
+                        });
+                    })
+                    .catch( (err) => {
+                        return next(err);
+                    });
+            })
+            .catch( (err) => {
+                return next(err);
+            });
+    },
+
+    getBookProfiles
 };
 
 module.exports = BookController;
