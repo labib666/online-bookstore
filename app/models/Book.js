@@ -4,7 +4,11 @@ var timestamps = require('mongoose-timestamp');
 var BookSchema = new mongoose.Schema({  
     title: String,
     author: String,
-    ISBN: String
+    ISBN: {
+        type: String,
+        unique: true,
+        dropDups: true
+    }
 });
 
 BookSchema.index({
@@ -15,5 +19,4 @@ BookSchema.index({
 
 BookSchema.plugin(timestamps);
 
-mongoose.model('Book', BookSchema, 'books');
-module.exports = mongoose.model('Book');
+module.exports = mongoose.model('Book', BookSchema, 'books');

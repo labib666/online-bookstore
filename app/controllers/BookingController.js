@@ -338,7 +338,8 @@ const BookingController = {
                     createdAt: {
                         $gte: start,
                         $lte: end
-                    }
+                    },
+                    status: 'approved'
                 }
             },
             {

@@ -1,5 +1,6 @@
-const sinon = require('sinon');
 const chai = require('chai');
+const sinon = require('sinon');
+const mock = require('mock-require');
 
 const Book = require('../../app/models/Book');
 const BC = require('../../app/controllers/BookController');
@@ -7,8 +8,37 @@ const BC = require('../../app/controllers/BookController');
 const sandbox = sinon.createSandbox();
 const expect = chai.expect;
 
+mock('raccoon', {
+    liked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('liked '+a+' '+b);
+        });
+    },
+    unliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('unliked '+a+' '+b);
+        });
+    },
+    disliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('disliked '+a+' '+b);
+        });
+    },
+    undisliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('undisliked '+a+' '+b);
+        });
+    }
+});
+
 describe('Test for BookController:addBook', function () {
     let req, res, resJsonSpy, resStatusSpy, nextSpy;
+
+    // after all tests
+    after( function(done) {
+        mock.stopAll();
+        done();
+    });
 
     // before each test
     beforeEach( function (done) {

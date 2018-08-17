@@ -1,5 +1,6 @@
 const chai = require('chai');
 const sinon = require('sinon');
+const mock = require('mock-require');
 const createError = require('http-errors');
 
 const JWT = require('jsonwebtoken');
@@ -9,8 +10,37 @@ const auth = require('../../app/controllers/AuthController');
 const sandbox = sinon.createSandbox();
 const expect = chai.expect;
 
+mock('raccoon', {
+    liked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('liked '+a+' '+b);
+        });
+    },
+    unliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('unliked '+a+' '+b);
+        });
+    },
+    disliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('disliked '+a+' '+b);
+        });
+    },
+    undisliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('undisliked '+a+' '+b);
+        });
+    }
+});
+
 describe('Test for AuthController:getUserData', function () {
     let req, res, resJsonSpy, resStatusSpy, nextSpy;
+
+    // after all tests
+    after( function(done) {
+        mock.stopAll();
+        done();
+    });
 
     // before each test
     beforeEach( function (done) {

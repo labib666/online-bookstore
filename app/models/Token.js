@@ -7,5 +7,4 @@ var TokenSchema = new mongoose.Schema({
 
 TokenSchema.plugin(timestamps);
 
-mongoose.model('Token', TokenSchema, 'tokens');
-module.exports = mongoose.model('Token');
+module.exports = mongoose.model('Token', TokenSchema, 'tokens');
