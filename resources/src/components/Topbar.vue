@@ -37,7 +37,7 @@ export default {
             'user'
         ]),
 
-        emailHash() {
+        emailHash () {
             return md5(this.user.email);
         }
     },

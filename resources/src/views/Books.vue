@@ -43,7 +43,7 @@ export default {
                     title: book.title,
                     isbn: book.ISBN,
                     categories: book.categories,
-                    rating: book.rating,
+                    rating: book.rating
                 };
                 this.books.push(data);
             });

@@ -19,15 +19,15 @@ export default {
     },
 
     computed: {
-        full() {
+        full () {
             return Math.floor(this.rating);
         },
 
-        empty() {
+        empty () {
             return this.total - Math.ceil(this.rating);
         },
 
-        half() {
+        half () {
             return this.total - this.full - this.empty;
         }
     },

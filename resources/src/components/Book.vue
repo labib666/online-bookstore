@@ -45,7 +45,7 @@ export default {
     props: ['book'],
 
     components: {
-        StarRatings,
+        StarRatings
     },
 
     computed: {

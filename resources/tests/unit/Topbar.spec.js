@@ -12,7 +12,8 @@ describe('Topbar.vue', () => {
             computed: {
                 user () {
                     return {
-                        name: 'Test User'
+                        name: 'Test User',
+                        email: 'test@example.com'
                     };
                 }
             }
