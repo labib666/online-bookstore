@@ -1,7 +1,8 @@
 <template>
     <span>
-        <i v-for="i in rating" :key="i" class="fas fa-star" @click="update(i)" />
-        <i v-for="i in (total - rating)" :key="i + rating" class="far fa-star" @click="update(i+rating)" />
+        <i v-for="i in full" :key="i" class="fas fa-star" @click="update(i)" />
+        <i v-if="half" class="fas fa-star-half-alt" />
+        <i v-for="i in empty" :key="i + full" class="far fa-star" @click="update(i+rating)" />
     </span>
 </template>
 
@@ -15,6 +16,20 @@ export default {
         return {
             total: 5
         };
+    },
+
+    computed: {
+        full() {
+            return Math.floor(this.rating);
+        },
+
+        empty() {
+            return this.total - Math.ceil(this.rating);
+        },
+
+        half() {
+            return this.total - this.full - this.empty;
+        }
     },
 
     methods: {

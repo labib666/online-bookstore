@@ -68,7 +68,8 @@ export default {
                         author: book.author,
                         title: book.title,
                         isbn: book.ISBN,
-                        categories: book.categories
+                        categories: book.categories,
+                        rating: book.rating
                     };
                     this.books.push(data);
                 });

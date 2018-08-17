@@ -81,6 +81,7 @@ export default {
             this.book.author = book.author;
             this.book.isbn = book.ISBN;
             this.book.categories = book.categories;
+            this.book.rating = book.rating;
 
             this.loading = false;
             this.book.loaded = true;

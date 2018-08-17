@@ -34,7 +34,7 @@
 
                     <hr />
                     <div class="float-left">
-                        <a href="#" v-on:click="toggleLoginRegister">Already have an account?</a>
+                        <a href="#" v-on:click="toggleLoginRegister" class="uppercase">Already have an account?</a>
                     </div>
                     <div class="float-right">
                         <button type="submit" class="btn btn-primary mb-2">Register</button>

@@ -4,11 +4,21 @@
             <div class="card-body">
                 <router-link :to="'/books/' + book.id" class="invisible-link">
                     <div class="card-title">
-                        <div class="clearfix">
-                            <div class="float-left">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
                                 <h4>{{ book.title }}</h4>
+                                <div v-if="book.rating">
+                                    <span class="text-muted">
+                                        <small>{{ book.rating.count }} users</small>
+                                        &nbsp;
+                                    </span>
+                                    <StarRatings :rating="book.rating.rating" />
+                                </div>
+                                <span v-if="!book.rating" class="text-muted">
+                                    <small>No ratings yet</small>
+                                </span>
                             </div>
-                            <div v-if="user.isModerator" class="float-right">
+                            <div v-if="user.isModerator">
                                 <router-link :to="'/moderator/edit/book/' + book.id">
                                     <i class="fas fa-edit fa-lg" />
                                 </router-link>
@@ -30,8 +40,13 @@
 
 <script>
 import { mapState } from 'vuex';
+import StarRatings from '@/components/StarRatings';
 export default {
     props: ['book'],
+
+    components: {
+        StarRatings,
+    },
 
     computed: {
         ...mapState([

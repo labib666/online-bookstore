@@ -5,7 +5,10 @@
                 <router-link to="/" tag="a" class="brand">Online Bookstore</router-link>
             </div>
             <div class="right">
-                <div class="mr-2">{{ user.name }}</div>
+                <div class="mr-2">
+                    <img :src="`https://www.gravatar.com/avatar/${emailHash}?s=30`" style="border-radius: 50%" />
+                    {{ user.name }}
+                </div>
                 <form class="mr-2">
                     <input id="searchInput" type="text" class="form-control" placeholder="Search books" v-model="query" @keyup.enter="searchBooks" />
                 </form>
@@ -16,6 +19,7 @@
 
 <script>
 import Logout from './Logout';
+import md5 from 'md5';
 import { mapMutations, mapState } from 'vuex';
 export default {
     data () {
@@ -31,7 +35,11 @@ export default {
     computed: {
         ...mapState([
             'user'
-        ])
+        ]),
+
+        emailHash() {
+            return md5(this.user.email);
+        }
     },
 
     methods: {
