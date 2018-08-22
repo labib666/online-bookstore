@@ -61,6 +61,7 @@ export default {
                 id: '',
                 title: '',
                 author: '',
+                details: '',
                 isbn: '',
                 categories: []
             }
@@ -79,6 +80,7 @@ export default {
             const book = response.data.book;
             this.book.title = book.title;
             this.book.author = book.author;
+            this.book.details = book.details;
             this.book.isbn = book.ISBN;
             this.book.categories = book.categories;
             this.book.rating = book.rating;

@@ -14,6 +14,13 @@
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Details:</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="5" v-model="details"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Author:</label>
                             <div class="col-sm-10">
                             <input type="text" class="form-control" v-model="author" />
@@ -40,6 +47,7 @@ export default {
         return {
             title: '',
             author: '',
+            details: '',
             isbn: ''
         };
     },
@@ -49,6 +57,7 @@ export default {
             this.$http.post('/books', {
                 title: this.title,
                 author: this.author,
+                details: this.details,
                 ISBN: this.isbn
             }).then((res) => {
                 const bookID = res.data.book;

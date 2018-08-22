@@ -27,9 +27,8 @@
                     </div>
                 </router-link>
                 <div class="card-text">
-                    Author: {{ book.author }}
-                    <br />
-                    <small>ISBN: {{ book.isbn }}</small>
+                    <p>{{ book.details }}</p>
+                    <small>Author: {{ book.author }} &bull; ISBN: {{ book.isbn }}</small>
                     <hr />
                     <button v-for="category in book.categories" :key="category" class="btn btn-primary category" @click="goToCategory(category)">{{category}}</button>
                 </div>
