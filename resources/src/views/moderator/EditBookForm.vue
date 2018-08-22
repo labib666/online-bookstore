@@ -95,7 +95,7 @@ export default {
             this.$http.patch(`/books/${this.id}`, {
                 title: this.title,
                 author: this.author,
-                details: this.details,
+                details: this.details
             }).then((res) => {
                 this.$notify({
                     text: 'Update sucessful'

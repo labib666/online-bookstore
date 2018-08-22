@@ -9,8 +9,8 @@
                     <img :src="`https://www.gravatar.com/avatar/${emailHash}?s=30`" style="border-radius: 50%" />
                     {{ user.name }}
                 </div>
-                <form class="mr-2">
-                    <input id="searchInput" type="text" class="form-control" placeholder="Search books" v-model="query" @keyup.enter="searchBooks" />
+                <form class="mr-2" @submit.prevent="searchBooks">
+                    <input id="searchInput" type="text" class="form-control" placeholder="Search books" v-model="query" />
                 </form>
                 <Logout></Logout>
             </div>
@@ -49,6 +49,7 @@ export default {
 
         searchBooks () {
             if (this.query.length === 0) return;
+            console.log('path is', `/books/search/${this.query}`);
             this.$router.push(`/books/search/${this.query}`);
             this.query = '';
         }
