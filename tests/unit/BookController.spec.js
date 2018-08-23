@@ -49,7 +49,8 @@ describe('Test for BookController:addBook', function () {
             body: {
                 title: 'test name',
                 author: 'testname',
-                ISBN: '0123456789'
+                ISBN: '0123456789',
+                details: 'some details'
             }
         };
         resJsonSpy = sandbox.spy();
@@ -57,6 +58,16 @@ describe('Test for BookController:addBook', function () {
             json: resJsonSpy
         };
         resStatusSpy = sandbox.stub().returns(res);
+        sandbox.stub(BC,'getGoogleBookProfile').callsFake((isbn) => {
+            return new Promise(resolve => {
+                resolve({
+                    imageLinks: {
+                        thumbnail: 'some url',
+                    },
+                    description: 'some more details'
+                });
+            });
+        });
         nextSpy =  sandbox.spy();
         done();
     });

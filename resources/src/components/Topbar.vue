@@ -53,7 +53,7 @@ export default {
 
         searchBooks () {
             if (this.query.length === 0) return;
-            console.log('path is', `/books/search/${this.query}`);
+            //console.log('path is', `/books/search/${this.query}`);
             this.$router.push(`/books/search/${this.query}`);
             this.query = '';
         }

@@ -177,7 +177,7 @@ const BookController = {
      *      500: {}             // internal error
      * }
      */
-    addBook: (req, res, next) => {
+    addBook: function (req, res, next) {
         // check if the user has previlige for this
         if (!req.user.isModerator) {
             return next(createError(403, 'user not authorized for this action'));
@@ -188,7 +188,7 @@ const BookController = {
         const author = req.body.author;
         const ISBN = req.body.ISBN;
         let details = req.body.details;
-        getGoogleBookProfile(ISBN)
+        this.getGoogleBookProfile(ISBN)
             .then( (item) => {
                 const image = item.imageLinks.thumbnail;
                 if (details.length === 0) {
@@ -285,7 +285,7 @@ const BookController = {
                 targetBook.title = req.body.title;
                 targetBook.author = req.body.author;
                 targetBook.details = req.body.details;
-                getGoogleBookProfile(targetBook.ISBN)
+                this.getGoogleBookProfile(targetBook.ISBN)
                     .then( (item) => {
                         // save changed data in database
                         targetBook.image = item.imageLinks.thumbnail;
@@ -411,7 +411,8 @@ const BookController = {
             });
     },
 
-    getBookProfiles
+    getBookProfiles,
+    getGoogleBookProfile
 };
 
 module.exports = BookController;
