@@ -6,11 +6,11 @@
             </div>
             <div class="right">
                 <div class="mr-2">
-                    <img :src="`https://www.gravatar.com/avatar/${emailHash}?s=30`" style="border-radius: 50%" />
+                    <img :src="`https://www.gravatar.com/avatar/${emailHash}?s=40&d=mp`" style="border-radius: 50%" />
                     {{ user.name }}
                 </div>
-                <form class="mr-2">
-                    <input id="searchInput" type="text" class="form-control" placeholder="Search books" v-model="query" @keyup.enter="searchBooks" />
+                <form class="mr-2" @submit.prevent="searchBooks">
+                    <input id="searchInput" type="text" class="form-control" placeholder="Search books" v-model="query" />
                 </form>
                 <Logout></Logout>
             </div>

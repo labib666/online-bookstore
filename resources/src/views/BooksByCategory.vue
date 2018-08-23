@@ -65,8 +65,10 @@ export default {
                 response.data.books.forEach((book) => {
                     const data = {
                         id: book._id,
-                        author: book.author,
                         title: book.title,
+                        author: book.author,
+                        details: book.details,
+                        image: book.image,
                         isbn: book.ISBN,
                         categories: book.categories,
                         rating: book.rating

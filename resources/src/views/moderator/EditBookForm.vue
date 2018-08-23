@@ -5,21 +5,28 @@
                 <div class="card-body">
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Book Title:</label>
-                            <div class="col-sm-8">
+                        <div class="col-sm-8">
                             <input type="text" class="form-control" v-model="title" />
                         </div>
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Details:</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" v-model="details" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Author:</label>
-                            <div class="col-sm-8">
+                        <div class="col-sm-8">
                             <input type="text" class="form-control" v-model="author" />
                         </div>
                     </div>
 
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">ISBN:</label>
-                            <div class="col-sm-8">
+                        <div class="col-sm-8">
                             <input type="text" class="form-control" v-model="isbn" disabled />
                         </div>
                     </div>
@@ -41,14 +48,16 @@
                     <div v-if="!categories.length">
                         <small>No categories</small>
                     </div>
-                    <div class="form-group row" style="margin-top:20px;">
-                        <div class="col-md-8">
-                            <input type="text" class="form-control" v-model="newCategory" />
+                    <form @submit.prevent="saveNewCategory">
+                        <div class="form-group row" style="margin-top:20px;">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" v-model="newCategory" />
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary">Add</button>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <button class="btn btn-primary" @click="saveNewCategory">Add</button>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -62,6 +71,7 @@ export default {
             id: '',
             title: '',
             author: '',
+            details: '',
             isbn: '',
             categories: [],
             newCategory: ''
@@ -74,6 +84,7 @@ export default {
             const book = response.data.book;
             this.title = book.title;
             this.author = book.author;
+            this.details = book.details;
             this.isbn = book.ISBN;
             this.categories = book.categories;
         });
@@ -83,7 +94,8 @@ export default {
         save () {
             this.$http.patch(`/books/${this.id}`, {
                 title: this.title,
-                author: this.author
+                author: this.author,
+                details: this.details
             }).then((res) => {
                 this.$notify({
                     text: 'Update sucessful'
