@@ -58,7 +58,7 @@ describe('Test for BookController:addBook', function () {
             json: resJsonSpy
         };
         resStatusSpy = sandbox.stub().returns(res);
-        sandbox.stub(BC,'getGoogleBookProfile').callsFake((isbn) => {
+        sandbox.stub(BC,'getGoogleBookProfile').callsFake(() => {
             return new Promise(resolve => {
                 resolve({
                     imageLinks: {
