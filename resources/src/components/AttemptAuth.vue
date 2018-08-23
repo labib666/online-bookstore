@@ -24,6 +24,7 @@ export default {
         this.$http.get('/users/me').then((res) => {
             this.authSuccess(res.data.user);
         }).catch((err) => {
+            // eslint-disable-next-line
             console.log(err);
             this.redirectToLogin();
         });
