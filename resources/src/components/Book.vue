@@ -7,6 +7,9 @@
                         <div class="d-flex">
                             <div class="flex-grow-1">
                                 <h4>{{ book.title }}</h4>
+                                <div>
+                                    <img :src="book.image" />
+                                </div>
                                 <div v-if="book.rating">
                                     <span class="text-muted">
                                         <small>{{ book.rating.count }} users</small>

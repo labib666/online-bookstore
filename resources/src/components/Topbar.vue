@@ -6,7 +6,7 @@
             </div>
             <div class="right">
                 <div class="mr-2">
-                    <img :src="`https://www.gravatar.com/avatar/${emailHash}?s=30`" style="border-radius: 50%" />
+                    <img :src="`https://www.gravatar.com/avatar/${emailHash}?s=40&d=${defaultURL}`" style="border-radius: 10%" />
                     {{ user.name }}
                 </div>
                 <form class="mr-2" @submit.prevent="searchBooks">
@@ -39,6 +39,10 @@ export default {
 
         emailHash () {
             return md5(this.user.email);
+        },
+
+        defaultURL () {
+            return encodeURIComponent('https://api.adorable.io/avatars/40/' + this.user._id);
         }
     },
 

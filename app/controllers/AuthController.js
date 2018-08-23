@@ -329,6 +329,7 @@ const vs = {
         // look up the book in db
         Book.findById(targetBookID)
             .then( (targetBook) => {
+                targetBook = targetBook.toObject();
                 // the target book does not exist
                 if (!targetBook) {
                     return next(createError(404,'book not found'));
@@ -347,7 +348,10 @@ const vs = {
 
                 // bind details to body
                 if (!('details' in req.body)) {
-                    req.body.details = targetBook.details;
+                    if ('details' in targetBook)
+                        req.body.details = targetBook.details;
+                    else
+                        req.body.details = '';
                 }
 
                 next();
@@ -498,8 +502,7 @@ const v = {
     // validate the book details
     details: () => {
         return check('details')
-            .exists().withMessage('body must have a \'details\' field')
-            .not().isEmpty().withMessage('\'details\' field must be non empty');
+            .exists().withMessage('body must have a \'details\' field');
     },
     // validate the category-name
     category_name: () => {

@@ -37,11 +37,15 @@ export default {
     mounted () {
         this.$http.get('/books').then((response) => {
             response.data.books.forEach((book) => {
+                if (!('image' in book)) {
+                    book.image = 'https://api.adorable.io/avatars/60/' + book.ISBN;
+                }
                 const data = {
                     id: book._id,
                     title: book.title,
                     author: book.author,
                     details: book.details,
+                    image: book.image,
                     isbn: book.ISBN,
                     categories: book.categories,
                     rating: book.rating

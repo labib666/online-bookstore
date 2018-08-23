@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const raccoon = require('raccoon');
+const axios = require('axios');
 
 const Book = require('../models/Book');
 const Category = require('../models/Category');
@@ -70,6 +71,61 @@ const fetchBookProfile = (book_id) => {
     });
 };
 
+/**
+ * Get profile image for a given isbn
+ * @param {string} isbn
+ */
+const getGoogleBookProfile = (isbn) => {
+    return new Promise( (resolve,reject) => {
+        const api_key = process.env.GOOGLE_BOOKS_API_KEY;
+        const req_uri = 'https://www.googleapis.com/books/v1/volumes'
+                        +'?q=isbn:'+isbn
+                        +'&key='+api_key;
+        axios.get(req_uri)
+            .then( (response) => {
+                const data = response.data;
+                if (data.totalItems < 1) {
+                    reject(createError(422,'\'ISBN\' must have a valid ISBN 10 value'));
+                } else {
+                    let bestItem = data.items[0];
+                    if (!('volumeInfo' in bestItem)) {
+                        bestItem.volumeInfo = {};
+                    }
+                    if (!('description' in bestItem.volumeInfo)) {
+                        bestItem.volumeInfo.description = '';
+                    }
+                    bestItem = bestItem.volumeInfo;
+                    data.items.forEach( (item) => {
+                        if (!('volumeInfo' in item)) {
+                            item.volumeInfo = {};
+                        }
+                        if (!('description' in item.volumeInfo)) {
+                            item.volumeInfo.description = '';
+                        }
+                        if ( ('searchInfo' in item) && ('textSnippet' in item.searchInfo) && 
+                            item.volumeInfo.description.length < item.searchInfo.textSnippet.length) {
+                            item.volumeInfo.description = item.searchInfo.textSnippet;
+                        }
+                        if (item.volumeInfo.description.length 
+                            > bestItem.description.length) {
+                            bestItem = item.volumeInfo;
+                        }
+                    });
+                    if (!('imageLinks' in bestItem)) {
+                        bestItem.imageLinks = {};
+                    }
+                    if (!('thumbnail' in bestItem.imageLinks)) {
+                        bestItem.imageLinks.thumbnail = 'https://api.adorable.io/avatars/285/'+isbn;
+                    }
+                    resolve(bestItem);
+                }
+            })
+            .catch( (err) => {
+                reject(err);
+            });
+    });
+};
+
 const BookController = {
 
     /**
@@ -131,29 +187,38 @@ const BookController = {
         const title = req.body.title;
         const author = req.body.author;
         const ISBN = req.body.ISBN;
-        const details = req.body.details;
-
-        Book.findOne({ ISBN: ISBN })
-            .then( (book) => {
-                // same book exists
-                if (book) {
-                    return next(createError(409,'book already in collection'));
+        let details = req.body.details;
+        getGoogleBookProfile(ISBN)
+            .then( (item) => {
+                const image = item.imageLinks.thumbnail;
+                if (details.length === 0) {
+                    details = item.description;
                 }
-
-                // duplicate does not exist. create new book
-                Book.create({
-                    title: title,
-                    author: author,
-                    ISBN: ISBN,
-                    details: details
-                })
-                    .then( (newBook) => {
-                        // new book created
-                        // send back the book id
-                        res.status(200).json({
-                            message: 'book successfully added',
-                            book: newBook._id
-                        });
+                Book.findOne({ ISBN: ISBN })
+                    .then( (book) => {
+                        // same book exists
+                        if (book) {
+                            return next(createError(409,'book already in collection'));
+                        }
+                        // duplicate does not exist. create new book
+                        Book.create({
+                            title: title,
+                            author: author,
+                            ISBN: ISBN,
+                            details: details,
+                            image: image
+                        })
+                            .then( (newBook) => {
+                                // new book created
+                                // send back the book id
+                                res.status(200).json({
+                                    message: 'book successfully added',
+                                    book: newBook._id
+                                });
+                            })
+                            .catch( (err) => {
+                                return next(err);
+                            });
                     })
                     .catch( (err) => {
                         return next(err);
@@ -220,14 +285,23 @@ const BookController = {
                 targetBook.title = req.body.title;
                 targetBook.author = req.body.author;
                 targetBook.details = req.body.details;
-                
-                // save changed data in database
-                targetBook.save()
-                    .then( (updatedBook) => {
-                        res.status(200).json({
-                            message: 'book updated successfully',
-                            book: updatedBook._id
-                        });
+                getGoogleBookProfile(targetBook.ISBN)
+                    .then( (item) => {
+                        // save changed data in database
+                        targetBook.image = item.imageLinks.thumbnail;
+                        if (targetBook.details.length === 0) {
+                            targetBook.details = item.description;
+                        }
+                        targetBook.save()
+                            .then( (updatedBook) => {
+                                res.status(200).json({
+                                    message: 'book updated successfully',
+                                    book: updatedBook._id
+                                });
+                            })
+                            .catch( (err) => {
+                                return next(err);
+                            });
                     })
                     .catch( (err) => {
                         return next(err);
@@ -319,7 +393,7 @@ const BookController = {
         const targetUserID = req.user._id;
 
         // ask raccoon for recoms
-        raccoon.recommendFor(targetUserID, 5)
+        raccoon.recommendFor(targetUserID, 3)
             .then( (results) => {
                 getBookProfiles(results)
                     .then( (books) => {

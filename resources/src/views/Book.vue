@@ -78,9 +78,13 @@ export default {
         this.book.id = this.$route.params.id;
         this.$http.get(`/books/${this.book.id}`).then((response) => {
             const book = response.data.book;
+            if (!('image' in book)) {
+                book.image = 'https://api.adorable.io/avatars/60/' + book.ISBN;
+            }
             this.book.title = book.title;
             this.book.author = book.author;
             this.book.details = book.details;
+            this.book.image = book.image;
             this.book.isbn = book.ISBN;
             this.book.categories = book.categories;
             this.book.rating = book.rating;
