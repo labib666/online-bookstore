@@ -63,9 +63,6 @@ export default {
             this.$http.get(`/books/category/${this.category}`).then((response) => {
                 this.books = [];
                 response.data.books.forEach((book) => {
-                    if (!('image' in book)) {
-                        book.image = 'https://api.adorable.io/avatars/60/' + book.ISBN;
-                    }
                     const data = {
                         id: book._id,
                         title: book.title,

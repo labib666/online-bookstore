@@ -7,9 +7,6 @@
                         <div class="d-flex">
                             <div class="flex-grow-1">
                                 <h4>{{ book.title }}</h4>
-                                <div>
-                                    <img :src="book.image" />
-                                </div>
                                 <div v-if="book.rating">
                                     <span class="text-muted">
                                         <small>{{ book.rating.count }} users</small>
@@ -30,9 +27,27 @@
                     </div>
                 </router-link>
                 <div class="card-text">
-                    <p>{{ book.details }}</p>
-                    <small>Author: {{ book.author }} &bull; ISBN: {{ book.isbn }}</small>
+                    <small><span class="text-muted">by</span> {{ book.author }} &bull; <span class="text-muted">ISBN:</span> {{ book.isbn }}</small>
                     <hr />
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <div v-if="book.details">{{ book.details }}</div>
+                            <div v-if="!book.details">
+                                <span class="text-muted">
+                                    No description yet.
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="width: 100px;">
+                                <div v-if="!book.image">
+                                    <i class="far fa-4x fa-file-image d-block" />
+                                    <small class="text-muted">No image available</small>
+                                </div>
+                                <img v-if="book.image" :src="book.image" height="160px" width="100px" />
+                            </div>
+                        </div>
+                    </div>
                     <button v-for="category in book.categories" :key="category" class="btn btn-primary category" @click="goToCategory(category)">{{category}}</button>
                 </div>
             </div>

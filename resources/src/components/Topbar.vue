@@ -6,7 +6,7 @@
             </div>
             <div class="right">
                 <div class="mr-2">
-                    <img :src="`https://www.gravatar.com/avatar/${emailHash}?s=40&d=${defaultURL}`" style="border-radius: 10%" />
+                    <img :src="`https://www.gravatar.com/avatar/${emailHash}?s=40&d=mp`" style="border-radius: 50%" />
                     {{ user.name }}
                 </div>
                 <form class="mr-2" @submit.prevent="searchBooks">
@@ -39,10 +39,6 @@ export default {
 
         emailHash () {
             return md5(this.user.email);
-        },
-
-        defaultURL () {
-            return encodeURIComponent('https://api.adorable.io/avatars/40/' + this.user._id);
         }
     },
 
@@ -53,7 +49,6 @@ export default {
 
         searchBooks () {
             if (this.query.length === 0) return;
-            // console.log('path is', `/books/search/${this.query}`);
             this.$router.push(`/books/search/${this.query}`);
             this.query = '';
         }
