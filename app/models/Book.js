@@ -8,7 +8,8 @@ var BookSchema = new mongoose.Schema({
         type: String,
         unique: true,
         dropDups: true
-    }
+    },
+    details: String
 });
 
 BookSchema.index({

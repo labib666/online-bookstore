@@ -131,6 +131,7 @@ const BookController = {
         const title = req.body.title;
         const author = req.body.author;
         const ISBN = req.body.ISBN;
+        const details = req.body.details;
 
         Book.findOne({ ISBN: ISBN })
             .then( (book) => {
@@ -143,7 +144,8 @@ const BookController = {
                 Book.create({
                     title: title,
                     author: author,
-                    ISBN: ISBN
+                    ISBN: ISBN,
+                    details: details
                 })
                     .then( (newBook) => {
                         // new book created
@@ -217,6 +219,7 @@ const BookController = {
             .then( (targetBook) => {
                 targetBook.title = req.body.title;
                 targetBook.author = req.body.author;
+                targetBook.details = req.body.details;
                 
                 // save changed data in database
                 targetBook.save()

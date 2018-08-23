@@ -140,15 +140,16 @@ const AuthController = {
         },
         addBook: () => {
             return [
-                v.title(), v.author(), v.ISBN(), validationPassCheck,
-                s('title'), s('author'), s('ISBN')
+                v.title(), v.author(), v.ISBN(), v.details(), validationPassCheck,
+                s('title'), s('author'), s('ISBN'), s_isbn(), s('details'),
+                v.ISBN(), validationPassCheck
             ];
         },
         updateBook: () => {
             return [
                 vs.bookUpdate,
-                v.title(), v.author(), validationPassCheck,
-                s('title'), s('author')
+                v.title(), v.author(), v.details(), validationPassCheck,
+                s('title'), s('author'), s('details')
             ];
         },
         category: () => {
@@ -344,6 +345,11 @@ const vs = {
                     req.body.author = targetBook.author;
                 }
 
+                // bind details to body
+                if (!('details' in req.body)) {
+                    req.body.details = targetBook.details;
+                }
+
                 next();
             })
             .catch( (err) => {
@@ -416,6 +422,17 @@ const vs = {
 const s = (field) => {
     return sanitize(field).trim();
 };
+/**
+ * Simple sanitizer method for ISBN Field
+ * Cleans unnecessary hyphenation
+ */
+const s_isbn = () => {
+    return sanitize('ISBN').customSanitizer( (value) => {
+        let finalISBN = value.replace(/([^0-9X])*/g,'');
+        
+        return finalISBN;
+    });
+};
 
 /**
  * Different purpose validator chains
@@ -477,6 +494,12 @@ const v = {
             .exists().withMessage('body must have a \'ISBN\' field')
             .not().isEmpty().withMessage('\'ISBN\' field must be non empty')
             .isISBN(10).withMessage('\'ISBN\' must have a ISBN 10 value');
+    },
+    // validate the book details
+    details: () => {
+        return check('details')
+            .exists().withMessage('body must have a \'details\' field')
+            .not().isEmpty().withMessage('\'details\' field must be non empty');
     },
     // validate the category-name
     category_name: () => {
