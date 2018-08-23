@@ -188,7 +188,7 @@ const BookController = {
         const author = req.body.author;
         const ISBN = req.body.ISBN;
         let details = req.body.details;
-        this.getGoogleBookProfile(ISBN)
+        getGoogleBookProfile(ISBN)
             .then( (item) => {
                 const image = item.imageLinks.thumbnail;
                 if (details.length === 0) {
@@ -285,7 +285,7 @@ const BookController = {
                 targetBook.title = req.body.title;
                 targetBook.author = req.body.author;
                 targetBook.details = req.body.details;
-                this.getGoogleBookProfile(targetBook.ISBN)
+                getGoogleBookProfile(targetBook.ISBN)
                     .then( (item) => {
                         // save changed data in database
                         targetBook.image = item.imageLinks.thumbnail;
@@ -411,8 +411,7 @@ const BookController = {
             });
     },
 
-    getBookProfiles,
-    getGoogleBookProfile
+    getBookProfiles
 };
 
 module.exports = BookController;

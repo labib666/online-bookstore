@@ -2,6 +2,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const mock = require('mock-require');
 
+const axios = require('axios');
 const Book = require('../../app/models/Book');
 const BC = require('../../app/controllers/BookController');
 
@@ -42,6 +43,25 @@ describe('Test for BookController:addBook', function () {
 
     // before each test
     beforeEach( function (done) {
+        sandbox.stub(axios, 'get').resolves({
+            data: {
+                totalItems: 1,
+                items: [
+                    {
+                        volumeInfo: {
+                            imageLinks: {
+                                thumbnail: 'some url',
+                            },
+                            description: 'some more details'
+                        },
+                        searchInfo: {
+                            textSnippet: 'some other detail'
+                        }
+                    }
+                ]
+            }
+        });
+        
         req = {
             user: {
                 isModerator: true
@@ -58,16 +78,6 @@ describe('Test for BookController:addBook', function () {
             json: resJsonSpy
         };
         resStatusSpy = sandbox.stub().returns(res);
-        sandbox.stub(BC,'getGoogleBookProfile').callsFake(() => {
-            return new Promise(resolve => {
-                resolve({
-                    imageLinks: {
-                        thumbnail: 'some url',
-                    },
-                    description: 'some more details'
-                });
-            });
-        });
         nextSpy =  sandbox.spy();
         done();
     });
