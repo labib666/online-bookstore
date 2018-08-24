@@ -1,12 +1,36 @@
 const sinon = require('sinon');
 const chai = require('chai');
 const bcrypt = require('bcrypt');
+const mock = require('mock-require');
 
 const User = require('../../app/models/User');
 const UC = require('../../app/controllers/UserController');
 
 let sandbox = sinon.createSandbox();
 let expect = chai.expect;
+
+mock('raccoon', {
+    liked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('liked '+a+' '+b);
+        });
+    },
+    unliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('unliked '+a+' '+b);
+        });
+    },
+    disliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('disliked '+a+' '+b);
+        });
+    },
+    undisliked: function(a,b) {
+        return new Promise(resolve => {
+            resolve('undisliked '+a+' '+b);
+        });
+    }
+});
 
 describe('Test for UserController:register', function () { 
     let req, res, resJsonSpy, resStatusSpy, nextSpy;
