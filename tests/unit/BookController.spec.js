@@ -50,7 +50,7 @@ describe('Test for BookController:addBook', function () {
                     {
                         volumeInfo: {
                             imageLinks: {
-                                thumbnail: 'some url',
+                                thumbnail: 'some other url',
                             },
                             description: 'some more details'
                         },
@@ -70,6 +70,7 @@ describe('Test for BookController:addBook', function () {
                 title: 'test name',
                 author: 'testname',
                 ISBN: '0123456789',
+                image: 'some url',
                 details: 'some details'
             }
         };
