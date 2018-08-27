@@ -140,16 +140,16 @@ const AuthController = {
         },
         addBook: () => {
             return [
-                v.title(), v.author(), v.ISBN(), v.details(), validationPassCheck,
-                s('title'), s('author'), s('ISBN'), s_isbn(), s('details'),
+                v.title(), v.author(), v.ISBN(), v.details(), v.image(), validationPassCheck,
+                s('title'), s('author'), s('ISBN'), s_isbn(), s('details'), s('image'),
                 v.ISBN(), validationPassCheck
             ];
         },
         updateBook: () => {
             return [
                 vs.bookUpdate,
-                v.title(), v.author(), v.details(), validationPassCheck,
-                s('title'), s('author'), s('details')
+                v.title(), v.author(), v.details(), v.image(), validationPassCheck,
+                s('title'), s('author'), s('details'), s('image')
             ];
         },
         category: () => {
@@ -354,6 +354,11 @@ const vs = {
                         req.body.details = '';
                 }
 
+                // bind the image to body
+                if (!('image' in req.body)) {
+                    req.body.image = targetBook.image;
+                }
+
                 next();
             })
             .catch( (err) => {
@@ -503,6 +508,11 @@ const v = {
     details: () => {
         return check('details')
             .exists().withMessage('body must have a \'details\' field');
+    },
+    // validate the book image
+    image: () => {
+        return check('image')
+            .exists().withMessage('body must have a \'image\' field');
     },
     // validate the category-name
     category_name: () => {
