@@ -58,6 +58,7 @@ export default {
                 title: this.title,
                 author: this.author,
                 details: this.details,
+                image: '',
                 ISBN: this.isbn
             }).then((res) => {
                 const bookID = res.data.book;

@@ -85,7 +85,12 @@ const getGoogleBookProfile = (isbn) => {
             .then( (response) => {
                 const data = response.data;
                 if (data.totalItems < 1) {
-                    reject(createError(422,'\'ISBN\' must have a valid ISBN 10 value'));
+                    resolve({
+                        imageLinks: {
+                            thumbnail: '',
+                        },
+                        description: ''
+                    });
                 } else {
                     let bestItem = data.items[0];
                     if (!('volumeInfo' in bestItem)) {
@@ -115,7 +120,7 @@ const getGoogleBookProfile = (isbn) => {
                         bestItem.imageLinks = {};
                     }
                     if (!('thumbnail' in bestItem.imageLinks)) {
-                        bestItem.imageLinks.thumbnail = 'https://api.adorable.io/avatars/285/'+isbn;
+                        bestItem.imageLinks.thumbnail = '';
                     }
                     resolve(bestItem);
                 }
@@ -165,7 +170,7 @@ const BookController = {
      * Creates new book
      * Returns new book id
      * Expects: {
-     *      body:   title, author, isbn
+     *      body:   title, author, isbn, details, image
      *      header: bearer-token
      * }
      * Responds: {
@@ -188,9 +193,12 @@ const BookController = {
         const author = req.body.author;
         const ISBN = req.body.ISBN;
         let details = req.body.details;
+        let image = req.body.image;
         getGoogleBookProfile(ISBN)
             .then( (item) => {
-                const image = item.imageLinks.thumbnail;
+                if (image.length === 0) {
+                    image = item.imageLinks.thumbnail;
+                }
                 if (details.length === 0) {
                     details = item.description;
                 }
@@ -288,7 +296,9 @@ const BookController = {
                 getGoogleBookProfile(targetBook.ISBN)
                     .then( (item) => {
                         // save changed data in database
-                        targetBook.image = item.imageLinks.thumbnail;
+                        if (targetBook.image.length === 0) {
+                            targetBook.image = item.imageLinks.thumbnail;
+                        }
                         if (targetBook.details.length === 0) {
                             targetBook.details = item.description;
                         }
