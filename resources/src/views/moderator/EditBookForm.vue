@@ -11,6 +11,13 @@
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Image URL:</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" v-model="image" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Details:</label>
                         <div class="col-sm-8">
                             <textarea class="form-control" v-model="details" />
@@ -70,6 +77,7 @@ export default {
         return {
             id: '',
             title: '',
+            image: '',
             author: '',
             details: '',
             isbn: '',
@@ -83,6 +91,7 @@ export default {
         this.$http.get(`/books/${this.id}`).then((response) => {
             const book = response.data.book;
             this.title = book.title;
+            this.image = book.image;
             this.author = book.author;
             this.details = book.details;
             this.isbn = book.ISBN;
@@ -94,6 +103,7 @@ export default {
         save () {
             this.$http.patch(`/books/${this.id}`, {
                 title: this.title,
+                image: this.image,
                 author: this.author,
                 details: this.details
             }).then((res) => {

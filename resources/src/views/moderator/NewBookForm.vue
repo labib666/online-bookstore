@@ -14,6 +14,13 @@
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Image URL:</label>
+                            <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="image" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Details:</label>
                         <div class="col-sm-10">
                             <textarea class="form-control" rows="5" v-model="details"></textarea>
@@ -46,6 +53,7 @@ export default {
     data () {
         return {
             title: '',
+            image: '',
             author: '',
             details: '',
             isbn: ''
@@ -58,7 +66,7 @@ export default {
                 title: this.title,
                 author: this.author,
                 details: this.details,
-                image: '',
+                image: this.image,
                 ISBN: this.isbn
             }).then((res) => {
                 const bookID = res.data.book;

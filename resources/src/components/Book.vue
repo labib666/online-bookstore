@@ -31,7 +31,7 @@
                     <hr />
                     <div class="d-flex">
                         <div class="flex-grow-1">
-                            <div v-if="book.details">{{ book.details }}</div>
+                            <div v-if="book.details">{{ summary }}</div>
                             <div v-if="!book.details">
                                 <span class="text-muted">
                                     No description yet.
@@ -59,7 +59,10 @@
 import { mapState } from 'vuex';
 import StarRatings from '@/components/StarRatings';
 export default {
-    props: ['book'],
+    props: [
+        'book',
+        'compact'
+    ],
 
     components: {
         StarRatings
@@ -68,7 +71,11 @@ export default {
     computed: {
         ...mapState([
             'user'
-        ])
+        ]),
+        summary () {
+            if (this.compact) return this.book.details.substr(0, 300) + (this.book.details.length > 300 ? ' ...' : '');
+            return this.book.details;
+        }
     },
 
     methods: {
