@@ -37,6 +37,11 @@
             <router-link tag="li" to="/moderator">Moderator panel</router-link>
         </div>
         <slot></slot>
+
+        <div id="privacy">
+            <hr />
+            <router-link tag="li" to="/privacy">Privacy policy</router-link>
+        </div>
     </div>
 </template>
 

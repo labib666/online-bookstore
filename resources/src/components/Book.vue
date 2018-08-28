@@ -40,11 +40,11 @@
                         </div>
                         <div>
                             <div style="width: 100px;">
-                                <div v-if="book.image.length === 0">
+                                <div v-if="!book.image || book.image.length === 0">
                                     <i class="far fa-4x fa-file-image d-block" />
                                     <small class="text-muted">No image available</small>
                                 </div>
-                                <img v-if="book.image" :src="book.image" height="160px" width="100px" />
+                                <img v-if="book.image && book.image.length" :src="book.image" height="160px" width="100px" />
                             </div>
                         </div>
                     </div>

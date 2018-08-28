@@ -11,6 +11,7 @@ import SearchBooks from './pages/SearchBooks';
 import BooksByCategory from './pages/BooksByCategory';
 import Books from './pages/Books';
 import Book from './pages/Book';
+import Privacy from './pages/Privacy';
 import NotFound from './pages/NotFound';
 
 Vue.use(Router);
@@ -66,6 +67,10 @@ export default new Router({
             path: '/books/:id',
             name: 'book',
             component: Book
+        },
+        {
+            path: '/privacy',
+            component: Privacy
         },
         {
             path: '/*',
