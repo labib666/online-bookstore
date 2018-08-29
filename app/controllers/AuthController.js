@@ -356,7 +356,7 @@ const vs = {
 
                 // bind the image to body
                 if (!('image' in req.body)) {
-                    req.body.image = targetBook.image;
+                    req.body.image = (targetBook.image) ? targetBook.image : '';
                 }
 
                 next();
