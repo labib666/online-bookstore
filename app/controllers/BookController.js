@@ -293,6 +293,7 @@ const BookController = {
                 targetBook.title = req.body.title;
                 targetBook.author = req.body.author;
                 targetBook.details = req.body.details;
+                targetBook.image = req.body.image;
                 getGoogleBookProfile(targetBook.ISBN)
                     .then( (item) => {
                         // save changed data in database
