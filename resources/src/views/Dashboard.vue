@@ -11,7 +11,7 @@
             </div>
             <div class="row mr-0 mb-5">
                 <div v-for="book in recommended" :key="book.id" class="col-lg-6 col-xl-4">
-                    <Book :book="book" />
+                    <Book :book="book" :compact="true" />
                 </div>
             </div>
             <div class="row mr-0">

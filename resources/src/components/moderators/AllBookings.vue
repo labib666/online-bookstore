@@ -6,7 +6,7 @@
                 <div class="card-text">
                     <h1>Pending for reviews</h1>
                     <hr />
-                    <div v-if="pending.length === 0">You haven't booked any book yet</div>
+                    <div v-if="pending.length === 0">No pending booking request yet.</div>
                     <div v-for="booking in pending" :key="booking.id">
                         <div class="clearfix">
                             <div class="float-left">
@@ -27,6 +27,8 @@
             <div class="card-body approved-booking">
                 <div class="card-text">
                     <h1>Approved</h1>
+                    <hr />
+                    <div v-if="approved.length === 0">No approved booking request yet.</div>
                     <div v-for="booking in approved" :key="booking.id" class="clearfix">
                         <div class="float-left">
                             {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} of
@@ -40,6 +42,8 @@
             <div class="card-body cancelled-booking">
                 <div class="card-text">
                     <h1>Cancelled</h1>
+                    <hr />
+                    <div v-if="cancelled.length === 0">No cancelled booking request has been cancelled.</div>
                     <div v-for="booking in cancelled" :key="booking.id">
                         {{booking.user.name}}'s request for {{ booking.quantity }} cop{{ booking.quantity > 1 ? 'ies' : 'y' }} of
                         <router-link :to="'/books/' + booking.book.id">{{ booking.book.title }}</router-link>  has been cancelled
