@@ -160,6 +160,38 @@
         "isAdmin": false
     }
 ```
+# GET /users/search
+
++ Request (application/json)
+   
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+    ```
+     ```json
+    {
+        "query": "Harry Potter"
+    }
+    ```
+  
+
+
++ Response (application/json)
+
+```json
+    {
+        "user": {
+        "_id": "5b86d7a42cc152178092fee3",
+        "name": "test two",
+        "username": "test02",
+        "email": "test02@test.com",
+        "isModerator": false,
+        "__v": 0,
+        "isAdmin": false
+    }
+```
+
 
 
 
