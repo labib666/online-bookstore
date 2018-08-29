@@ -54,3 +54,37 @@
         "username": "testuser"
     }
 ```
+# POST /social/google
+
++ Request (application/json)
+
+```json
+    {
+        "id_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    }
+```
++ Response (application/json)
+
+```json
+    {
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    }
+```
+# POST /social/facebook
+
++ Request (application/json)
+
+```json
+    {
+        "id_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    }
+```
++ Response (application/json)
+
+```json
+    {
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    }
+```
+
+
