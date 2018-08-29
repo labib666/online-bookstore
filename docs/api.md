@@ -181,7 +181,7 @@
 
 ```json
     {
-        "user": {
+        "user": 
         "_id": "5b86d7a42cc152178092fee3",
         "name": "test two",
         "username": "test02",
@@ -191,6 +191,34 @@
         "isAdmin": false
     }
 ```
+# GET /logout
+
++ Request (application/json)
+
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+    ```
+
++ Response (application/json)
+
+```json
+    
+       "bookings": 
+        {
+            "_id": "5b870ab92cc152178092fef5",
+            "user_id": "5b86d7a42cc152178092fee3",
+            "book_id": "5b646494b09cbd1327f17b78",
+            "quantity": 3,
+            "status": "pending",
+            "updatedAt": "2018-08-29T21:06:10.503Z",
+            "createdAt": "2018-08-29T21:06:01.985Z",
+            "__v": 0
+        }
+    
+```
+
 
 
 
