@@ -518,6 +518,41 @@
          "book": "5b878ae2854120229b6e1a6e"
     }
 ```
+# GET/api/books/:id/ratings
+
++ Request (application/json)
+   
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+    ```
+     ```json
+    {
+       "book._id":"5b646494b09cbd1327f17b78"
+    }
+    ```
+  
+
+
++ Response (application/json)
+
+```json
+    {"ratings": [
+        {
+            "_id": "5b870cca2cc152178092fef8",
+            "user_id": "5b86d7a42cc152178092fee3",
+            "book_id": "5b646494b09cbd1327f17b78",
+            "rating": 5,
+            "review": "",
+            "updatedAt": "2018-08-29T21:14:50.667Z",
+            "createdAt": "2018-08-29T21:14:50.667Z",
+            "__v": 0
+        }
+    ]
+}
+    }
+```
 
 
 
