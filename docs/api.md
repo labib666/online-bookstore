@@ -493,6 +493,31 @@
         "booking": "5b879ca9854120229b6e1a71"
     }
 ```
+# POST/api/books/:id/category
+
++ Request (application/json)
+   
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+    ```
+     ```json
+    {
+       "book._id":"5b878ae2854120229b6e1a6e",
+       "category_name":"Drama"
+    }
+    ```
+  
+
+
++ Response (application/json)
+
+```json
+    {
+         "book": "5b878ae2854120229b6e1a6e"
+    }
+```
 
 
 
