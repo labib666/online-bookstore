@@ -425,14 +425,45 @@
             ]
         }
         {
-            "_id": "5b646494b09cbd1327f17b78",
-            "title": "Harry Potter and the Sorcerer's Stone",
-            "author": "J.K. Rowling",
-            "ISBN": "0439554934",
+            "_id": "5b878ae2854120229b6e1a6e",
+            "title": "And the Mountains Echoed",
+            "author": "Khaled Hosseini",
+            "ISBN": "159463176X",
             "__v": 0,
-            "categories": [
-                "Fiction"
-            ]
+            "categories": []
+        }
+    ]
+    }
+```
+# GET/api/books/:id/booking
+
++ Request (application/json)
+   
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+    ```
+     ```json
+    {
+       "book._id":"5b878ae2854120229b6e1a6e"
+    }
+    ```
+  
+
+
++ Response (application/json)
+
+```json
+    {
+        "books": [
+       {
+            "_id": "5b878ae2854120229b6e1a6e",
+            "title": "And the Mountains Echoed",
+            "author": "Khaled Hosseini",
+            "ISBN": "159463176X",
+            "__v": 0,
+            "categories": []
         }
     ]
     }
