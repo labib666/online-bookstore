@@ -330,6 +330,38 @@
         "book": "5b878ae2854120229b6e1a6e"
     }
 ```
+# GET/api/books/:id
+
++ Request (application/json)
+   
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+    ```
+     ```json
+    {
+       "book._id":"5b878ae2854120229b6e1a6e"
+    }
+    ```
+  
+
+
++ Response (application/json)
+
+```json
+    {
+        "book": {
+        "_id": "5b878ae2854120229b6e1a6e",
+        "title": "And the Mountains Echoed",
+        "author": "Khaled Hosseini",
+        "ISBN": "159463176X",
+        "__v": 0,
+        "categories": []
+    }
+    }
+```
+
 
 
 
