@@ -468,6 +468,31 @@
     ]
     }
 ```
+# POST/api/books/:id/bookings
+
++ Request (application/json)
+   
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+    ```
+     ```json
+    {
+       "book._id":"5b878ae2854120229b6e1a6e",
+       "quantity":"5"
+    }
+    ```
+  
+
+
++ Response (application/json)
+
+```json
+    {
+        "booking": "5b879ca9854120229b6e1a71"
+    }
+```
 
 
 
