@@ -304,6 +304,33 @@
         ]
     }
 ```
+# POST/api/books
+
++ Request (application/json)
+   
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+    ```
+     ```json
+    {
+       "title":"And the mountains echoed",
+       "author":"Khaled Hossaini",
+       "ISBN":"159463176X"
+    }
+    ```
+  
+
+
++ Response (application/json)
+
+```json
+    {
+        "book": "5b878ae2854120229b6e1a6e"
+    }
+```
+
 
 
 
