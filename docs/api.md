@@ -1,3 +1,22 @@
+# POST /register
+
++ Request (application/json)
+
+```json
+    {
+        "name":"Test User",
+        "username": "testuser",
+        "password": "123456",
+        "email": "testexample@test.com"
+    }
+```
++ Response (application/json)
+
+```json
+    {
+        "user": "5b86d7a42cc152178092fee3"
+    }
+```
 # POST /login
 
 + Request (application/json)
@@ -205,17 +224,28 @@
 
 ```json
     {
-       "bookings": 
-        {
-            "_id": "5b870ab92cc152178092fef5",
-            "user_id": "5b86d7a42cc152178092fee3",
-            "book_id": "5b646494b09cbd1327f17b78",
-            "quantity": 3,
-            "status": "pending",
-            "updatedAt": "2018-08-29T21:06:10.503Z",
-            "createdAt": "2018-08-29T21:06:01.985Z",
-            "__v": 0
-        }
+       "bookings": [
+            {
+                "_id": "5b870ab92cc152178092fef5",
+                "user_id": "5b86d7a42cc152178092fee3",
+                "book_id": "5b646494b09cbd1327f17b78",
+                "quantity": 3,
+                "status": "pending",
+                "updatedAt": "2018-08-29T21:06:10.503Z",
+                "createdAt": "2018-08-29T21:06:01.985Z",
+                "__v": 0
+            },
+            {
+                "_id": "5b870ab92cc152178092fef6",
+                "user_id": "5b86d7a42cc152178092fee4",
+                "book_id": "5b646494b09cbd1327f17b74",
+                "quantity": 2,
+                "status": "approved",
+                "updatedAt": "2018-08-29T21:06:10.503Z",
+                "createdAt": "2018-08-29T21:06:01.985Z",
+                "__v": 0
+            }
+       ]
     }
 ```
 # GET /users/ratings
@@ -261,17 +291,17 @@
 ```json
     {
        "books": [
-        {
-            "_id": "5b646494b09cbd1327f17b78",
-            "title": "Harry Potter and the Sorcerer's Stone",
-            "author": "J.K. Rowling",
-            "ISBN": "0439554934",
-            "__v": 0,
-            "categories": [
-                "Fiction"
-            ]
-        }
-    ]
+            {
+                "_id": "5b646494b09cbd1327f17b78",
+                "title": "Harry Potter and the Sorcerer's Stone",
+                "author": "J.K. Rowling",
+                "ISBN": "0439554934",
+                "__v": 0,
+                "categories": [
+                    "Fiction"
+                ]
+            }
+        ]
     }
 ```
 

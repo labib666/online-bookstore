@@ -1,0 +1,3 @@
+● redis.service - Redis In-Memory Data Store
+   Loaded: loaded (/etc/systemd/system/redis.service; disabled; vendor preset: enabled)
+   Active: inactive (dead)
