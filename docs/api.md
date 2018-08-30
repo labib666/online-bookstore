@@ -361,6 +361,41 @@
     }
     }
 ```
+# GET/api/books/search
+
++ Request (application/json)
+   
+    + Headers
+
+    ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+    ```
+     ```json
+    {
+       "search":"Harry Potter and the Sorceror's Stone"
+    }
+    ```
+  
+
+
++ Response (application/json)
+
+```json
+    {
+        "books": [
+        {
+            "_id": "5b646494b09cbd1327f17b78",
+            "title": "Harry Potter and the Sorcerer's Stone",
+            "author": "J.K. Rowling",
+            "ISBN": "0439554934",
+            "__v": 0,
+            "categories": [
+                "Fiction"
+            ]
+        }
+    ]
+    }
+```
 
 
 
