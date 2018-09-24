@@ -1,0 +1,44 @@
+#main {
+    margin-top: $topbar-height;
+    padding-top: $default-padding;
+    margin-left: $sidebar-width;
+    padding-left: $default-padding;
+    transition: $default-transition;
+
+    &.toggle-full-width {
+        margin-left: 0px;
+    }
+
+    a, a:hover {
+        color: $dark-primary-color;
+        font-weight: 1000;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        color: $secondary-text-color;
+        background-color: $light-secondary-color;
+
+        &:hover {
+            background-color: $dark-secondary-color;
+        }
+    }
+
+    .btn-danger {
+        color: $tertiary-text-color;
+        background-color: $tertiary-color;
+        &:hover {
+            background-color: $dark-tertiary-color;
+        }
+    }
+}
+
+@media(max-width: 768px) {
+    // For mobile device
+    #main {
+        margin-left: 0px;
+        &.toggle-full-width {
+            margin-left: $sidebar-width;
+        }
+    }
+}

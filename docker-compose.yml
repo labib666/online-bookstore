@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+    web:
+        image: coffeemate/nodejs
+        ports:
+            - 8000:8000
+        volumes:
+            - .:/var/www/swe-ninjas/online-bookstore
+        working_dir: /var/www/swe-ninjas/online-bookstore
+        command: node app.js
+        depends_on:
+            - mongodb
+            - redisdb
+
+    mongodb:
+        image: mongo
+        restart: unless-stopped
+        environment:
+            MONGO_INITDB_DATABASE: online-bookstore
+
+    redisdb:
+        image: redis:4
+        command: [
+            "redis-server",
+            "--appendonly",
+            "yes"
+        ]
+        restart: unless-stopped

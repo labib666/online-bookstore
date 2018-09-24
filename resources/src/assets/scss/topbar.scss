@@ -1,0 +1,46 @@
+#topbar {
+    color: $secondary-text-color;
+    background-color: $primary-color;
+    min-width: 100vw;
+    max-width: 100vw;
+    min-height: $topbar-height;
+    max-height: $topbar-height;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: $default-padding;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 999;
+    box-shadow: 0px 1px 6px lighten($secondary-color, 20%);
+    transition: $default-transition;
+
+    a, a:hover {
+        color: $secondary-text-color;
+        text-decoration: none;
+        font-weight: 900;
+        padding-left: 5px;
+    }
+
+    .left {
+        cursor: pointer;
+        margin-left: $default-margin;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .right {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .brand, .brand:hover {
+        font-size: 20px;
+        padding-left: $default-padding;
+    }
+}

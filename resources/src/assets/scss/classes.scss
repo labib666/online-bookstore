@@ -1,0 +1,58 @@
+.full-height {
+    min-height: 80vh;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.center-content {
+    text-align: center;
+}
+
+.uppercase {
+    letter-spacing: .05rem;
+    text-transform: uppercase;
+}
+
+.social-auth {
+    padding-top: $default-padding;
+}
+
+.card {
+    margin: 10px;
+    border: 0px;
+    border-radius: 0px;
+    box-shadow: 1px 1px 5px 1px grey;
+}
+
+.invisible-link {
+    color: $primary-text-color !important;
+    font-weight: inherit !important;
+    text-decoration: none !important;
+}
+
+.cross {
+    color: $tertiary-color;
+    margin-left: 5px;
+}
+
+.category {
+    margin: 5px;
+    padding: 0px 10px;
+    border-radius: 10px !important;
+}
+
+.pending-booking {
+    background-color: lighten($secondary-color, 70%);
+}
+
+.approved-booking {
+    background-color: lighten($primary-color, 28%);
+}
+
+.cancelled-booking {
+    background-color: lighten($light-tertiary-color, 28%);
+}

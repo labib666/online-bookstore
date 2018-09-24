@@ -1,0 +1,32 @@
+image: coffeemate/nodejs
+
+stages:
+    - build
+    - test
+    - deploy
+
+build_app:
+    stage: build
+    script:
+        - yarn install
+        - cd resources && yarn install && cd ..
+        - yarn run build
+    artifacts:
+        expire_in: 1 week
+        untracked: true
+
+test_app:
+    stage: test
+    script:
+        - yarn run lint
+        - yarn run test
+        - cd resources
+        - yarn run lint
+        - yarn run test:unit
+
+deploy_production:
+    stage: deploy
+    script:
+        - dpl --provider=heroku --app=swe-bookstore --api-key=$HEROKU_STAGING_API_KEY
+    only:
+        - master

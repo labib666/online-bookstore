@@ -1,0 +1,40 @@
+{
+  "name": "online-bookstore",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@gitlab.com:swe-ninjas/online-bookstore.git",
+  "author": "Hasib <himuhasib@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ./",
+    "start": "nodemon --inspect app.js",
+    "build": "cd resources && yarn run build",
+    "test": "mocha ./tests/**/*.spec.js --timeout 10000 --exit",
+    "heroku-postbuild": "cd resources && yarn install --production=false && yarn run build"
+  },
+  "dependencies": {
+    "bcrypt": "^2.0.1",
+    "chalk": "^2.4.1",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "express-bearer-token": "^2.1.1",
+    "express-validator": "^5.2.0",
+    "google-auth-library": "^1.6.1",
+    "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.1.7",
+    "mongoose-timestamp": "^0.6.0",
+    "morgan": "^1.9.0",
+    "raccoon": "^0.2.8",
+    "randomstring": "^1.1.5",
+    "redis": "^2.8.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.19.1",
+    "mocha": "^5.2.0",
+    "mock-require": "^3.0.2",
+    "nodemon": "^1.17.5",
+    "sinon": "^6.1.4"
+  }
+}
