@@ -6,9 +6,9 @@
 
 A Software to keep track of book inventory, booking and suggestion for bookstore owners. 
 
-Live Demo: https://swe-bookstore.herokuapp.com/#/
-Project Wiki: https://github.com/labib666/online-bookstore/wiki
-Backend API: https://github.com/labib666/online-bookstore/blob/master/docs/api.md
+Live Demo: https://swe-bookstore.herokuapp.com/#/<br/>
+Project Wiki: https://github.com/labib666/online-bookstore/wiki<br/>
+Backend API: https://github.com/labib666/online-bookstore/blob/master/docs/api.md<br/>
 
 **Team:** 
 - Labib Md Rashid
